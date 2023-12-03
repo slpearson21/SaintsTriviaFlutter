@@ -11,7 +11,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Saints Trivia',
+      darkTheme: ThemeData.dark(),
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -22,9 +23,9 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.blueGrey,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Saints Trivia'),
     );
   }
 }
@@ -48,17 +49,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  bool otCheckState = false;
+  bool ntCheckState = false;
+  bool bomCheckState = false;
+  bool dcCheckState = false;
+  bool pgpCheckState = false;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  void startGame() {
+
   }
 
   @override
@@ -71,45 +69,96 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+      body: SizedBox.expand(
+        child: Container(
+          padding: const EdgeInsets.only(top: 25.0, left: 15.0, right: 15.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              const Text(
+                'Pick Your Trivia',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+              CheckboxListTile(
+                value: otCheckState,
+                onChanged: (bool? value) {
+                  setState(() {
+                    otCheckState = value!;
+                  });
+                },
+                title: const Text("Old Testament"),
+              ),
+              const Divider(
+                height: 10.0,
+              ),
+              CheckboxListTile(
+                value: ntCheckState,
+                onChanged: (bool? value) {
+                  setState(() {
+                    ntCheckState = value!;
+                  });
+                },
+                title: const Text("New Testament"),
+              ),
+              const Divider(
+                height: 10.0,
+              ),
+              CheckboxListTile(
+                value: bomCheckState,
+                onChanged: (bool? value) {
+                  setState(() {
+                    bomCheckState = value!;
+                  });
+                },
+                title: const Text("Book of Mormon"),
+              ),
+              const Divider(
+                height: 10.0,
+              ),
+              CheckboxListTile(
+                value: dcCheckState,
+                onChanged: (bool? value) {
+                  setState(() {
+                    dcCheckState = value!;
+                  });
+                },
+                title: const Text("Doctrine and Covenants"),
+              ),
+              const Divider(
+                height: 10.0,
+              ),
+              CheckboxListTile(
+                value: pgpCheckState,
+                onChanged: (bool? value) {
+                  setState(() {
+                    pgpCheckState = value!;
+                  });
+                },
+                title: const Text("Pearl of Great Price"),
+              ),
+              const Divider(
+                height: 20.0,
+              ),
+              ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(200, 50),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(2)),
+                    ),
+                  ),
+                  child: const Text(
+                    "GO!",
+                    style: TextStyle(fontSize: 20),
+                  ))
+            ],
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
