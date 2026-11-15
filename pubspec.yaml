@@ -67,6 +67,12 @@ flutter:
   # Offline question bank. The schema version is the directory name.
   assets:
     - assets/questions/v1/
+    # Open Book + Spark masters. The overlay scales these to the native
+    # splash size (192 dp, or 288 dp on Android 12+).
+    - assets/splash/splash-image-light-768.png
+    - assets/splash/splash-image-dark-768.png
+    - assets/splash/splash-android12-light-1152.png
+    - assets/splash/splash-android12-dark-1152.png
 
   # Source Serif 4 (SIL OFL, see assets/fonts/OFL.txt). The family name matches
   # the theme's SourceSerif4. Body and UI text omit a fontFamily so they use
