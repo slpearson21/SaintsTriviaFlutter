@@ -7,6 +7,7 @@
         <item name="android:windowDrawsSystemBarBackgrounds">false</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
         <item name="android:windowSplashScreenBackground">#0F1620</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">#0F1620</item>
         <!-- Not @drawable/android12splash. That name also exists without a
              night qualifier, and the splash icon loader can resolve the light
              artwork. On the navy background the navy mark is invisible, so

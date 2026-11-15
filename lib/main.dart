@@ -7,9 +7,14 @@ import 'app.dart';
 import 'data/questions/bundled_question_bank_loader.dart';
 import 'splash_fade.dart';
 
-Future<void> main() async {
+Future<void> main(List<String> args) async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  // Android passes SDK_INT as the first entrypoint argument.
+  final sdk = args.isEmpty ? null : int.tryParse(args.first);
+  if (sdk != null) {
+    setSplashAndroidSdkInt(sdk);
+  }
   holdSplashForHandoff();
   await prepareSplashHandoff();
   runApp(const ProviderScope(child: SaintsTriviaApp()));
