@@ -94,7 +94,7 @@ place_icon() {
     ls -la "$spring" >>"$NOTES" 2>&1 || true
     return 0
   fi
-  python3 - "$plist" "$BUNDLE_ID" "Trivia" | tee -a "$NOTES" <<'PY'
+  python3 - "$plist" "$BUNDLE_ID" "Trivia" <<'PY' | tee -a "$NOTES"
 import plistlib, sys
 path, bundle, name = sys.argv[1:]
 with open(path, "rb") as handle:

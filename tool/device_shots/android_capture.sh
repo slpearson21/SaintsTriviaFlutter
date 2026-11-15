@@ -18,7 +18,35 @@ log() { echo "$*" | tee -a "$NOTES"; }
 
 adb wait-for-device
 adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
+# Give System UI time to finish booting before we start taking shots.
+sleep 20
 log "emulator booted (api request $API, release $(adb shell getprop ro.build.version.release | tr -d '\r'))"
+
+dismiss_anr() {
+  local xml="$OUT/anr-check.xml"
+  adb shell uiautomator dump /sdcard/anr.xml >/dev/null 2>&1 || return 0
+  adb shell cat /sdcard/anr.xml >"$xml" 2>/dev/null || return 0
+  if ! grep -q "isn't responding" "$xml"; then
+    return 0
+  fi
+  log "dismissing an ANR dialog"
+  python3 - "$xml" <<'PY' || true
+import re, subprocess, sys
+text = open(sys.argv[1], encoding="utf-8", errors="ignore").read()
+match = re.search(r'text="Wait"[^>]*bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"', text)
+if not match:
+    match = re.search(r'bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"[^>]*text="Wait"', text)
+if not match:
+    sys.exit(1)
+x1, y1, x2, y2 = (int(v) for v in match.groups())
+subprocess.check_call(["adb", "shell", "input", "tap", str((x1 + x2) // 2), str((y1 + y2) // 2)])
+PY
+  sleep 2
+}
+
+for _ in 1 2 3 4 5; do
+  dismiss_anr || true
+done
 
 if [[ ! -f "$APK" ]]; then
   log "missing apk at $APK"
@@ -48,22 +76,33 @@ night() {
   sleep 2
 }
 
+app_focused() {
+  adb shell dumpsys window | tr -d '\r' | grep -m1 mCurrentFocus | grep -q "$PKG"
+}
+
 capture_run() {
   local night_mode="$1"
   local label="$2"
   adb shell am force-stop "$PKG" || true
   night "$night_mode"
-  adb shell am start -n "$ACT"
+  dismiss_anr || true
+  adb shell am start -W -n "$ACT" || true
   log "started $label"
-  sleep 2
+  local i
+  for i in 1 2 3 4 5 6 7 8 9 10; do
+    dismiss_anr || true
+    if app_focused; then
+      log "$label focused after ${i}s"
+      break
+    fi
+    sleep 1
+  done
   cap "launch-${label}.png"
-  if [[ "$HOLD_SECONDS" -gt 3 ]]; then
-    sleep $((HOLD_SECONDS - 3))
-  fi
+  sleep 3
   cap "mid-${label}.png"
-  sleep 4
+  sleep $((HOLD_SECONDS))
   cap "loaded-${label}.png"
-  sleep 2
+  sleep 3
   cap "settled-${label}.png"
 }
 
