@@ -6,11 +6,11 @@ import 'home_snapshot.dart';
 
 /// Opens setup with [settings] attached as go_router `extra`.
 ///
-/// Play again should eventually skip setup and start a shuffled game,
-/// the same path Results uses. The engine is not in this slice, so Home
-/// calls only this function. STRIV-11 can prefill setup from
-/// [LastGameSettings], or replace this function with a start-and-open
-/// `/game` path, without rewriting Home.
+/// Home's Play again still lands on setup, which is the screen-inventory
+/// path. Starting the dealt game — Results' Play again, or a restored
+/// `/game` — goes through the game route. That route reads
+/// [LastGameSettings] from `extra` only when `extra` is one, and otherwise
+/// uses the last settings on the home snapshot.
 void openPlayAgain(BuildContext context, LastGameSettings settings) {
   context.go(AppRoutes.setup, extra: settings);
 }

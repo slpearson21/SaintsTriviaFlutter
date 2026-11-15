@@ -1,6 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../game/game_launch.dart';
+import '../progress/home_providers.dart';
+import '../progress/home_snapshot.dart';
+import '../screens/content_load_error_screen.dart';
 import '../screens/game_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/results_screen.dart';
@@ -10,10 +14,26 @@ import '../screens/setup_screen.dart';
 import '../screens/stats_screen.dart';
 import 'routes.dart';
 
+/// Settings the game route will deal.
+///
+/// [state.extra] is read twice on purpose: it is a getter, so the `is`
+/// check does not promote it, and the cast runs only after that check.
+LastGameSettings? gameRouteSettings(Ref ref, GoRouterState state) {
+  final fromRoute = state.extra is LastGameSettings
+      ? state.extra as LastGameSettings
+      : null;
+  return gameSettingsFromRoute(fromRoute, ref.read(homeSnapshotProvider));
+}
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
     initialLocation: AppRoutes.home,
     routes: [
+      GoRoute(
+        path: AppRoutes.contentError,
+        name: AppRouteNames.contentError,
+        builder: (context, state) => const ContentLoadErrorScreen(),
+      ),
       GoRoute(
         path: AppRoutes.home,
         name: AppRouteNames.home,
@@ -27,7 +47,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'game',
             name: AppRouteNames.game,
-            builder: (context, state) => const GameScreen(),
+            redirect: (context, state) {
+              if (gameRouteSettings(ref, state) == null) return AppRoutes.setup;
+              return null;
+            },
+            builder: (context, state) {
+              return GameScreen(settings: gameRouteSettings(ref, state));
+            },
           ),
           GoRoute(
             path: 'results',
