@@ -1,0 +1,77 @@
+[
+  {
+    "id": "ot-0001",
+    "volume": "OT",
+    "reference": "Genesis 1:1",
+    "prompt": "According to the first verse of the Bible, what did God create in the beginning?",
+    "options": [
+      "The Garden of Eden",
+      "The heaven and the earth",
+      "Man and woman",
+      "The sun and the moon"
+    ],
+    "answerIndex": 1,
+    "explanation": "Genesis opens with God creating the heaven and the earth.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "ot-0002",
+    "volume": "OT",
+    "reference": "Genesis 2:8",
+    "prompt": "Eastward in what place did God plant a garden for Adam?",
+    "options": [
+      "Goshen",
+      "Shinar",
+      "Ur",
+      "Eden"
+    ],
+    "answerIndex": 3,
+    "explanation": "The Lord planted a garden eastward in Eden.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "ot-0003",
+    "volume": "OT",
+    "reference": "Genesis 2:19-20",
+    "prompt": "Who gave names to the cattle, the fowl, and every beast of the field?",
+    "options": [
+      "Adam",
+      "Noah",
+      "Seth",
+      "Eve"
+    ],
+    "answerIndex": 0,
+    "explanation": "The animals were brought to Adam to see what he would call them.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "ot-0004",
+    "volume": "OT",
+    "reference": "Genesis 4:2",
+    "prompt": "What was Abel's occupation?",
+    "options": [
+      "A builder of cities",
+      "A keeper of sheep",
+      "A hunter",
+      "A tiller of the ground"
+    ],
+    "answerIndex": 1,
+    "explanation": "Abel was a keeper of sheep, while Cain was a tiller of the ground.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "ot-0005",
+    "volume": "OT",
+    "reference": "Genesis 4:25",
+    "prompt": "Which son did Eve bear after the death of Abel?",
+    "options": [
+      "Enos",
+      "Seth",
+      "Jared",
+      "Enoch"
+    ],
+    "answerIndex": 1,
+    "explanation": "Eve named her son Seth, appointed instead of Abel.",
+    "reviewStatus": "draft"
+  }
+]

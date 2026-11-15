@@ -1,0 +1,77 @@
+[
+  {
+    "id": "nt-0001",
+    "volume": "NT",
+    "reference": "Matthew 1:20",
+    "prompt": "In Matthew 1, how did an angel of the Lord appear to Joseph?",
+    "options": [
+      "In the temple",
+      "By the river Jordan",
+      "On a mountain",
+      "In a dream"
+    ],
+    "answerIndex": 3,
+    "explanation": "The angel appeared unto Joseph in a dream.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "nt-0002",
+    "volume": "NT",
+    "reference": "Matthew 2:1",
+    "prompt": "In which town was Jesus born?",
+    "options": [
+      "Capernaum",
+      "Bethlehem of Judaea",
+      "Jerusalem",
+      "Nazareth"
+    ],
+    "answerIndex": 1,
+    "explanation": "Jesus was born in Bethlehem of Judaea in the days of Herod the king.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "nt-0003",
+    "volume": "NT",
+    "reference": "Matthew 2:11",
+    "prompt": "Which of these was NOT among the gifts the wise men presented?",
+    "options": [
+      "Silver",
+      "Myrrh",
+      "Frankincense",
+      "Gold"
+    ],
+    "answerIndex": 0,
+    "explanation": "The wise men presented gold, frankincense, and myrrh.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "nt-0004",
+    "volume": "NT",
+    "reference": "Matthew 2:14",
+    "prompt": "Where did Joseph take the young child and His mother to flee from Herod?",
+    "options": [
+      "Egypt",
+      "Galilee",
+      "Damascus",
+      "Samaria"
+    ],
+    "answerIndex": 0,
+    "explanation": "Joseph departed into Egypt by night.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "nt-0005",
+    "volume": "NT",
+    "reference": "Matthew 3:4",
+    "prompt": "What was John the Baptist's food in the wilderness?",
+    "options": [
+      "Manna",
+      "Bread and fish",
+      "Locusts and wild honey",
+      "Figs and dates"
+    ],
+    "answerIndex": 2,
+    "explanation": "His meat was locusts and wild honey.",
+    "reviewStatus": "draft"
+  }
+]

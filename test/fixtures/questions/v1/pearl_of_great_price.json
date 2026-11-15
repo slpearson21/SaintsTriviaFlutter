@@ -1,0 +1,77 @@
+[
+  {
+    "id": "pgp-0001",
+    "volume": "PGP",
+    "reference": "Moses 1:1",
+    "prompt": "Where was Moses when God spoke the words recorded in Moses 1?",
+    "options": [
+      "Caught up into an exceedingly high mountain",
+      "At the Red Sea",
+      "In Pharaoh's court",
+      "In the land of Midian at a well"
+    ],
+    "answerIndex": 0,
+    "explanation": "Moses was caught up into an exceedingly high mountain.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0002",
+    "volume": "PGP",
+    "reference": "Moses 1:4",
+    "prompt": "In Moses 1:4, God calls Moses what?",
+    "options": [
+      "My friend",
+      "My prophet",
+      "My servant",
+      "My son"
+    ],
+    "answerIndex": 3,
+    "explanation": "God said, Behold, thou art my son.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0003",
+    "volume": "PGP",
+    "reference": "Moses 1:12-13",
+    "prompt": "Who came tempting Moses after God's presence withdrew in Moses 1?",
+    "options": [
+      "Pharaoh",
+      "A false prophet",
+      "Satan",
+      "Korah"
+    ],
+    "answerIndex": 2,
+    "explanation": "Satan came tempting him, saying, Moses, son of man, worship me.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0004",
+    "volume": "PGP",
+    "reference": "Moses 1:21",
+    "prompt": "In whose name did Moses finally command Satan to depart?",
+    "options": [
+      "Aaron",
+      "Jehovah's angel",
+      "The Only Begotten",
+      "Abraham"
+    ],
+    "answerIndex": 2,
+    "explanation": "Moses commanded Satan in the name of the Only Begotten to depart.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0005",
+    "volume": "PGP",
+    "reference": "Moses 1:33",
+    "prompt": "In Moses 1:33, by whom did God say He created worlds without number?",
+    "options": [
+      "The Son, mine Only Begotten",
+      "The angels",
+      "Moses",
+      "Michael"
+    ],
+    "answerIndex": 0,
+    "explanation": "Worlds without number have I created by the Son, mine Only Begotten.",
+    "reviewStatus": "draft"
+  }
+]
