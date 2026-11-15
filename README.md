@@ -71,7 +71,7 @@ A release build skips questions that are not `approved`. Debug and profile build
 
 [`.github/workflows/ci.yml`](.github/workflows/ci.yml) has two checks. Draft pull requests skip both until they are marked ready for review. A skipped check still satisfies branch protection.
 
-**Analyze, test, and debug APK** runs on Linux for every pull request that changes the app, for every push to `main`, and for a manual run. A pull request that only changes Markdown (`**/*.md`), files under `docs/`, or CSV review files outside `assets/` skips this job. Anything under `assets/` is app content, including CSV or Markdown stored there, so those changes still run the Linux job.
+**Analyze, test, and debug APK** runs on Linux for every pull request that changes the app, for every push to `main`, and for a manual run. A pull request that only changes Markdown (`**/*.md`), files under `docs/`, or CSV review files outside `assets/` and `test/` skips this job. Anything under `assets/` is app content, and anything under `test/` is what this job runs, including CSV or Markdown in either tree.
 
 **iOS simulator build** runs on macOS only when one of these is true:
 

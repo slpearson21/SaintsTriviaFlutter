@@ -5,8 +5,8 @@
 # Writes docs_only and ios to stdout and, when set, to GITHUB_OUTPUT.
 #
 # docs_only: every changed file is Markdown, under docs/, or a CSV that is
-# not under assets/. assets/ is bundled (or is source art the app build
-# consumes), so a change there still runs the Linux job.
+# outside assets/ and test/. assets/ is bundled, and test/ is what the Linux
+# job runs, so a change in either tree still runs that job.
 # ios: any changed file can affect the iOS simulator build: ios/, the
 # pubspecs, workflow files, or native plugin config (Podfile, Podfile.lock,
 # *.podspec).
@@ -27,7 +27,7 @@ is_ios_path() {
 
 is_docs_path() {
   case "$1" in
-    assets/*)
+    assets/* | test/*)
       return 1
       ;;
     *.md | docs/* | *.csv)
@@ -97,6 +97,9 @@ self_test() {
   expect "asset json" false false "assets/questions/v1/old_testament.json"
   expect "asset png" false false "assets/icon/ios-master-1024.png"
   expect "asset markdown" false false "assets/fonts/OFL.md"
+  expect "test csv" false false "test/fixtures/questions/v1/extra.csv"
+  expect "test markdown" false false "test/README.md"
+  expect "readme and test csv" false false $'README.md\ntest/fixtures/bank.csv'
   expect "dart and readme" false false $'README.md\nlib/main.dart'
   expect "ios plist" false true "ios/Runner/Info.plist"
   expect "ios readme only" true true "ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md"
