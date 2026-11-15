@@ -9,12 +9,14 @@ typedef HomeClock = DateTime Function();
 
 final homeClockProvider = Provider<HomeClock>((ref) => DateTime.now);
 
-/// Stats snapshot and last-game settings for Home.
+/// Seam for the progress snapshot and last-game settings Home displays.
 ///
-/// Defaults to [HomeSnapshot.firstRun]. STRIV-16 replaces the body with
-/// a shared_preferences read and publishes [HomeSnapshot.firstRun] again
-/// after reset stats. Home only watches the value, so that swap does not
-/// change Home. This provider does not load the question bank.
+/// The value defaults to an in-memory [HomeSnapshot.firstRun]. STRIV-16
+/// replaces this body with the shared_preferences record: read it here,
+/// and publish [HomeSnapshot.firstRun] again after reset stats clears
+/// that record. Home only watches the value, so the persisted
+/// implementation does not change Home. This provider does not load the
+/// question bank.
 final homeSnapshotProvider = Provider<HomeSnapshot>(
   (ref) => const HomeSnapshot.firstRun(),
 );

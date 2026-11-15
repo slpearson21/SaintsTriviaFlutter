@@ -85,6 +85,76 @@ void main() {
       expect(formatLastGameDate(DateTime(2025, 11, 9), now), 'Nov 9, 2025');
       expect(formatLastGameDate(DateTime(2026, 11, 16), now), 'Nov 16');
     });
+
+    test('late evening yesterday stays yesterday the next morning', () {
+      final morning = DateTime(2026, 6, 15, 9);
+      expect(
+        formatLastGameDate(DateTime(2026, 6, 14, 23), morning),
+        'Yesterday',
+      );
+      expect(
+        formatLastGameDate(DateTime(2026, 6, 14, 20), morning),
+        'Yesterday',
+      );
+    });
+
+    test('a UTC timestamp from a late local evening is still yesterday', () {
+      final morning = DateTime(2026, 6, 15, 9);
+      final eleven = DateTime(2026, 6, 14, 23).toUtc();
+      final eight = DateTime(2026, 6, 14, 20).toUtc();
+      expect(eleven.isUtc, isTrue);
+      expect(eight.isUtc, isTrue);
+      expect(formatLastGameDate(eleven, morning), 'Yesterday');
+      expect(formatLastGameDate(eight, morning), 'Yesterday');
+    });
+
+    test('23 hours across midnight is still yesterday', () {
+      final morning = DateTime(2026, 6, 15, 9);
+      final played = morning.subtract(const Duration(hours: 23));
+      expect(morning.difference(played), const Duration(hours: 23));
+      expect(played.day, 14);
+      expect(formatLastGameDate(played, morning), 'Yesterday');
+    });
+
+    test('US spring-forward night keeps the calendar day', () {
+      // 2026-03-08 is the 23-hour day in America/Denver. Local midnights
+      // that night are 23 hours apart, so an elapsed-time gap reads as
+      // zero days. 11 PM and 8 PM local are still the previous calendar day
+      // the next morning.
+      final morning = DateTime(2026, 3, 9, 9);
+      expect(
+        formatLastGameDate(DateTime(2026, 3, 8, 23), morning),
+        'Yesterday',
+      );
+      expect(
+        formatLastGameDate(DateTime(2026, 3, 8, 20), morning),
+        'Yesterday',
+      );
+      expect(
+        formatLastGameDate(DateTime(2026, 3, 8, 1), DateTime(2026, 3, 8, 23)),
+        'Today',
+      );
+    });
+
+    test('US fall-back night keeps the calendar day', () {
+      // 2026-11-01 is the 25-hour day in America/Denver.
+      final morning = DateTime(2026, 11, 2, 9);
+      expect(
+        formatLastGameDate(DateTime(2026, 11, 1, 23), morning),
+        'Yesterday',
+      );
+      expect(
+        formatLastGameDate(DateTime(2026, 11, 1, 20), morning),
+        'Yesterday',
+      );
+      expect(
+        formatLastGameDate(
+          DateTime(2026, 11, 1, 1, 30),
+          DateTime(2026, 11, 1, 23),
+        ),
+        'Today',
+      );
+    });
   });
 
   group('play again subtitle', () {
@@ -235,7 +305,7 @@ void main() {
     expect(find.textContaining('Yesterday'), findsNothing);
   });
 
-  testWidgets('dark hero uses the container fill and a light pill', (
+  testWidgets('dark hero uses the container fill and a primary pill', (
     tester,
   ) async {
     tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
@@ -255,12 +325,162 @@ void main() {
     );
     expect(
       button.style?.backgroundColor?.resolve(const <WidgetState>{}),
-      darkScheme.onPrimaryContainer,
+      darkScheme.primary,
     );
     expect(
       button.style?.foregroundColor?.resolve(const <WidgetState>{}),
       darkScheme.onPrimary,
     );
+  });
+
+  testWidgets('returning home without a last game does not crash', (
+    tester,
+  ) async {
+    await pumpApp(
+      tester,
+      overrides: [
+        homeSnapshotProvider.overrideWith(
+          (ref) => const HomeSnapshot(
+            gamesPlayed: 4,
+            accuracyPercent: 50,
+            bestStreak: 2,
+          ),
+        ),
+      ],
+    );
+
+    expect(find.text('Welcome back!'), findsOneWidget);
+    expect(find.text('WELCOME'), findsNothing);
+    expect(find.text('Play again'), findsNothing);
+    expect(find.textContaining('Last game'), findsNothing);
+    expect(find.text('4'), findsOneWidget);
+    expect(find.text('50%'), findsOneWidget);
+    expect(find.text('2'), findsOneWidget);
+    expect(find.text('Your progress'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('play again and last game have spoken labels', (tester) async {
+    final handle = tester.ensureSemantics();
+    try {
+      await pumpApp(tester, overrides: _returning());
+
+      const playAgain =
+          'Play again, Book of Mormon, Doctrine and Covenants, 10 questions';
+      expect(find.bySemanticsLabel(playAgain), findsOneWidget);
+      expect(
+        tester.getSemantics(find.bySemanticsLabel(playAgain)),
+        matchesSemantics(
+          label: playAgain,
+          isButton: true,
+          hasTapAction: true,
+          textDirection: TextDirection.ltr,
+        ),
+      );
+      expect(
+        find.bySemanticsLabel('Book of Mormon · D&C · 10 questions'),
+        findsNothing,
+      );
+
+      const lastGame = 'Last game: 8 out of 10, yesterday';
+      expect(find.bySemanticsLabel(lastGame), findsOneWidget);
+      expect(
+        tester.getSemantics(find.bySemanticsLabel(lastGame)),
+        matchesSemantics(label: lastGame, textDirection: TextDirection.ltr),
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await pumpApp(tester, overrides: _returning(_nov9));
+      expect(
+        find.bySemanticsLabel('Play again, New Testament, 1 question'),
+        findsOneWidget,
+      );
+    } finally {
+      handle.dispose();
+    }
+  });
+
+  testWidgets('home titles and section labels are headers', (tester) async {
+    final handle = tester.ensureSemantics();
+    try {
+      await pumpApp(tester);
+
+      expect(
+        tester.getSemantics(find.text('Scripture Trivia')),
+        matchesSemantics(
+          label: 'Scripture Trivia',
+          isHeader: true,
+          textDirection: TextDirection.ltr,
+        ),
+      );
+      expect(
+        tester.getSemantics(find.text('Test your scripture knowledge')),
+        matchesSemantics(
+          label: 'Test your scripture knowledge',
+          isHeader: true,
+          textDirection: TextDirection.ltr,
+        ),
+      );
+      expect(
+        tester.getSemantics(find.text('How it works')),
+        matchesSemantics(
+          label: 'How it works',
+          isHeader: true,
+          textDirection: TextDirection.ltr,
+        ),
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await pumpApp(tester, overrides: _returning());
+      expect(
+        tester.getSemantics(find.text('Welcome back!')),
+        matchesSemantics(
+          label: 'Welcome back!',
+          isHeader: true,
+          textDirection: TextDirection.ltr,
+        ),
+      );
+      expect(
+        tester.getSemantics(find.text('Your progress')),
+        matchesSemantics(
+          label: 'Your progress',
+          isHeader: true,
+          textDirection: TextDirection.ltr,
+        ),
+      );
+    } finally {
+      handle.dispose();
+    }
+  });
+
+  testWidgets('home meets tap target and contrast guidelines', (tester) async {
+    final handle = tester.ensureSemantics();
+    addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+    try {
+      const guidelines = <AccessibilityGuideline>[
+        androidTapTargetGuideline,
+        iOSTapTargetGuideline,
+        labeledTapTargetGuideline,
+        textContrastGuideline,
+      ];
+      for (final brightness in Brightness.values) {
+        for (final firstRun in [true, false]) {
+          tester.platformDispatcher.platformBrightnessTestValue = brightness;
+          await tester.pumpWidget(const SizedBox.shrink());
+          await pumpApp(
+            tester,
+            overrides: _returning(
+              firstRun ? const HomeSnapshot.firstRun() : _yesterday,
+            ),
+          );
+          for (final guideline in guidelines) {
+            await expectLater(tester, meetsGuideline(guideline));
+          }
+        }
+      }
+    } finally {
+      handle.dispose();
+    }
   });
 
   testWidgets('start, stats, and settings open the existing routes', (

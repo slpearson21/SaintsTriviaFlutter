@@ -11,6 +11,12 @@ import '../progress/play_again.dart';
 import '../routing/routes.dart';
 import '../theme/st_theme.dart';
 
+/// Mockup inset that is not on the 4-pt grid.
+const _cardInset = 14.0;
+
+/// How-it-works rule starts at the copy: 16 pad + 36 icon + 16 gap.
+const _howItWorksDividerIndent = 68.0;
+
 /// Home hub. Reads [homeSnapshotProvider] and does not load the question bank.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -44,13 +50,12 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: StSpace.lg),
               const _EmptyStats(),
             ] else ...[
-              if (settings != null) _PlayAgainCard(settings: settings),
-              if (settings != null && lastGame != null)
+              if (settings != null) ...[
+                _PlayAgainCard(settings: settings),
                 const SizedBox(height: StSpace.lg),
-              if (lastGame != null) ...[
-                const _ProgressHeader(),
-                _ProgressCard(game: lastGame, snapshot: snapshot, now: now),
               ],
+              const _ProgressHeader(),
+              _ProgressCard(game: lastGame, snapshot: snapshot, now: now),
             ],
           ],
         ),
@@ -107,11 +112,14 @@ class _AndroidHomeBar extends StatelessWidget implements PreferredSizeWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    'Scripture Trivia',
-                    style: theme.textTheme.headlineSmall,
-                    softWrap: true,
-                    overflow: TextOverflow.clip,
+                  child: Semantics(
+                    header: true,
+                    child: Text(
+                      'Scripture Trivia',
+                      style: theme.textTheme.headlineSmall,
+                      softWrap: true,
+                      overflow: TextOverflow.clip,
+                    ),
                   ),
                 ),
                 const _HomeIconButton(
@@ -157,9 +165,12 @@ class _IosHomeHeader extends StatelessWidget {
           ],
         ),
         const SizedBox(height: StSpace.xxs),
-        Text(
-          'Scripture Trivia',
-          style: Theme.of(context).textTheme.headlineMedium,
+        Semantics(
+          header: true,
+          child: Text(
+            'Scripture Trivia',
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
         ),
       ],
     );
@@ -210,15 +221,12 @@ class _HomeHero extends StatelessWidget {
     final text = theme.textTheme;
     final gold = theme.extension<StColors>()!.gold;
     final light = theme.brightness == Brightness.light;
-    // Light fill is primary. Dark fill is primaryContainer, so the tonal
-    // pill cannot also use primaryContainer or it disappears into the hero.
-    // Dark keeps the same light pill: onPrimaryContainer on onPrimary text.
+    // Light hero is primary. Dark hero is primaryContainer, so the pill
+    // uses primary / onPrimary there and stays visible on that fill.
     final heroColor = light ? scheme.primary : scheme.primaryContainer;
     final onHero = light ? scheme.onPrimary : scheme.onPrimaryContainer;
     final subtitleColor = light ? scheme.primaryContainer : scheme.primary;
-    final buttonBackground = light
-        ? scheme.primaryContainer
-        : scheme.onPrimaryContainer;
+    final buttonBackground = light ? scheme.primaryContainer : scheme.primary;
     final buttonForeground = light
         ? scheme.onPrimaryContainer
         : scheme.onPrimary;
@@ -257,13 +265,19 @@ class _HomeHero extends StatelessWidget {
               ],
             ),
             const SizedBox(height: StSpace.xs),
-            Text(headline, style: text.headlineSmall?.copyWith(color: onHero)),
+            Semantics(
+              header: true,
+              child: Text(
+                headline,
+                style: text.headlineSmall?.copyWith(color: onHero),
+              ),
+            ),
             const SizedBox(height: StSpace.xs),
             Text(
               subtitle,
               style: text.bodyMedium?.copyWith(color: subtitleColor),
             ),
-            const SizedBox(height: StSpace.xs),
+            const SizedBox(height: StSpace.md),
             FilledButton(
               key: const Key('home-start-game'),
               style: FilledButton.styleFrom(
@@ -295,10 +309,13 @@ class _SectionLabel extends StatelessWidget {
         : theme.textTheme.labelMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           );
-    return Text(
-      material ? title : title.toUpperCase(),
-      semanticsLabel: title,
-      style: style,
+    return Semantics(
+      header: true,
+      child: Text(
+        material ? title : title.toUpperCase(),
+        semanticsLabel: title,
+        style: style,
+      ),
     );
   }
 }
@@ -346,7 +363,7 @@ class _HowItWorksCard extends StatelessWidget {
                 Divider(
                   height: StSpace.md,
                   thickness: 1,
-                  indent: 68,
+                  indent: _howItWorksDividerIndent,
                   color: scheme.outlineVariant,
                 ),
               _HowItWorksRow(step: _howItWorks[i]),
@@ -371,7 +388,7 @@ class _HowItWorksRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: StSpace.md),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ExcludeSemantics(
             child: SizedBox(
@@ -428,7 +445,12 @@ class _EmptyStats extends StatelessWidget {
         borderRadius: const BorderRadius.all(StRadius.lg),
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(StSpace.md, 14, StSpace.md, 14),
+        padding: const EdgeInsets.fromLTRB(
+          StSpace.md,
+          _cardInset,
+          StSpace.md,
+          _cardInset,
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -467,56 +489,66 @@ class _PlayAgainCard extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final text = theme.textTheme;
-    return Card(
-      key: const Key('home-play-again'),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => openPlayAgain(context, settings),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
-          child: Row(
-            children: [
-              ExcludeSemantics(
-                child: SizedBox(
-                  width: 44,
-                  height: 44,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: scheme.secondaryContainer,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: StIcon(
-                        Icons.replay_rounded,
-                        color: scheme.onSecondaryContainer,
+    final spoken = playAgainSemanticsLabel(settings);
+    return Semantics(
+      button: true,
+      label: spoken,
+      onTap: () => openPlayAgain(context, settings),
+      excludeSemantics: true,
+      child: Card(
+        key: const Key('home-play-again'),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => openPlayAgain(context, settings),
+          child: ExcludeSemantics(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                StSpace.md,
+                _cardInset,
+                StSpace.sm,
+                _cardInset,
+              ),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 44,
+                    height: 44,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: scheme.secondaryContainer,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: StIcon(
+                          Icons.replay_rounded,
+                          color: scheme.onSecondaryContainer,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Play again', style: text.titleMedium),
-                    Text(
-                      playAgainSubtitle(settings),
-                      style: text.bodyMedium?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
+                  const SizedBox(width: _cardInset),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Play again', style: text.titleMedium),
+                        Text(
+                          playAgainSubtitle(settings),
+                          style: text.bodyMedium?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: _cardInset),
+                  StIcon(
+                    Icons.chevron_right_rounded,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ],
               ),
-              const SizedBox(width: 14),
-              ExcludeSemantics(
-                child: StIcon(
-                  Icons.chevron_right_rounded,
-                  color: scheme.onSurfaceVariant,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -552,7 +584,7 @@ class _ProgressCard extends StatelessWidget {
     required this.now,
   });
 
-  final LastGameSummary game;
+  final LastGameSummary? game;
   final HomeSnapshot snapshot;
   final DateTime now;
 
@@ -598,33 +630,36 @@ class _ProgressCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [for (final stat in stats) Expanded(child: stat)],
               ),
-            const SizedBox(height: StSpace.sm),
-            Divider(height: 1, thickness: 1, color: scheme.outlineVariant),
-            const SizedBox(height: StSpace.sm),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: ExcludeSemantics(
-                    child: StIcon(
-                      Icons.emoji_events_rounded,
-                      size: 16,
-                      color: gold,
+            if (game != null) ...[
+              const SizedBox(height: StSpace.sm),
+              Divider(height: 1, thickness: 1, color: scheme.outlineVariant),
+              const SizedBox(height: StSpace.sm),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: ExcludeSemantics(
+                      child: StIcon(
+                        Icons.emoji_events_rounded,
+                        size: 18,
+                        color: gold,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: StSpace.xs),
-                Expanded(
-                  child: Text(
-                    lastGameLine(game, now),
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: scheme.onSurfaceVariant,
+                  const SizedBox(width: StSpace.xs),
+                  Expanded(
+                    child: Text(
+                      lastGameLine(game!, now),
+                      semanticsLabel: lastGameSemanticsLabel(game!, now),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
           ],
         ),
       ),

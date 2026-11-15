@@ -116,11 +116,25 @@ String playAgainSubtitle(LastGameSettings settings) {
 
 /// "Today", "Yesterday", or a short English date.
 ///
+/// The gap is calendar days in the local zone, not elapsed hours. Local
+/// midnights are 23 hours apart when the clocks spring forward, so
+/// subtracting those [DateTime]s reports yesterday as "Today". Both
+/// instants are converted with [DateTime.toLocal] first, so a UTC
+/// timestamp from an 11 PM local game still uses that local day. Those
+/// local year, month, and day fields are then copied onto UTC dates,
+/// which are always 24 hours apart. [DateTime.toUtc] is not used.
+///
 /// Same calendar year is "Nov 9". A different year is "Nov 9, 2025".
 /// A future day uses that short date too. v1 stays English.
 String formatLastGameDate(DateTime playedAt, DateTime now) {
-  final playedDay = DateTime(playedAt.year, playedAt.month, playedAt.day);
-  final today = DateTime(now.year, now.month, now.day);
+  final playedLocal = playedAt.toLocal();
+  final nowLocal = now.toLocal();
+  final playedDay = DateTime.utc(
+    playedLocal.year,
+    playedLocal.month,
+    playedLocal.day,
+  );
+  final today = DateTime.utc(nowLocal.year, nowLocal.month, nowLocal.day);
   final dayGap = today.difference(playedDay).inDays;
   if (dayGap == 0) {
     return 'Today';
@@ -142,11 +156,37 @@ String formatLastGameDate(DateTime playedAt, DateTime now) {
     'Nov',
     'Dec',
   ];
-  final monthDay = '${months[playedAt.month - 1]} ${playedAt.day}';
-  if (playedAt.year == now.year) {
+  final monthDay = '${months[playedLocal.month - 1]} ${playedLocal.day}';
+  if (playedLocal.year == nowLocal.year) {
     return monthDay;
   }
-  return '$monthDay, ${playedAt.year}';
+  return '$monthDay, ${playedLocal.year}';
+}
+
+/// Spoken Play again label. Full volume names, no middle dots.
+String playAgainSemanticsLabel(LastGameSettings settings) {
+  final names = [
+    for (final volume in ScriptureVolume.values)
+      if (settings.volumes.contains(volume)) volume.label,
+  ];
+  final count = settings.questionCount;
+  final questions = count == 1 ? '1 question' : '$count questions';
+  if (names.isEmpty) {
+    return 'Play again, $questions';
+  }
+  return 'Play again, ${names.join(', ')}, $questions';
+}
+
+/// Spoken last-game line. "8 / 10 · Yesterday" is read as
+/// "8 out of 10, yesterday".
+String lastGameSemanticsLabel(LastGameSummary game, DateTime now) {
+  final date = formatLastGameDate(game.playedAt, now);
+  final spokenDate = switch (date) {
+    'Today' => 'today',
+    'Yesterday' => 'yesterday',
+    _ => date,
+  };
+  return 'Last game: ${game.correct} out of ${game.total}, $spokenDate';
 }
 
 /// "Last game: 8 / 10 · Yesterday".
