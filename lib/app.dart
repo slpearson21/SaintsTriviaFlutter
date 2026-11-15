@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'routing/app_router.dart';
+import 'splash_fade.dart';
 import 'theme/st_theme.dart';
 
 /// Icons stay at their drawn size when the user enlarges text.
@@ -29,6 +30,9 @@ class SaintsTriviaApp extends ConsumerWidget {
       darkTheme: darkTheme,
       themeMode: ThemeMode.system,
       routerConfig: router,
+      builder: (context, child) {
+        return SplashFade(child: child ?? const SizedBox.shrink());
+      },
     );
   }
 }
