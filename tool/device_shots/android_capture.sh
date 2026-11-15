@@ -53,34 +53,52 @@ capture_run() {
   local label="$2"
   adb shell am force-stop "$PKG" || true
   night "$night_mode"
+  # A screencap loop made System UI show an ANR over the splash. One recording
+  # covers the native hold and the Flutter overlay without poking the display.
+  adb shell settings put global hide_error_dialogs 1 || true
+  adb shell am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS >/dev/null 2>&1 || true
+  local remote="/sdcard/splash-${label}.mp4"
+  adb shell rm -f "$remote" || true
+  local seconds=$((HOLD_SECONDS * 2 + 15))
+  if (( seconds > 180 )); then
+    seconds=180
+  fi
+  adb shell screenrecord --time-limit "$seconds" --bit-rate 8000000 "$remote" >/dev/null 2>&1 &
+  local rec_pid=$!
+  sleep 1
   adb shell am start -n "$ACT"
-  log "started $label"
+  log "started $label (screenrecord ${seconds}s)"
+  wait "$rec_pid" || log "screenrecord exited $?"
+  adb pull "$remote" "$OUT/splash-${label}.mp4"
+  adb shell rm -f "$remote" || true
+  if ! command -v ffmpeg >/dev/null; then
+    log "ffmpeg is required to pull frames out of the recording"
+    exit 1
+  fi
   local burst="$OUT/burst-${label}"
   mkdir -p "$burst"
-  local start=$SECONDS
-  local i=0
-  while (( SECONDS - start < HOLD_SECONDS * 2 + 25 )); do
-    local elapsed=$((SECONDS - start))
+  ffmpeg -y -i "$OUT/splash-${label}.mp4" -vf fps=2 "$burst/%03d.png" >>"$NOTES" 2>&1
+  local n
+  n=$(find "$burst" -name '*.png' | wc -l)
+  if (( n < 1 )); then
+    log "no frames extracted for $label"
+    exit 1
+  fi
+  cp "$burst/001.png" "$OUT/launch-${label}.png"
+  copy_at() {
+    local at="$1"
+    local dest="$2"
+    local idx=$((at * 2 + 1))
+    if (( idx > n )); then idx=$n; fi
+    if (( idx < 1 )); then idx=1; fi
     local frame
-    frame="$(printf '%03d' "$i")"
-    adb exec-out screencap -p >"$burst/${frame}.png"
-    log "burst $label $frame at ${elapsed}s ($(wc -c <"$burst/${frame}.png") bytes)"
-    if [[ "$i" -eq 0 ]]; then
-      cp "$burst/${frame}.png" "$OUT/launch-${label}.png"
-    fi
-    if [[ "$elapsed" -ge $((HOLD_SECONDS / 2)) && ! -f "$OUT/mid-${label}.png" ]]; then
-      cp "$burst/${frame}.png" "$OUT/mid-${label}.png"
-    fi
-    if [[ "$elapsed" -ge $((HOLD_SECONDS + 10)) && ! -f "$OUT/loaded-${label}.png" ]]; then
-      cp "$burst/${frame}.png" "$OUT/loaded-${label}.png"
-    fi
-    if [[ "$elapsed" -ge $((HOLD_SECONDS * 2 + 5)) && ! -f "$OUT/settled-${label}.png" ]]; then
-      cp "$burst/${frame}.png" "$OUT/settled-${label}.png"
-    fi
-    i=$((i + 1))
-    # A tight screencap loop makes System UI ANR and cover the splash.
-    sleep 3
-  done
+    frame="$(printf '%s/%03d.png' "$burst" "$idx")"
+    cp "$frame" "$dest"
+    log "copied $frame to $(basename "$dest") (about ${at}s, $n frames)"
+  }
+  copy_at $((HOLD_SECONDS / 2)) "$OUT/mid-${label}.png"
+  copy_at $((HOLD_SECONDS + 10)) "$OUT/loaded-${label}.png"
+  copy_at $((HOLD_SECONDS * 2 + 5)) "$OUT/settled-${label}.png"
 }
 
 capture_run no light
