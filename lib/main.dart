@@ -11,6 +11,7 @@ Future<void> main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   holdSplashForHandoff();
+  await prepareSplashHandoff();
   runApp(const ProviderScope(child: SaintsTriviaApp()));
   await removeSplashAfterBundledQuestionBank();
 }

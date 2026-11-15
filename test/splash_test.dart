@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart'
+    show debugDefaultTargetPlatformOverride;
+import 'package:flutter/rendering.dart' show RenderImage;
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -119,6 +122,184 @@ void main() {
       features: const FakeAccessibilityFeatures(accessibleNavigation: true),
     );
   });
+
+  testWidgets('first frame uses the light launch color and the logo', (
+    tester,
+  ) async {
+    await _pumpHeldSplash(tester, brightness: Brightness.light);
+    _expectLaunchFrame(
+      tester,
+      color: splashLaunchLight,
+      asset: splashMarkLightAsset,
+      extent: splashMarkExtent,
+    );
+  });
+
+  testWidgets('first frame uses the dark launch color and the logo', (
+    tester,
+  ) async {
+    await _pumpHeldSplash(tester, brightness: Brightness.dark);
+    _expectLaunchFrame(
+      tester,
+      color: splashLaunchDark,
+      asset: splashMarkDarkAsset,
+      extent: splashMarkExtent,
+    );
+  });
+
+  testWidgets('cover keeps the launch color when the theme surface differs', (
+    tester,
+  ) async {
+    holdSplashForHandoff();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(
+          brightness: Brightness.light,
+          colorScheme: const ColorScheme.light(surface: Color(0xFFFF00FF)),
+        ),
+        home: const SplashFade(child: SizedBox.expand()),
+      ),
+    );
+    final theme = Theme.of(tester.element(find.byKey(splashBackgroundKey)));
+    expect(theme.colorScheme.surface, isNot(splashLaunchLight));
+    _expectLaunchFrame(
+      tester,
+      color: splashLaunchLight,
+      asset: splashMarkLightAsset,
+      extent: splashMarkExtent,
+    );
+  });
+
+  testWidgets(
+    'dark cover keeps the launch color when the theme surface differs',
+    (tester) async {
+      holdSplashForHandoff();
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            brightness: Brightness.dark,
+            colorScheme: const ColorScheme.dark(surface: Color(0xFF010203)),
+          ),
+          home: const SplashFade(child: SizedBox.expand()),
+        ),
+      );
+      final darkTheme = Theme.of(
+        tester.element(find.byKey(splashBackgroundKey)),
+      );
+      expect(darkTheme.colorScheme.surface, isNot(splashLaunchDark));
+      _expectLaunchFrame(
+        tester,
+        color: splashLaunchDark,
+        asset: splashMarkDarkAsset,
+        extent: splashMarkExtent,
+      );
+    },
+  );
+
+  testWidgets('Android 12+ light frame uses the 288 dp splash icon', (
+    tester,
+  ) async {
+    debugSetSplashAndroidSdkInt(34);
+    await _pumpHeldSplash(tester, brightness: Brightness.light);
+    _expectLaunchFrame(
+      tester,
+      color: splashLaunchLight,
+      asset: splashAndroid12MarkLightAsset,
+      extent: splashAndroid12MarkExtent,
+    );
+  });
+
+  testWidgets('Android 12+ dark frame uses the 288 dp splash icon', (
+    tester,
+  ) async {
+    debugSetSplashAndroidSdkInt(31);
+    await _pumpHeldSplash(tester, brightness: Brightness.dark);
+    _expectLaunchFrame(
+      tester,
+      color: splashLaunchDark,
+      asset: splashAndroid12MarkDarkAsset,
+      extent: splashAndroid12MarkExtent,
+    );
+  });
+
+  testWidgets('Android 11 first frame uses the 192 dp launch image', (
+    tester,
+  ) async {
+    debugSetSplashAndroidSdkInt(30);
+    await _pumpHeldSplash(tester, brightness: Brightness.light);
+    _expectLaunchFrame(
+      tester,
+      color: splashLaunchLight,
+      asset: splashMarkLightAsset,
+      extent: splashMarkExtent,
+    );
+  });
+
+  testWidgets('iOS first frame uses the centered 192 pt launch image', (
+    tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    await _pumpHeldSplash(tester, brightness: Brightness.dark);
+    _expectLaunchFrame(
+      tester,
+      color: splashLaunchDark,
+      asset: splashMarkDarkAsset,
+      extent: splashMarkExtent,
+    );
+  });
+
+  testWidgets('logo and background fade out together', (tester) async {
+    await _expectCoverFade(tester, fade: StMotion.medium);
+  });
+
+  testWidgets('failed question bank load still fades the splash', (
+    tester,
+  ) async {
+    holdSplashForHandoff();
+    await tester.pumpWidget(const ProviderScope(child: SaintsTriviaApp()));
+    expect(find.byKey(splashLogoKey), findsOneWidget);
+    expect(
+      tester.widget<ColoredBox>(find.byKey(splashBackgroundKey)).color,
+      splashLaunchLight,
+    );
+
+    await removeSplashAfterBundledQuestionBank(
+      loadQuestionBank: () async {
+        throw Exception('bank failed');
+      },
+      removeSplash: () {},
+    );
+    await tester.pump();
+    expect(_coverOpacity(tester), closeTo(1, 0.001));
+    _expectSharedFade(tester);
+
+    await tester.pump(const Duration(milliseconds: 125));
+    final mid = _coverOpacity(tester);
+    expect(mid, greaterThan(0));
+    expect(mid, lessThan(1));
+    _expectSharedFade(tester);
+
+    await tester.pump(const Duration(milliseconds: 125));
+    final done = _coverOpacity(tester);
+    expect(done == null || done == 0, isTrue);
+    if (done == 0) {
+      _expectSharedFade(tester);
+    }
+    await tester.pump(const Duration(microseconds: 1));
+    expect(_coverOpacity(tester), isNull);
+    expect(find.byKey(splashLogoKey), findsNothing);
+    expect(find.byKey(splashBackgroundKey), findsNothing);
+  });
+
+  testWidgets('the logo is decoded before the first frame', (tester) async {
+    await warmSplashMark(splashMarkLightAsset);
+    holdSplashForHandoff();
+    await tester.pumpWidget(const ProviderScope(child: SaintsTriviaApp()));
+    final render = tester.renderObject<RenderImage>(find.byKey(splashLogoKey));
+    expect(render.image, isNotNull);
+    expect(render.image!.width, greaterThan(0));
+  });
 }
 
 /// Holds the splash, proves the cover stays up until removal, then checks
@@ -136,6 +317,9 @@ Future<void> _expectCoverFade(
   holdSplashForHandoff();
   await tester.pumpWidget(const ProviderScope(child: SaintsTriviaApp()));
   expect(_coverOpacity(tester), 1);
+  _expectSharedFade(tester);
+  final logoAtRest = tester.getRect(find.byKey(splashLogoKey));
+  final backgroundAtRest = tester.getRect(find.byKey(splashBackgroundKey));
 
   await tester.pump(const Duration(milliseconds: 400));
   expect(
@@ -143,6 +327,7 @@ Future<void> _expectCoverFade(
     1,
     reason: 'cover faded before the splash was removed',
   );
+  expect(tester.getRect(find.byKey(splashLogoKey)), logoAtRest);
 
   await removeSplashAfterBundledQuestionBank(
     loadQuestionBank: () async {},
@@ -150,12 +335,20 @@ Future<void> _expectCoverFade(
   );
   await tester.pump();
   expect(_coverOpacity(tester), closeTo(1, 0.001));
+  _expectSharedFade(tester);
 
   await tester.pump(fade - const Duration(milliseconds: 1));
   final mid = _coverOpacity(tester);
   expect(mid, isNotNull, reason: 'cover was gone before $fade');
   expect(mid, greaterThan(0));
   expect(mid, lessThan(1));
+  _expectSharedFade(tester);
+  expect(tester.getRect(find.byKey(splashLogoKey)), logoAtRest);
+  expect(tester.getRect(find.byKey(splashBackgroundKey)), backgroundAtRest);
+  expect(
+    tester.widget<FadeTransition>(find.byKey(splashFadeKey)).opacity.value,
+    mid,
+  );
 
   await tester.pump(const Duration(milliseconds: 1));
   final done = _coverOpacity(tester);
@@ -163,6 +356,70 @@ Future<void> _expectCoverFade(
     done == null || done == 0,
     isTrue,
     reason: 'cover still up after $fade (opacity $done)',
+  );
+  if (done == 0) {
+    _expectSharedFade(tester);
+  }
+  // The simulation reports done only after the duration, so the cover leaves
+  // on the following tick. Logo and background go together.
+  await tester.pump(const Duration(microseconds: 1));
+  expect(_coverOpacity(tester), isNull);
+  expect(find.byKey(splashLogoKey), findsNothing);
+  expect(find.byKey(splashBackgroundKey), findsNothing);
+}
+
+Future<void> _pumpHeldSplash(
+  WidgetTester tester, {
+  required Brightness brightness,
+}) async {
+  tester.platformDispatcher.platformBrightnessTestValue = brightness;
+  addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+  holdSplashForHandoff();
+  await tester.pumpWidget(const ProviderScope(child: SaintsTriviaApp()));
+}
+
+void _expectLaunchFrame(
+  WidgetTester tester, {
+  required Color color,
+  required String asset,
+  required double extent,
+}) {
+  final background = tester.widget<ColoredBox>(find.byKey(splashBackgroundKey));
+  expect(background.color, color);
+
+  final logo = tester.widget<Image>(find.byKey(splashLogoKey));
+  expect(logo.image, isA<AssetImage>());
+  expect((logo.image as AssetImage).assetName, asset);
+  expect(logo.width, extent);
+  expect(logo.height, extent);
+
+  final overlay = tester.getRect(find.byKey(splashFadeKey));
+  final logoRect = tester.getRect(find.byKey(splashLogoKey));
+  final backgroundRect = tester.getRect(find.byKey(splashBackgroundKey));
+  expect(backgroundRect, overlay);
+  expect(logoRect.width, extent);
+  expect(logoRect.height, extent);
+  expect(logoRect.center.dx, closeTo(overlay.center.dx, 0.01));
+  expect(logoRect.center.dy, closeTo(overlay.center.dy, 0.01));
+  _expectSharedFade(tester);
+  expect(_coverOpacity(tester), 1);
+}
+
+/// Logo and background are painted by the one splash fade, not two.
+void _expectSharedFade(WidgetTester tester) {
+  final fade = find.byKey(splashFadeKey);
+  expect(fade, findsOneWidget);
+  expect(
+    find.descendant(of: fade, matching: find.byKey(splashBackgroundKey)),
+    findsOneWidget,
+  );
+  expect(
+    find.descendant(of: fade, matching: find.byKey(splashLogoKey)),
+    findsOneWidget,
+  );
+  expect(
+    find.descendant(of: fade, matching: find.byType(FadeTransition)),
+    findsNothing,
   );
 }
 
