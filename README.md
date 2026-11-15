@@ -20,7 +20,7 @@ Question fields:
 - `volume` — `OT`, `NT`, `BOM`, `DC`, or `PGP`
 - `reference` — display string, not empty
 - `prompt` — not empty, at most 140 characters
-- `options` — exactly four non-empty strings
+- `options` — exactly four non-empty strings, distinct after trimming and case-folding
 - `answerIndex` — integer 0–3
 - `explanation` — one line, not empty, at most 160 characters
 - `reviewStatus` — `draft` or `approved`
@@ -37,15 +37,25 @@ From the repository root:
 dart run tool/validate_questions.dart
 ```
 
-That checks structure only. Pull-request CI runs this command. It passes while questions are still `draft`.
+That checks structure only, including the rule that `assets/questions/v1/` has at least 100 questions in each volume. Pull-request CI runs this command. It passes while questions are still `draft`. Fixture directories such as `test/fixtures/questions/v1/` are not held to the 100-question minimum.
 
-A release workflow should reject unapproved questions:
+The release gate rejects unapproved questions and, for the bundled bank, counts only approved questions toward that minimum:
 
 ```sh
 dart run tool/validate_questions.dart --require-approved
 ```
 
-`--release` is an alias for `--require-approved`. The flag fails the run if any question is not `approved`. Point `--bank` at another directory of the five volume files to check fixtures or a future copy:
+`--release` is an alias for `--require-approved`. The current bank is entirely `draft`, so this command fails until doctrinal review. Pull-request CI does not run it.
+
+STRIV-19's release pipeline should call the reusable workflow [`.github/workflows/validate-question-bank-release.yml`](.github/workflows/validate-question-bank-release.yml):
+
+```yaml
+jobs:
+  question-bank:
+    uses: ./.github/workflows/validate-question-bank-release.yml
+```
+
+That workflow is also available from the Actions tab (`workflow_dispatch`). Point `--bank` at another directory to check fixtures or a future copy:
 
 ```sh
 dart run tool/validate_questions.dart --bank test/fixtures/questions/v1
@@ -53,6 +63,6 @@ dart run tool/validate_questions.dart --bank test/fixtures/questions/v1
 
 ## Loading in the app
 
-`loadBundledQuestionBank()` reads the bundled JSON offline. It throws `QuestionBankException` for malformed content. Show `QuestionBankException.userMessage` (`Content failed to load.`) and use `violations` in logs.
+`loadBundledQuestionBank()` reads the bundled JSON offline and returns the `QuestionBank`. It throws `QuestionBankException` for malformed content. Show `QuestionBankException.userMessage` (`Content failed to load.`) and use `violations` in logs.
 
-Release builds (`kReleaseMode`) pass the same approved-only rule as `--require-approved`. A draft question fails the whole load. It is not dropped. Debug and profile builds still load drafts so the game can be tried before review. The loader is not wired into the home screen yet.
+A release build skips questions that are not `approved`. Debug and profile builds still load drafts, so the full bank is available for development and performance testing. Skipping drafts does not throw. `QuestionBank.availableVolumes` lists the volumes that still have questions, and `forVolume` is empty when a volume has none. That is the "no questions for this selection" state. The loader is not wired into the home screen yet.

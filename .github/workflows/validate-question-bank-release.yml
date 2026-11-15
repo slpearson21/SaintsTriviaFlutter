@@ -1,0 +1,35 @@
+name: Validate question bank (release)
+
+# Not part of pull-request CI. The bank is still draft, so this job fails
+# until doctrinal review marks every question approved. STRIV-19's release
+# pipeline should call this reusable workflow:
+#
+#   jobs:
+#     question-bank:
+#       uses: ./.github/workflows/validate-question-bank-release.yml
+#
+# It can also be run by hand from the Actions tab (workflow_dispatch).
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  require-approved:
+    name: Require approved questions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Validate question bank (approved only)
+        run: dart run tool/validate_questions.dart --require-approved

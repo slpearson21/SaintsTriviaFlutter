@@ -28,8 +28,9 @@ jobs:
         run: flutter pub get
 
       - name: Validate question bank
-        # Structure only. The bank is still draft. Release builds pass
-        # --require-approved (see tool/validate_questions.dart).
+        # Structure only. The bank is still draft, so this step does not pass
+        # --require-approved. STRIV-19 should call
+        # .github/workflows/validate-question-bank-release.yml for that gate.
         run: dart run tool/validate_questions.dart
 
       - name: Analyze

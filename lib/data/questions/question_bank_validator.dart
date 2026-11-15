@@ -11,8 +11,11 @@ import 'trivia_question.dart';
 final class QuestionBankValidator {
   const QuestionBankValidator({this.requireApproved = false});
 
-  /// When true, a question that is not `approved` is a not-approved violation.
-  /// The loader does not drop that question and keep the rest.
+  /// When true, a question that is not `approved` is a violation.
+  ///
+  /// The in-app loader does not set this. A release build skips those
+  /// questions. `tool/validate_questions.dart --require-approved` is the
+  /// gate that rejects them.
   final bool requireApproved;
 
   QuestionBankValidation validate({

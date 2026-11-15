@@ -10,8 +10,8 @@ export 'bundled_question_bank_loader.dart'
     show
         QuestionBankAssetException,
         loadBundledQuestionBank,
-        questionBankRequiresApproval,
-        readBundledQuestionAsset;
+        readBundledQuestionAsset,
+        skipUnapprovedQuestions;
 export 'question_assets.dart' show QuestionAssets;
 export 'question_bank.dart' show QuestionBank;
 export 'question_bank_exception.dart'

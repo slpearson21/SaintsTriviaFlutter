@@ -439,7 +439,24 @@ List<String>? _readOptions(Map<String, Object?> json, _AddViolation add) {
     }
     options.add(option);
   }
-  return ok ? options : null;
+  if (!ok) {
+    return null;
+  }
+
+  final seen = <String>{};
+  for (final option in options) {
+    final folded = option.trim().toLowerCase();
+    if (!seen.add(folded)) {
+      add(
+        QuestionBankViolationKind.duplicateOption,
+        'Options must be distinct after trimming and case-folding. '
+        '"$option" repeats.',
+        field: 'options',
+      );
+      return null;
+    }
+  }
+  return options;
 }
 
 int? _readAnswerIndex(Map<String, Object?> json, _AddViolation add) {
@@ -501,7 +518,7 @@ ReviewStatus? _readReviewStatus(
     final label = questionId == null ? 'A question' : 'Question $questionId';
     add(
       QuestionBankViolationKind.notApproved,
-      '$label is "$value". Release mode only loads approved questions.',
+      '$label is "$value". The release validator only allows approved questions.',
       field: 'reviewStatus',
       questionId: questionId,
     );

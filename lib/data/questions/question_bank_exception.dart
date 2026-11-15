@@ -30,6 +30,9 @@ enum QuestionBankViolationKind {
   /// `options` is a list of a length other than 4.
   optionCount,
 
+  /// Two options match after trimming and case-folding.
+  duplicateOption,
+
   /// `answerIndex` is missing, not an integer, or outside 0–3.
   answerIndex,
 
@@ -42,8 +45,18 @@ enum QuestionBankViolationKind {
   /// A value has the wrong JSON type or is not one of the allowed codes.
   invalidValue,
 
-  /// Release mode saw a question whose review status is not `approved`.
+  /// The release validator saw a question that is not `approved`.
+  ///
+  /// The in-app loader does not emit this. A release build skips those
+  /// questions instead of failing.
   notApproved,
+
+  /// The bundled bank has fewer than 100 questions in a volume.
+  ///
+  /// `tool/validate_questions.dart` emits this for `assets/questions/v1/`
+  /// only. With `--require-approved` the count is approved questions. The
+  /// in-app loader does not emit this, and fixture banks are not checked.
+  tooFewQuestions,
 }
 
 /// One schema problem. A load collects every violation it can.

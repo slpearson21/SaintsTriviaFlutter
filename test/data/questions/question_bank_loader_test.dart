@@ -87,7 +87,7 @@ void main() {
 
     test('rootBundle loads all 591 draft questions in volume order', () async {
       final fromFiles = await loadDirectory(QuestionAssets.v1Directory);
-      final bundled = await loadBundledQuestionBank().load();
+      final bundled = await loadBundledQuestionBank();
 
       expect(bundled.schemaVersion, 1);
       expect(bundled.length, 591);
@@ -123,30 +123,29 @@ void main() {
       );
     });
 
-    test(
-      'release mode refuses the draft bank instead of dropping questions',
-      () async {
-        final error = await loadFailure(
-          loadBundledQuestionBank(requireApproved: true),
-        );
+    test('skipping unapproved questions drops the draft bank', () async {
+      final bank = await loadBundledQuestionBank(skipUnapproved: true);
 
-        expect(QuestionBankException.userMessage, 'Content failed to load.');
-        expect(error.toString(), contains(QuestionBankException.userMessage));
-        expect(error.violations, hasLength(591));
-        expect(error.violations.map((violation) => violation.kind).toSet(), {
-          QuestionBankViolationKind.notApproved,
-        });
+      expect(bank.schemaVersion, 1);
+      expect(bank.isEmpty, isTrue);
+      expect(bank.availableVolumes, isEmpty);
+      for (final volume in ScriptureVolume.values) {
+        expect(bank.hasQuestionsFor(volume), isFalse);
+        expect(bank.forVolume(volume), isEmpty);
+      }
+    });
+
+    test(
+      'release builds skip unapproved questions; debug and profile do not',
+      () {
+        expect(skipUnapprovedQuestions(), kReleaseMode);
+        expect(skipUnapprovedQuestions(skipUnapproved: true), isTrue);
+        expect(skipUnapprovedQuestions(skipUnapproved: false), isFalse);
       },
     );
 
-    test('requireApproved defaults to kReleaseMode', () {
-      expect(questionBankRequiresApproval(), kReleaseMode);
-      expect(questionBankRequiresApproval(requireApproved: true), isTrue);
-      expect(questionBankRequiresApproval(requireApproved: false), isFalse);
-    });
-
     test('a missing asset is a typed error', () async {
-      final error = await loadFailure(
+      final error = await expectLoadFailure(
         loadBundledQuestionBank(
           assets: const QuestionAssets(directory: 'assets/questions/missing'),
         ),
@@ -294,6 +293,30 @@ void main() {
         'ot-0001',
       );
     });
+
+    test(
+      'rejects options that match after trimming and case-folding',
+      () async {
+        final byCase = await failureOn(ScriptureVolume.ot, [
+          validQuestion(ScriptureVolume.ot)
+            ..['options'] = ['Eden', 'eden', 'Ur', 'Nod'],
+        ]);
+        final bySpace = await failureOn(ScriptureVolume.ot, [
+          validQuestion(ScriptureVolume.ot)
+            ..['options'] = ['Eden', ' Eden ', 'Ur', 'Nod'],
+        ]);
+
+        expect(
+          byCase.violations.single.kind,
+          QuestionBankViolationKind.duplicateOption,
+        );
+        expect(byCase.violations.single.field, 'options');
+        expect(
+          bySpace.violations.single.kind,
+          QuestionBankViolationKind.duplicateOption,
+        );
+      },
+    );
 
     test('rejects three options and five options', () async {
       final tooFew = validQuestion(ScriptureVolume.ot)
@@ -527,49 +550,90 @@ void main() {
       },
     );
 
-    test('release mode rejects a single draft and keeps nothing', () async {
+    test('skipping drafts leaves an empty bank instead of throwing', () async {
+      final bank = await loadVolumes(skipUnapproved: true);
+
+      expect(bank.isEmpty, isTrue);
+      expect(bank.availableVolumes, isEmpty);
+      expect(bank.forVolume(ScriptureVolume.ot), isEmpty);
+      expect(bank.hasQuestionsFor(ScriptureVolume.nt), isFalse);
+    });
+
+    test(
+      'skipping drafts keeps approved questions and the volumes that have them',
+      () async {
+        final bank = await loadVolumes(
+          replace: {
+            for (final volume in ScriptureVolume.values)
+              volume: switch (volume) {
+                ScriptureVolume.bom => [
+                  validQuestion(volume, reviewStatus: 'approved'),
+                  validQuestion(volume, number: 2),
+                ],
+                ScriptureVolume.pgp => [
+                  validQuestion(volume, number: 3, reviewStatus: 'approved'),
+                ],
+                _ => [validQuestion(volume)],
+              },
+          },
+          skipUnapproved: true,
+        );
+
+        expect(bank.length, 2);
+        expect(bank.availableVolumes, [
+          ScriptureVolume.bom,
+          ScriptureVolume.pgp,
+        ]);
+        expect(bank.hasQuestionsFor(ScriptureVolume.ot), isFalse);
+        expect(bank.forVolume(ScriptureVolume.dc), isEmpty);
+        expect(
+          bank.forVolume(ScriptureVolume.bom).single.reviewStatus,
+          ReviewStatus.approved,
+        );
+        expect(bank.forVolume(ScriptureVolume.pgp).single.id, 'pgp-0003');
+      },
+    );
+
+    test('skipping drafts still fails the load on a schema error', () async {
       final error = await loadFailure(
         loaderFor(
           replace: {
-            for (final volume in ScriptureVolume.values)
-              volume: [
-                validQuestion(
-                  volume,
-                  reviewStatus: volume == ScriptureVolume.dc
-                      ? 'draft'
-                      : 'approved',
-                ),
-              ],
+            ScriptureVolume.ot: [
+              validQuestion(ScriptureVolume.ot)..['answerIndex'] = 9,
+            ],
           },
-          requireApproved: true,
+          skipUnapproved: true,
         ),
       );
 
       expect(
         error.violations.single.kind,
-        QuestionBankViolationKind.notApproved,
+        QuestionBankViolationKind.answerIndex,
       );
-      expect(error.violations.single.questionId, 'dc-0001');
       expect(error.toString(), contains(QuestionBankException.userMessage));
     });
 
-    test('release mode accepts a fully approved bank', () async {
-      final bank = await loadVolumes(
-        replace: {
-          for (final volume in ScriptureVolume.values)
-            volume: [validQuestion(volume, reviewStatus: 'approved')],
-        },
-        requireApproved: true,
-      );
+    test(
+      'a fully approved bank is unchanged when drafts are skipped',
+      () async {
+        final bank = await loadVolumes(
+          replace: {
+            for (final volume in ScriptureVolume.values)
+              volume: [validQuestion(volume, reviewStatus: 'approved')],
+          },
+          skipUnapproved: true,
+        );
 
-      expect(bank.length, ScriptureVolume.values.length);
-      expect(
-        bank.questions.every(
-          (question) => question.reviewStatus == ReviewStatus.approved,
-        ),
-        isTrue,
-      );
-    });
+        expect(bank.length, ScriptureVolume.values.length);
+        expect(bank.availableVolumes, ScriptureVolume.values);
+        expect(
+          bank.questions.every(
+            (question) => question.reviewStatus == ReviewStatus.approved,
+          ),
+          isTrue,
+        );
+      },
+    );
 
     test(
       'an unreadable file is a typed error and does not hide other files',
@@ -676,8 +740,100 @@ void main() {
       );
       expect(required.toString(), contains('notApproved'));
       expect(required.toString(), contains('ot-0001'));
+      expect(required.toString(), contains('tooFewQuestions'));
       expect(release.toString(), contains('pgp-0118'));
+      expect(release.toString(), contains('tooFewQuestions'));
     });
+
+    test('fixtures are not held to the bundled 100-question minimum', () async {
+      final errors = StringBuffer();
+
+      expect(
+        await runQuestionBankValidator(
+          const ['--require-approved', '--bank', 'test/fixtures/questions/v1'],
+          output: StringBuffer(),
+          errorOutput: errors,
+        ),
+        1,
+      );
+      expect(errors.toString(), contains('notApproved'));
+      expect(errors.toString(), isNot(contains('tooFewQuestions')));
+    });
+
+    test(
+      'the 100-question minimum counts approved questions only when required',
+      () {
+        expect(minimumQuestionsPerVolume, 100);
+        expect(isBundledQuestionBank('assets/questions/v1'), isTrue);
+        expect(isBundledQuestionBank('assets/questions/v1/'), isTrue);
+        expect(isBundledQuestionBank('./assets/questions/v1'), isTrue);
+        expect(isBundledQuestionBank('test/fixtures/questions/v1'), isFalse);
+
+        final small = QuestionBank(
+          schemaVersion: 1,
+          questions: [
+            for (final volume in ScriptureVolume.values)
+              TriviaQuestion.fromJson(validQuestion(volume)),
+          ],
+        );
+        final belowMinimum = bundledVolumeMinimumViolations(
+          small,
+          approvedOnly: false,
+        );
+        expect(belowMinimum, hasLength(ScriptureVolume.values.length));
+        expect(belowMinimum.map((violation) => violation.kind).toSet(), {
+          QuestionBankViolationKind.tooFewQuestions,
+        });
+
+        final approved = QuestionBank(
+          schemaVersion: 1,
+          questions: [
+            for (final volume in ScriptureVolume.values)
+              for (
+                var number = 1;
+                number <= minimumQuestionsPerVolume;
+                number++
+              )
+                TriviaQuestion.fromJson(
+                  validQuestion(
+                    volume,
+                    number: number,
+                    reviewStatus: 'approved',
+                  ),
+                ),
+          ],
+        );
+        expect(
+          bundledVolumeMinimumViolations(approved, approvedOnly: false),
+          isEmpty,
+        );
+        expect(
+          bundledVolumeMinimumViolations(approved, approvedOnly: true),
+          isEmpty,
+        );
+
+        final drafts = QuestionBank(
+          schemaVersion: 1,
+          questions: [
+            for (final volume in ScriptureVolume.values)
+              for (
+                var number = 1;
+                number <= minimumQuestionsPerVolume;
+                number++
+              )
+                TriviaQuestion.fromJson(validQuestion(volume, number: number)),
+          ],
+        );
+        expect(
+          bundledVolumeMinimumViolations(drafts, approvedOnly: false),
+          isEmpty,
+        );
+        expect(
+          bundledVolumeMinimumViolations(drafts, approvedOnly: true),
+          hasLength(ScriptureVolume.values.length),
+        );
+      },
+    );
 
     test('can validate the sample fixture directory', () async {
       final output = StringBuffer();
@@ -739,7 +895,7 @@ Future<QuestionBank> loadDirectory(String directory) {
 
 QuestionBankLoader loaderFor({
   Map<ScriptureVolume, List<Object?>> replace = const {},
-  bool requireApproved = false,
+  bool skipUnapproved = false,
   QuestionAssets assets = const QuestionAssets(directory: 'mem'),
 }) {
   final files = <String, String>{
@@ -751,15 +907,15 @@ QuestionBankLoader loaderFor({
   return QuestionBankLoader(
     read: (path) async => files[path]!,
     assets: assets,
-    requireApproved: requireApproved,
+    skipUnapproved: skipUnapproved,
   );
 }
 
 Future<QuestionBank> loadVolumes({
   Map<ScriptureVolume, List<Object?>> replace = const {},
-  bool requireApproved = false,
+  bool skipUnapproved = false,
 }) {
-  return loaderFor(replace: replace, requireApproved: requireApproved).load();
+  return loaderFor(replace: replace, skipUnapproved: skipUnapproved).load();
 }
 
 Future<QuestionBankException> failureOn(
@@ -781,9 +937,15 @@ Future<QuestionBankException> failureRaw(ScriptureVolume volume, String json) {
   );
 }
 
-Future<QuestionBankException> loadFailure(QuestionBankLoader loader) async {
+Future<QuestionBankException> loadFailure(QuestionBankLoader loader) {
+  return expectLoadFailure(loader.load());
+}
+
+Future<QuestionBankException> expectLoadFailure(
+  Future<QuestionBank> future,
+) async {
   try {
-    await loader.load();
+    await future;
   } on QuestionBankException catch (error) {
     return error;
   }
