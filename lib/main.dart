@@ -52,7 +52,7 @@ Future<void> removeSplashAfterBundledQuestionBank({
     const holdMs = int.fromEnvironment('SPLASH_HOLD_MS');
     if (holdMs > 0) {
       removeSplash();
-      await Future<void>.delayed(const Duration(seconds: 4));
+      await Future<void>.delayed(Duration(milliseconds: holdMs));
     }
     revealSplash();
     removeSplash();

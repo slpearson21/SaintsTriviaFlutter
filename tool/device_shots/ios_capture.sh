@@ -149,22 +149,22 @@ capture_launch() {
   mkdir -p "$burst"
   local start=$SECONDS
   local i=0
-  while (( SECONDS - start < HOLD_SECONDS + 8 )); do
+  while (( SECONDS - start < HOLD_SECONDS * 2 + 25 )); do
     local elapsed=$((SECONDS - start))
     local frame
     frame="$(printf '%03d' "$i")"
     xcrun simctl io "$UDID" screenshot "$burst/${frame}.png"
     log "burst $mode $frame at ${elapsed}s"
-    if [[ "$elapsed" -ge 2 && ! -f "$OUT/launch-${mode}.png" ]]; then
+    if [[ "$i" -eq 0 ]]; then
       cp "$burst/${frame}.png" "$OUT/launch-${mode}.png"
     fi
-    if [[ "$elapsed" -ge $((HOLD_SECONDS - 1)) && ! -f "$OUT/mid-${mode}.png" ]]; then
+    if [[ "$elapsed" -ge $((HOLD_SECONDS / 2)) && ! -f "$OUT/mid-${mode}.png" ]]; then
       cp "$burst/${frame}.png" "$OUT/mid-${mode}.png"
     fi
-    if [[ "$elapsed" -ge $((HOLD_SECONDS + 3)) && ! -f "$OUT/loaded-${mode}.png" ]]; then
+    if [[ "$elapsed" -ge $((HOLD_SECONDS + 10)) && ! -f "$OUT/loaded-${mode}.png" ]]; then
       cp "$burst/${frame}.png" "$OUT/loaded-${mode}.png"
     fi
-    if [[ "$elapsed" -ge $((HOLD_SECONDS + 6)) && ! -f "$OUT/settled-${mode}.png" ]]; then
+    if [[ "$elapsed" -ge $((HOLD_SECONDS * 2 + 5)) && ! -f "$OUT/settled-${mode}.png" ]]; then
       cp "$burst/${frame}.png" "$OUT/settled-${mode}.png"
     fi
     i=$((i + 1))

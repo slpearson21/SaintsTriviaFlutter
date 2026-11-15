@@ -59,22 +59,22 @@ capture_run() {
   mkdir -p "$burst"
   local start=$SECONDS
   local i=0
-  while (( SECONDS - start < HOLD_SECONDS + 8 )); do
+  while (( SECONDS - start < HOLD_SECONDS * 2 + 25 )); do
     local elapsed=$((SECONDS - start))
     local frame
     frame="$(printf '%03d' "$i")"
     adb exec-out screencap -p >"$burst/${frame}.png"
     log "burst $label $frame at ${elapsed}s ($(wc -c <"$burst/${frame}.png") bytes)"
-    if [[ "$elapsed" -ge 2 && ! -f "$OUT/launch-${label}.png" ]]; then
+    if [[ "$i" -eq 0 ]]; then
       cp "$burst/${frame}.png" "$OUT/launch-${label}.png"
     fi
-    if [[ "$elapsed" -ge $((HOLD_SECONDS - 1)) && ! -f "$OUT/mid-${label}.png" ]]; then
+    if [[ "$elapsed" -ge $((HOLD_SECONDS / 2)) && ! -f "$OUT/mid-${label}.png" ]]; then
       cp "$burst/${frame}.png" "$OUT/mid-${label}.png"
     fi
-    if [[ "$elapsed" -ge $((HOLD_SECONDS + 3)) && ! -f "$OUT/loaded-${label}.png" ]]; then
+    if [[ "$elapsed" -ge $((HOLD_SECONDS + 10)) && ! -f "$OUT/loaded-${label}.png" ]]; then
       cp "$burst/${frame}.png" "$OUT/loaded-${label}.png"
     fi
-    if [[ "$elapsed" -ge $((HOLD_SECONDS + 6)) && ! -f "$OUT/settled-${label}.png" ]]; then
+    if [[ "$elapsed" -ge $((HOLD_SECONDS * 2 + 5)) && ! -f "$OUT/settled-${label}.png" ]]; then
       cp "$burst/${frame}.png" "$OUT/settled-${label}.png"
     fi
     i=$((i + 1))

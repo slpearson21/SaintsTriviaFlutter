@@ -31,7 +31,7 @@ jobs:
 
       - name: Build debug iOS simulator app
         # SPLASH_HOLD_MS keeps the native launch screen up for the first shot.
-        run: flutter build ios --simulator --debug --dart-define=SPLASH_HOLD_MS=8000
+        run: flutter build ios --simulator --debug --dart-define=SPLASH_HOLD_MS=20000
 
       - name: Show simulators
         run: xcrun simctl list devices available
@@ -39,7 +39,7 @@ jobs:
       - name: Capture screenshots
         run: bash tool/device_shots/ios_capture.sh
         env:
-          HOLD_SECONDS: "8"
+          HOLD_SECONDS: "20"
 
       - name: Upload screenshots
         if: always()
@@ -93,7 +93,7 @@ jobs:
         run: flutter pub get
 
       - name: Build debug APK
-        run: flutter build apk --debug --dart-define=SPLASH_HOLD_MS=8000
+        run: flutter build apk --debug --dart-define=SPLASH_HOLD_MS=20000
 
       - name: API 34 screenshots
         uses: reactivecircus/android-emulator-runner@v2
@@ -108,7 +108,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           disable-animations: false
           force-avd-creation: true
-          script: bash tool/device_shots/android_capture.sh 34
+          script: HOLD_SECONDS=20 bash tool/device_shots/android_capture.sh 34
 
       - name: Drop the API 34 system image
         if: always()
@@ -131,7 +131,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           disable-animations: false
           force-avd-creation: true
-          script: bash tool/device_shots/android_capture.sh 30
+          script: HOLD_SECONDS=20 bash tool/device_shots/android_capture.sh 30
 
       - name: Upload screenshots
         if: always()
