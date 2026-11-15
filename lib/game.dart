@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class Game extends StatefulWidget {
-  const Game({Key? key}) : super(key: key);
+  const Game({super.key});
 
   @override
   State<Game> createState() => _GameState();

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   runApp(const MyApp());
@@ -55,10 +55,6 @@ class _MyHomePageState extends State<MyHomePage> {
   bool dcCheckState = false;
   bool pgpCheckState = false;
 
-  void startGame() {
-
-  }
-
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -68,9 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
+      appBar: AppBar(title: Text(widget.title)),
       body: SizedBox.expand(
         child: Container(
           padding: const EdgeInsets.only(top: 25.0, left: 15.0, right: 15.0),
@@ -91,9 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
                 title: const Text("Old Testament"),
               ),
-              const Divider(
-                height: 10.0,
-              ),
+              const Divider(height: 10.0),
               CheckboxListTile(
                 value: ntCheckState,
                 onChanged: (bool? value) {
@@ -103,9 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
                 title: const Text("New Testament"),
               ),
-              const Divider(
-                height: 10.0,
-              ),
+              const Divider(height: 10.0),
               CheckboxListTile(
                 value: bomCheckState,
                 onChanged: (bool? value) {
@@ -115,9 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
                 title: const Text("Book of Mormon"),
               ),
-              const Divider(
-                height: 10.0,
-              ),
+              const Divider(height: 10.0),
               CheckboxListTile(
                 value: dcCheckState,
                 onChanged: (bool? value) {
@@ -127,9 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
                 title: const Text("Doctrine and Covenants"),
               ),
-              const Divider(
-                height: 10.0,
-              ),
+              const Divider(height: 10.0),
               CheckboxListTile(
                 value: pgpCheckState,
                 onChanged: (bool? value) {
@@ -139,22 +125,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
                 title: const Text("Pearl of Great Price"),
               ),
-              const Divider(
-                height: 20.0,
-              ),
+              const Divider(height: 20.0),
               ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(200, 50),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(2)),
-                    ),
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(200, 50),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(2)),
                   ),
-                  child: const Text(
-                    "GO!",
-                    style: TextStyle(fontSize: 20),
-                  ))
+                ),
+                child: const Text("GO!", style: TextStyle(fontSize: 20)),
+              ),
             ],
           ),
         ),
