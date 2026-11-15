@@ -286,16 +286,36 @@ void main() {
   testWidgets(
     'app theme controls at text scale 2, alone and together in a row',
     (tester) async {
-      const controls = <Widget>[
-        FilledButton(onPressed: _noop, child: Text('Filled')),
-        ElevatedButton(onPressed: _noop, child: Text('Elevated')),
-        OutlinedButton(onPressed: _noop, child: Text('Outlined')),
-        TextButton(onPressed: _noop, child: Text('Text')),
-        _SampleSegmentedButton(),
+      final controls = <(Widget, Finder, double)>[
+        (
+          const FilledButton(onPressed: _noop, child: Text('Filled')),
+          find.widgetWithText(FilledButton, 'Filled'),
+          52,
+        ),
+        (
+          const ElevatedButton(onPressed: _noop, child: Text('Elevated')),
+          find.widgetWithText(ElevatedButton, 'Elevated'),
+          52,
+        ),
+        (
+          const OutlinedButton(onPressed: _noop, child: Text('Outlined')),
+          find.widgetWithText(OutlinedButton, 'Outlined'),
+          52,
+        ),
+        (
+          const TextButton(onPressed: _noop, child: Text('Text')),
+          find.widgetWithText(TextButton, 'Text'),
+          52,
+        ),
+        (
+          const _SampleSegmentedButton(),
+          find.byType(SegmentedButton<SegmentChoice>),
+          StSpace.minTap,
+        ),
       ];
 
       for (final theme in [lightTheme, darkTheme]) {
-        for (final control in controls) {
+        for (final (control, finder, minHeight) in controls) {
           await _pumpButtons(
             tester,
             theme: theme,
@@ -303,7 +323,11 @@ void main() {
             body: Center(child: control),
           );
           expect(tester.takeException(), isNull);
-          _expectControlHeights(tester);
+          expect(finder, findsOneWidget);
+          expect(
+            tester.getSize(finder).height,
+            greaterThanOrEqualTo(minHeight),
+          );
         }
 
         await tester.binding.setSurfaceSize(const Size(2400, 800));
@@ -434,9 +458,7 @@ Future<void> _pumpButtons(
 
 void _expectControlHeights(WidgetTester tester) {
   void expectHeight(Finder finder, double minHeight) {
-    if (finder.evaluate().isEmpty) {
-      return;
-    }
+    expect(finder, findsOneWidget);
     expect(tester.getSize(finder).height, greaterThanOrEqualTo(minHeight));
   }
 
