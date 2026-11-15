@@ -78,6 +78,8 @@ capture_run() {
       cp "$burst/${frame}.png" "$OUT/settled-${label}.png"
     fi
     i=$((i + 1))
+    # A tight screencap loop makes System UI ANR and cover the splash.
+    sleep 3
   done
 }
 
