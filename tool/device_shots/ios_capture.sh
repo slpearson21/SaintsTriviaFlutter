@@ -111,31 +111,41 @@ def summarize(label, items):
         else:
             print(" ", type(item))
 
-icon = {"bundleIdentifier": bundle, "displayName": name}
+def is_ours(item):
+    return item == bundle or (isinstance(item, dict) and item.get("bundleIdentifier") == bundle)
+
 changed = False
 lists = data.get("iconLists") if isinstance(data, dict) else None
 if isinstance(lists, list) and lists and isinstance(lists[0], list):
     summarize("page0 before", lists[0])
-    lists[0] = [item for item in lists[0] if not (isinstance(item, dict) and item.get("bundleIdentifier") == bundle)]
-    lists[0].insert(0, icon)
+    page = [item for item in lists[0] if not is_ours(item)]
+    insert_at = 0
+    for index, item in enumerate(page):
+        if isinstance(item, dict):
+            insert_at = index + 1
+    # This runtime stores app icons as bundle-id strings, not dictionaries.
+    page.insert(insert_at, bundle)
+    lists[0] = page
     changed = True
 dock = data.get("buttonBar") if isinstance(data, dict) else None
 if isinstance(dock, list):
     summarize("dock before", dock)
-    dock[:] = [item for item in dock if not (isinstance(item, dict) and item.get("bundleIdentifier") == bundle)]
-    dock.append(dict(icon))
+    dock[:] = [item for item in dock if not is_ours(item)]
+    dock.append(bundle if dock and isinstance(dock[0], str) else {"bundleIdentifier": bundle, "displayName": name})
     changed = True
 if changed:
     with open(path, "wb") as handle:
         plistlib.dump(data, handle)
-    print("wrote Trivia onto the first page and the dock")
+    print("wrote Trivia bundle id onto the first page and the dock")
 else:
     print("could not edit iconLists or buttonBar")
 PY
   cp "$plist" "$spring/DesiredIconState.plist" || true
-  xcrun simctl spawn "$UDID" launchctl kickstart -k user/foreground/com.apple.SpringBoard \
-    >>"$NOTES" 2>&1 || log "SpringBoard kickstart failed"
-  sleep 5
+  # A full reboot is what makes SpringBoard reread IconState.plist.
+  xcrun simctl shutdown "$UDID" || true
+  xcrun simctl boot "$UDID"
+  xcrun simctl bootstatus "$UDID" -b
+  sleep 3
 }
 
 capture_launch() {
