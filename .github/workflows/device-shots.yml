@@ -1,10 +1,10 @@
 name: Device shots
 
-# Throwaway branch. Not part of PR #4 and not for merge.
+# Throwaway branch. Not part of PR #5 and not for merge.
 on:
   push:
     branches:
-      - cursor/striv-21-device-shots
+      - cursor/striv-polish-device-shots
 
 permissions:
   contents: read
