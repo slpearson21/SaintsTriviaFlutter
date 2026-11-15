@@ -1,0 +1,142 @@
+name: Device shots
+
+# Throwaway branch for the seamless-splash frame comparison. Not for merge.
+on:
+  push:
+    branches:
+      - cursor/striv-seamless-device-shots
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  ios:
+    name: iOS simulator screenshots
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.50.0"
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build debug iOS simulator app
+        # SPLASH_HOLD_MS keeps the native launch screen up for the first shot.
+        run: flutter build ios --simulator --debug --dart-define=SPLASH_HOLD_MS=8000
+
+      - name: Show simulators
+        run: xcrun simctl list devices available
+
+      - name: Capture screenshots
+        run: bash tool/device_shots/ios_capture.sh
+        env:
+          HOLD_SECONDS: "8"
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-device-shots
+          path: shots/ios/**
+          if-no-files-found: error
+
+  android:
+    name: Android emulator screenshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Require KVM
+        run: |
+          if [[ ! -e /dev/kvm ]]; then
+            echo "/dev/kvm is missing on this runner"
+            exit 1
+          fi
+          sudo chmod 666 /dev/kvm || true
+          ls -l /dev/kvm
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost \
+            /usr/local/share/chromium /usr/share/swift \
+            /usr/local/lib/android/sdk/ndk \
+            /usr/local/lib/android/sdk/system-images \
+            /opt/hostedtoolcache/CodeQL || true
+          sudo apt-get clean
+          df -h
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.50.0"
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build debug APK
+        run: flutter build apk --debug --dart-define=SPLASH_HOLD_MS=8000
+
+      - name: API 34 screenshots
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          avd-name: api34
+          emulator-port: 5554
+          ram-size: 2048M
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          disable-animations: false
+          force-avd-creation: true
+          script: bash tool/device_shots/android_capture.sh 34
+
+      - name: Drop the API 34 system image
+        if: always()
+        run: |
+          sudo rm -rf /usr/local/lib/android/sdk/system-images/android-34 \
+            "$HOME/Library/Android/sdk/system-images/android-34" \
+            "$HOME/.android/avd/api34.avd" "$HOME/.android/avd/api34.ini" || true
+          df -h
+
+      - name: API 30 screenshots
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_4
+          avd-name: api30
+          emulator-port: 5556
+          ram-size: 2048M
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          disable-animations: false
+          force-avd-creation: true
+          script: bash tool/device_shots/android_capture.sh 30
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-device-shots
+          path: shots/android-*/**
+          if-no-files-found: error

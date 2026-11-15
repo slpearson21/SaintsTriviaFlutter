@@ -37,10 +37,23 @@ Future<void> removeSplashAfterBundledQuestionBank({
       await loadQuestionBank();
     } else {
       await loadBundledQuestionBank();
+      // Device-shot builds pass SPLASH_HOLD_MS so the native splash stays
+      // up long enough to photograph. Tests and normal builds leave it at 0.
+      const holdMs = int.fromEnvironment('SPLASH_HOLD_MS');
+      if (holdMs > 0) {
+        await Future<void>.delayed(Duration(milliseconds: holdMs));
+      }
     }
   } catch (error) {
     debugPrint('Bundled question bank failed to load: $error');
   } finally {
+    // With a hold, drop the native splash while the cover is still opaque
+    // and leave that first Flutter frame up long enough to photograph.
+    const holdMs = int.fromEnvironment('SPLASH_HOLD_MS');
+    if (holdMs > 0) {
+      removeSplash();
+      await Future<void>.delayed(const Duration(seconds: 4));
+    }
     revealSplash();
     removeSplash();
   }
