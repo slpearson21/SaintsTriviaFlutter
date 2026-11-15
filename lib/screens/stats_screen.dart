@@ -14,7 +14,7 @@ class StatsScreen extends StatelessWidget {
       title: 'Stats',
       primary: PrimaryButton(
         label: 'Start a game',
-        onPressed: () => context.push(AppRoutes.setup),
+        onPressed: () => context.go(AppRoutes.setup),
       ),
       body: Text(
         'On-device stats will go here. No games yet.',

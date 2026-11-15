@@ -25,10 +25,11 @@ class PlaceholderScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scaler = MediaQuery.textScalerOf(context);
-    // titleLarge's line height is 30. Allow two lines once text is large.
-    final toolbarHeight = isLargeText(context)
-        ? scaler.scale(30) * 2 + StSpace.md
-        : null;
+    final titleStyle = Theme.of(context).textTheme.titleLarge;
+    final fontSize = titleStyle?.fontSize ?? 22;
+    final heightFactor = titleStyle?.height ?? 30 / 22;
+    final line = scaler.scale(fontSize * heightFactor);
+    final toolbarHeight = isLargeText(context) ? line * 2 + StSpace.md : null;
 
     return Scaffold(
       appBar: AppBar(

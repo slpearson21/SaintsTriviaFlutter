@@ -18,38 +18,40 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.home,
         name: AppRouteNames.home,
         builder: (context, state) => const HomeScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.setup,
-        name: AppRouteNames.setup,
-        builder: (context, state) => const SetupScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.game,
-        name: AppRouteNames.game,
-        builder: (context, state) => const GameScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.results,
-        name: AppRouteNames.results,
-        builder: (context, state) => const ResultsScreen(),
         routes: [
           GoRoute(
-            path: 'review',
-            name: AppRouteNames.review,
-            builder: (context, state) => const ReviewScreen(),
+            path: 'setup',
+            name: AppRouteNames.setup,
+            builder: (context, state) => const SetupScreen(),
+          ),
+          GoRoute(
+            path: 'game',
+            name: AppRouteNames.game,
+            builder: (context, state) => const GameScreen(),
+          ),
+          GoRoute(
+            path: 'results',
+            name: AppRouteNames.results,
+            builder: (context, state) => const ResultsScreen(),
+            routes: [
+              GoRoute(
+                path: 'review',
+                name: AppRouteNames.review,
+                builder: (context, state) => const ReviewScreen(),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: 'stats',
+            name: AppRouteNames.stats,
+            builder: (context, state) => const StatsScreen(),
+          ),
+          GoRoute(
+            path: 'settings',
+            name: AppRouteNames.settings,
+            builder: (context, state) => const SettingsScreen(),
           ),
         ],
-      ),
-      GoRoute(
-        path: AppRoutes.stats,
-        name: AppRouteNames.stats,
-        builder: (context, state) => const StatsScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.settings,
-        name: AppRouteNames.settings,
-        builder: (context, state) => const SettingsScreen(),
       ),
     ],
   );

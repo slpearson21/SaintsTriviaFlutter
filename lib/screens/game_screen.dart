@@ -6,7 +6,6 @@ import 'package:material_ui/material_ui.dart';
 import '../layout/question_progress.dart';
 import '../layout/screen_body.dart';
 import '../layout/st_icon.dart';
-import '../layout/text_scale.dart';
 import '../routing/routes.dart';
 import '../theme/st_theme.dart';
 import 'placeholder_scaffold.dart';
@@ -38,7 +37,6 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final target = minTapTarget(context);
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
@@ -54,14 +52,14 @@ class _GameScreenState extends State<GameScreen> {
           tooltip: 'Close',
           onPressed: _requestQuit,
           style: IconButton.styleFrom(
-            minimumSize: Size.square(target),
+            minimumSize: const Size.square(StSpace.minTap),
             tapTargetSize: MaterialTapTargetSize.padded,
           ),
           icon: const StIcon(Icons.close),
         ),
         primary: PrimaryButton(
           label: 'See results',
-          onPressed: () => context.push(AppRoutes.results),
+          onPressed: () => context.go(AppRoutes.results),
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,11 +78,6 @@ class _GameScreenState extends State<GameScreen> {
 }
 
 Future<bool> showQuitGameDialog(BuildContext context) async {
-  final target = minTapTarget(context);
-  final buttonStyle = TextButton.styleFrom(
-    minimumSize: Size(target, target),
-    tapTargetSize: MaterialTapTargetSize.padded,
-  );
   final quit = await showDialog<bool>(
     context: context,
     builder: (context) {
@@ -93,12 +86,10 @@ Future<bool> showQuitGameDialog(BuildContext context) async {
         content: const Text('Your progress in this game will be lost.'),
         actions: [
           TextButton(
-            style: buttonStyle,
             onPressed: () => Navigator.of(context).pop(false),
             child: const Text('Keep playing'),
           ),
           TextButton(
-            style: buttonStyle,
             onPressed: () => Navigator.of(context).pop(true),
             child: const Text('Quit'),
           ),

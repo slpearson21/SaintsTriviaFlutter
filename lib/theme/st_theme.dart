@@ -41,6 +41,9 @@ abstract final class StMotion {
 
 const _serif = 'SourceSerif4';
 
+/// Primary (filled, elevated) and outlined pill height.
+const _pillHeight = 52.0;
+
 TextTheme _textTheme(Color on) => TextTheme(
   displaySmall: TextStyle(
     fontFamily: _serif,
@@ -277,18 +280,40 @@ ThemeData buildTheme(Brightness b) {
         side: BorderSide(color: scheme.outlineVariant),
       ),
     ),
+    // Primary pills are 52 tall (Mikey's spec). That is above the 48 dp /
+    // 44 pt minimum. Text buttons and icon buttons use the 48 dp minimum,
+    // which also covers the iOS 44 pt target.
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        minimumSize: const Size.fromHeight(52),
+        minimumSize: const Size.fromHeight(_pillHeight),
+        shape: const StadiumBorder(),
+        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+      ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size.fromHeight(_pillHeight),
         shape: const StadiumBorder(),
         textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        minimumSize: const Size.fromHeight(52),
+        minimumSize: const Size.fromHeight(_pillHeight),
         shape: const StadiumBorder(),
         side: BorderSide(color: scheme.outline),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        minimumSize: const Size(StSpace.minTap, StSpace.minTap),
+        tapTargetSize: MaterialTapTargetSize.padded,
+      ),
+    ),
+    iconButtonTheme: IconButtonThemeData(
+      style: IconButton.styleFrom(
+        minimumSize: const Size.square(StSpace.minTap),
+        tapTargetSize: MaterialTapTargetSize.padded,
       ),
     ),
     chipTheme: const ChipThemeData(

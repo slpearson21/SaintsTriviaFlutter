@@ -14,7 +14,7 @@ class SetupScreen extends StatelessWidget {
       title: 'Game setup',
       primary: PrimaryButton(
         label: 'Start game',
-        onPressed: () => context.push(AppRoutes.game),
+        onPressed: () => context.go(AppRoutes.game),
       ),
       body: Text(
         'Volume picker and question count will go here.',

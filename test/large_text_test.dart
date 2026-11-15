@@ -1,10 +1,14 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:saints_trivia_flutter/app.dart';
 import 'package:saints_trivia_flutter/layout/adaptive_actions.dart';
 import 'package:saints_trivia_flutter/layout/question_progress.dart';
 import 'package:saints_trivia_flutter/layout/screen_body.dart';
 import 'package:saints_trivia_flutter/layout/st_icon.dart';
 import 'package:saints_trivia_flutter/layout/text_scale.dart';
+import 'package:saints_trivia_flutter/routing/app_router.dart';
+import 'package:saints_trivia_flutter/routing/routes.dart';
 import 'package:saints_trivia_flutter/theme/st_theme.dart';
 
 const _spoken = 'Question 7 of 10';
@@ -234,6 +238,108 @@ void main() {
     } finally {
       semantics.dispose();
     }
+  });
+
+  testWidgets(
+    'primary and outlined buttons are at least 52, text buttons at least 48',
+    (tester) async {
+      const scales = <double>[1, 2];
+      for (final brightness in Brightness.values) {
+        for (final scale in scales) {
+          await tester.pumpWidget(
+            MaterialApp(
+              theme: buildTheme(brightness),
+              builder: (context, child) {
+                return MediaQuery(
+                  data: MediaQuery.of(context)
+                      .copyWith(textScaler: TextScaler.linear(scale)),
+                  child: child!,
+                );
+              },
+              home: const Scaffold(
+                body: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      FilledButton(onPressed: _noop, child: Text('Filled')),
+                      ElevatedButton(onPressed: _noop, child: Text('Elevated')),
+                      OutlinedButton(onPressed: _noop, child: Text('Outlined')),
+                      TextButton(onPressed: _noop, child: Text('Text')),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+          expect(tester.takeException(), isNull);
+
+          expect(
+            tester.getSize(find.widgetWithText(FilledButton, 'Filled')).height,
+            greaterThanOrEqualTo(52),
+          );
+          expect(
+            tester
+                .getSize(find.widgetWithText(ElevatedButton, 'Elevated'))
+                .height,
+            greaterThanOrEqualTo(52),
+          );
+          expect(
+            tester
+                .getSize(find.widgetWithText(OutlinedButton, 'Outlined'))
+                .height,
+            greaterThanOrEqualTo(52),
+          );
+          expect(
+            tester.getSize(find.widgetWithText(TextButton, 'Text')).height,
+            greaterThanOrEqualTo(StSpace.minTap),
+          );
+        }
+      }
+    },
+  );
+
+  testWidgets('every route renders at text scale 1 and 2 without overflow', (
+    tester,
+  ) async {
+    const routes = <String>[
+      AppRoutes.home,
+      AppRoutes.setup,
+      AppRoutes.game,
+      AppRoutes.results,
+      AppRoutes.review,
+      AppRoutes.stats,
+      AppRoutes.settings,
+    ];
+
+    for (final scale in <double>[1, 2]) {
+      await tester.binding.setSurfaceSize(const Size(360, 640));
+      tester.platformDispatcher.textScaleFactorTestValue = scale;
+
+      final container = ProviderContainer();
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const SaintsTriviaApp(),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final router = container.read(appRouterProvider);
+
+      for (final path in routes) {
+        router.go(path);
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull, reason: '$path at $scale');
+        if (scale == 2 && path == AppRoutes.game) {
+          expect(find.text('7 / 10'), findsOneWidget);
+        }
+      }
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      container.dispose();
+    }
+
+    tester.platformDispatcher.clearTextScaleFactorTestValue();
+    await tester.binding.setSurfaceSize(null);
   });
 }
 

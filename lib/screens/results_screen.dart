@@ -33,7 +33,7 @@ class ResultsScreen extends StatelessWidget {
                 child: const Text('New game'),
               ),
               OutlinedButton(
-                onPressed: () => context.push(AppRoutes.review),
+                onPressed: () => context.go(AppRoutes.review),
                 child: const Text('Review answers'),
               ),
             ],

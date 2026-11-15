@@ -17,7 +17,7 @@ class HomeScreen extends StatelessWidget {
       title: 'Home',
       primary: PrimaryButton(
         label: 'Start a game',
-        onPressed: () => context.push(AppRoutes.setup),
+        onPressed: () => context.go(AppRoutes.setup),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,11 +32,11 @@ class HomeScreen extends StatelessWidget {
           AdaptiveActions(
             children: [
               OutlinedButton(
-                onPressed: () => context.push(AppRoutes.stats),
+                onPressed: () => context.go(AppRoutes.stats),
                 child: const Text('Stats'),
               ),
               OutlinedButton(
-                onPressed: () => context.push(AppRoutes.settings),
+                onPressed: () => context.go(AppRoutes.settings),
                 child: const Text('Settings'),
               ),
             ],
