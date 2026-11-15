@@ -43,6 +43,11 @@ const splashLaunchDark = Color(0xFF0F1620);
 const splashMarkExtent = 192.0;
 
 /// On-screen size of the Android 12+ splash icon, including its clear margin.
+///
+/// With no icon background, AOSP puts the icon in a 192 dp view (160 dp × 1.2)
+/// and the adaptive-icon viewport paints the bitmap at 1.5× that view, so the
+/// full asset is 192 × 1.5 = 288 dp. The center 192 dp is what the mask keeps.
+/// An icon background would switch this to 240 dp, and none is set.
 const splashAndroid12MarkExtent = 288.0;
 
 /// Android 12, when [windowSplashScreenAnimatedIcon] replaced launch_background.
@@ -309,6 +314,21 @@ class _SplashFadeState extends State<SplashFade>
         splashHandoff.value == SplashHandoff.revealing &&
         mounted) {
       setState(() {});
+      // The 1152 masters are several megabytes decoded. Drop them once the
+      // cover is gone so they do not sit in the image cache for the session.
+      WidgetsBinding.instance.addPostFrameCallback((_) => _evictSplashMarks());
+    }
+  }
+
+  void _evictSplashMarks() {
+    final platform = defaultTargetPlatform;
+    for (final brightness in Brightness.values) {
+      final mark = splashMarkFor(
+        platform: platform,
+        brightness: brightness,
+        androidSdkInt: _splashAndroidSdkInt,
+      );
+      unawaited(AssetImage(mark.asset).evict());
     }
   }
 
@@ -346,7 +366,9 @@ class _SplashFadeState extends State<SplashFade>
   @override
   Widget build(BuildContext context) {
     if (!_showCover) return widget.child;
-    final brightness = Theme.of(context).brightness;
+    // The native splash follows the system setting. Theme brightness can
+    // diverge once Settings can override the theme.
+    final brightness = MediaQuery.platformBrightnessOf(context);
     final platform = defaultTargetPlatform;
     final mark = splashMarkFor(
       platform: platform,
