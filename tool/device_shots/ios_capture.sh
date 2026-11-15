@@ -87,36 +87,55 @@ log "installed $APP"
 
 # Put Trivia on the first home-screen page when the icon state is a plain list.
 place_icon() {
-  local plist="$HOME/Library/Developer/CoreSimulator/Devices/$UDID/data/Library/SpringBoard/IconState.plist"
+  local spring="$HOME/Library/Developer/CoreSimulator/Devices/$UDID/data/Library/SpringBoard"
+  local plist="$spring/IconState.plist"
   if [[ ! -f "$plist" ]]; then
     log "IconState.plist not found at $plist"
-    ls -la "$(dirname "$plist")" >>"$NOTES" 2>&1 || true
+    ls -la "$spring" >>"$NOTES" 2>&1 || true
     return 0
   fi
-  python3 - "$plist" "$BUNDLE_ID" "Trivia" >>"$NOTES" <<'PY'
+  python3 - "$plist" "$BUNDLE_ID" "Trivia" | tee -a "$NOTES" <<'PY'
 import plistlib, sys
 path, bundle, name = sys.argv[1:]
 with open(path, "rb") as handle:
     data = plistlib.load(handle)
 print("IconState keys:", sorted(data) if isinstance(data, dict) else type(data))
+
+def summarize(label, items):
+    print(label, "count", len(items) if isinstance(items, list) else type(items))
+    if not isinstance(items, list):
+        return
+    for item in items[:8]:
+        if isinstance(item, dict):
+            print(" ", item.get("bundleIdentifier") or item.get("displayName") or sorted(item)[:6])
+        else:
+            print(" ", type(item))
+
+icon = {"bundleIdentifier": bundle, "displayName": name}
+changed = False
 lists = data.get("iconLists") if isinstance(data, dict) else None
-if not isinstance(lists, list) or not lists or not isinstance(lists[0], list):
-    print("iconLists not editable; leaving springboard layout alone")
-    sys.exit(0)
-page = lists[0]
-for item in page:
-    if isinstance(item, dict) and item.get("bundleIdentifier") == bundle:
-        print("icon already on first page")
-        break
-else:
-    page.insert(0, {"bundleIdentifier": bundle, "displayName": name})
+if isinstance(lists, list) and lists and isinstance(lists[0], list):
+    summarize("page0 before", lists[0])
+    lists[0] = [item for item in lists[0] if not (isinstance(item, dict) and item.get("bundleIdentifier") == bundle)]
+    lists[0].insert(0, icon)
+    changed = True
+dock = data.get("buttonBar") if isinstance(data, dict) else None
+if isinstance(dock, list):
+    summarize("dock before", dock)
+    dock[:] = [item for item in dock if not (isinstance(item, dict) and item.get("bundleIdentifier") == bundle)]
+    dock.append(dict(icon))
+    changed = True
+if changed:
     with open(path, "wb") as handle:
         plistlib.dump(data, handle)
-    print("inserted icon at start of first page")
+    print("wrote Trivia onto the first page and the dock")
+else:
+    print("could not edit iconLists or buttonBar")
 PY
-  xcrun simctl spawn "$UDID" launchctl kickstart -k system/com.apple.SpringBoard \
+  cp "$plist" "$spring/DesiredIconState.plist" || true
+  xcrun simctl spawn "$UDID" launchctl kickstart -k user/foreground/com.apple.SpringBoard \
     >>"$NOTES" 2>&1 || log "SpringBoard kickstart failed"
-  sleep 3
+  sleep 5
 }
 
 capture_launch() {
