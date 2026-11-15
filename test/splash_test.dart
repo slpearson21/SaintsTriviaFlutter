@@ -170,27 +170,56 @@ void main() {
     );
   });
 
+  testWidgets('dark platform keeps the dark launch color under a light theme', (
+    tester,
+  ) async {
+    tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+    addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+    holdSplashForHandoff();
+    await tester.pumpWidget(
+      MaterialApp(
+        themeMode: ThemeMode.light,
+        theme: ThemeData(
+          brightness: Brightness.light,
+          colorScheme: const ColorScheme.light(surface: Color(0xFFFF00FF)),
+        ),
+        home: const SplashFade(child: SizedBox.expand()),
+      ),
+    );
+    final context = tester.element(find.byKey(splashBackgroundKey));
+    expect(Theme.of(context).brightness, Brightness.light);
+    expect(MediaQuery.platformBrightnessOf(context), Brightness.dark);
+    _expectLaunchFrame(
+      tester,
+      color: splashLaunchDark,
+      asset: splashMarkDarkAsset,
+      extent: splashMarkExtent,
+    );
+  });
+
   testWidgets(
-    'dark cover keeps the launch color when the theme surface differs',
+    'light platform keeps the light launch color under a dark theme',
     (tester) async {
+      tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
+      addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
       holdSplashForHandoff();
       await tester.pumpWidget(
         MaterialApp(
-          theme: ThemeData(
+          themeMode: ThemeMode.dark,
+          darkTheme: ThemeData(
             brightness: Brightness.dark,
             colorScheme: const ColorScheme.dark(surface: Color(0xFF010203)),
           ),
           home: const SplashFade(child: SizedBox.expand()),
         ),
       );
-      final darkTheme = Theme.of(
-        tester.element(find.byKey(splashBackgroundKey)),
-      );
-      expect(darkTheme.colorScheme.surface, isNot(splashLaunchDark));
+      final context = tester.element(find.byKey(splashBackgroundKey));
+      expect(Theme.of(context).brightness, Brightness.dark);
+      expect(MediaQuery.platformBrightnessOf(context), Brightness.light);
       _expectLaunchFrame(
         tester,
-        color: splashLaunchDark,
-        asset: splashMarkDarkAsset,
+        color: splashLaunchLight,
+        asset: splashMarkLightAsset,
         extent: splashMarkExtent,
       );
     },
@@ -341,7 +370,9 @@ void main() {
   });
 
   testWidgets('the logo is decoded before the first frame', (tester) async {
-    await warmSplashMark(splashMarkLightAsset);
+    // Image decoding uses real async. The test clock would never fire the
+    // warm-up timeout, so run it outside the fake async zone.
+    await tester.runAsync(() => warmSplashMark(splashMarkLightAsset));
     holdSplashForHandoff();
     await tester.pumpWidget(const ProviderScope(child: SaintsTriviaApp()));
     final render = tester.renderObject<RenderImage>(find.byKey(splashLogoKey));
