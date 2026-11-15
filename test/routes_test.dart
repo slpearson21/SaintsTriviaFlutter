@@ -6,7 +6,7 @@ import 'pump_app.dart';
 void main() {
   testWidgets('every route renders and is reachable', (tester) async {
     await pumpApp(tester);
-    expect(find.text('Home'), findsOneWidget);
+    expect(find.text('Scripture Trivia'), findsOneWidget);
     expect(find.text('Start a game'), findsOneWidget);
 
     await tester.tap(find.text('Start a game'));
@@ -32,17 +32,17 @@ void main() {
 
     await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
-    expect(find.text('Home'), findsOneWidget);
+    expect(find.text('Scripture Trivia'), findsOneWidget);
 
-    await tester.tap(find.text('Stats'));
+    await tester.tap(find.byTooltip('Stats'));
     await tester.pumpAndSettle();
     expect(find.text('Stats'), findsOneWidget);
 
     await tester.pageBack();
     await tester.pumpAndSettle();
-    expect(find.text('Home'), findsOneWidget);
+    expect(find.text('Scripture Trivia'), findsOneWidget);
 
-    await tester.tap(find.text('Settings'));
+    await tester.tap(find.byTooltip('Settings'));
     await tester.pumpAndSettle();
     expect(find.text('Settings'), findsOneWidget);
   });
@@ -60,7 +60,7 @@ void main() {
     await tester.pageBack();
     await tester.pumpAndSettle();
 
-    expect(find.text('Home'), findsOneWidget);
+    expect(find.text('Scripture Trivia'), findsOneWidget);
     expect(find.text('Question'), findsNothing);
     expect(find.byType(AlertDialog), findsNothing);
   });
@@ -80,7 +80,7 @@ void main() {
     await tester.pageBack();
     await tester.pumpAndSettle();
 
-    expect(find.text('Home'), findsOneWidget);
+    expect(find.text('Scripture Trivia'), findsOneWidget);
     expect(find.text('Game setup'), findsNothing);
     expect(find.text('Question'), findsNothing);
   });
