@@ -5,10 +5,12 @@ import 'package:material_ui/material_ui.dart';
 
 import 'app.dart';
 import 'data/questions/bundled_question_bank_loader.dart';
+import 'splash_fade.dart';
 
 Future<void> main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  holdSplashForHandoff();
   runApp(const ProviderScope(child: SaintsTriviaApp()));
   await removeSplashAfterBundledQuestionBank();
 }
@@ -17,7 +19,8 @@ Future<void> main() async {
 ///
 /// [FlutterNativeSplash.preserve] must already have run. The splash comes
 /// down after a successful load and after a failed one, so a bad question
-/// bank cannot leave the launch screen up.
+/// bank cannot leave the launch screen up. [revealSplash] runs in this
+/// finally block so the first frame cross-fades in as the splash leaves.
 @visibleForTesting
 Future<void> removeSplashAfterBundledQuestionBank({
   Future<void> Function()? loadQuestionBank,
@@ -32,6 +35,7 @@ Future<void> removeSplashAfterBundledQuestionBank({
   } catch (error) {
     debugPrint('Bundled question bank failed to load: $error');
   } finally {
+    revealSplash();
     removeSplash();
   }
 }

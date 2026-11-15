@@ -1,10 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:saints_trivia_flutter/app.dart';
 import 'package:saints_trivia_flutter/main.dart';
+import 'package:saints_trivia_flutter/splash_fade.dart';
+import 'package:saints_trivia_flutter/theme/st_theme.dart';
 
 void main() {
+  tearDown(debugResetSplashHandoff);
   testWidgets('splash stays up until the question bank load finishes', (
     tester,
   ) async {
@@ -83,4 +89,86 @@ void main() {
 
     expect(tester.binding.sendFramesToEngine, isTrue);
   });
+
+  testWidgets('splash fades into the first frame over 250ms', (tester) async {
+    await _expectCoverFade(tester, fade: StMotion.medium);
+  });
+
+  testWidgets('reduced motion fades the splash out over 150ms', (tester) async {
+    await _expectCoverFade(
+      tester,
+      fade: StMotion.fast,
+      features: const FakeAccessibilityFeatures(disableAnimations: true),
+    );
+  });
+
+  testWidgets('iOS reduce motion fades the splash out over 150ms', (
+    tester,
+  ) async {
+    await _expectCoverFade(
+      tester,
+      fade: StMotion.fast,
+      features: const FakeAccessibilityFeatures(reduceMotion: true),
+    );
+  });
+
+  testWidgets('screen readers keep the 250ms splash fade', (tester) async {
+    await _expectCoverFade(
+      tester,
+      fade: StMotion.medium,
+      features: const FakeAccessibilityFeatures(accessibleNavigation: true),
+    );
+  });
+}
+
+/// Holds the splash, proves the cover stays up until removal, then checks
+/// [fade] against the cover's opacity.
+Future<void> _expectCoverFade(
+  WidgetTester tester, {
+  required Duration fade,
+  FakeAccessibilityFeatures? features,
+}) async {
+  if (features != null) {
+    tester.platformDispatcher.accessibilityFeaturesTestValue = features;
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+  }
+
+  holdSplashForHandoff();
+  await tester.pumpWidget(const ProviderScope(child: SaintsTriviaApp()));
+  expect(_coverOpacity(tester), 1);
+
+  await tester.pump(const Duration(milliseconds: 400));
+  expect(
+    _coverOpacity(tester),
+    1,
+    reason: 'cover faded before the splash was removed',
+  );
+
+  await removeSplashAfterBundledQuestionBank(
+    loadQuestionBank: () async {},
+    removeSplash: () {},
+  );
+  await tester.pump();
+  expect(_coverOpacity(tester), closeTo(1, 0.001));
+
+  await tester.pump(fade - const Duration(milliseconds: 1));
+  final mid = _coverOpacity(tester);
+  expect(mid, isNotNull, reason: 'cover was gone before $fade');
+  expect(mid, greaterThan(0));
+  expect(mid, lessThan(1));
+
+  await tester.pump(const Duration(milliseconds: 1));
+  final done = _coverOpacity(tester);
+  expect(
+    done == null || done == 0,
+    isTrue,
+    reason: 'cover still up after $fade (opacity $done)',
+  );
+}
+
+/// Opacity of the splash cover, or null once the fade has removed it.
+double? _coverOpacity(WidgetTester tester) {
+  final finder = find.byKey(splashFadeKey);
+  if (finder.evaluate().isEmpty) return null;
+  return tester.widget<FadeTransition>(finder).opacity.value;
 }
