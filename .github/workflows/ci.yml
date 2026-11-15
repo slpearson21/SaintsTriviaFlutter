@@ -1,16 +1,100 @@
 name: CI
 
+# Job names are the checks reviewers and branch protection refer to.
+# Keep "Analyze, test, and debug APK" and "iOS simulator build" exact.
+#
+# Both jobs use a job-level if so a pull request that should not run them
+# reports the check as skipped. A skipped required check still passes.
+# A workflow-level paths filter would leave the check pending.
+
 on:
   push:
     branches:
       - main
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+      - labeled
+  workflow_dispatch:
+
+# Cancel a superseded pull request run. Pushes to main and manual runs
+# finish, so two quick merges each get a full result.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+  pull-requests: read
 
 jobs:
+  changes:
+    name: Detect changed paths
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    outputs:
+      docs_only: ${{ steps.filter.outputs.docs_only }}
+      ios: ${{ steps.filter.outputs.ios }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # The pull request file list is the diff. Outputs feed the job-level
+      # ifs below so checks are skipped rather than omitted.
+      - name: Classify changed paths
+        id: filter
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          bash tool/classify_ci_paths.sh --self-test
+          if [[ "${EVENT_NAME}" != "pull_request" ]]; then
+            echo "docs_only=false" >> "${GITHUB_OUTPUT}"
+            echo "ios=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+          gh api --paginate \
+            "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/files" \
+            --jq '.[].filename' \
+            | bash tool/classify_ci_paths.sh
+
   android:
     name: Analyze, test, and debug APK
+    needs: changes
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Drafts skip. Docs-only pull requests skip. Pushes to main and manual
+    # runs always run. A failed path-detection job runs this job so the
+    # required check goes red instead of skipped.
+    if: |
+      !cancelled() &&
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      (
+        needs.changes.result == 'failure' ||
+        (
+          needs.changes.result == 'success' &&
+          (
+            github.event_name != 'pull_request' ||
+            needs.changes.outputs.docs_only != 'true'
+          )
+        )
+      )
     steps:
+      - name: Stop if path detection failed
+        if: needs.changes.result != 'success'
+        env:
+          CHANGES_RESULT: ${{ needs.changes.result }}
+        run: |
+          echo "Path detection did not succeed (${CHANGES_RESULT})."
+          echo "The Linux job is failing closed so this pull request cannot merge on a skip."
+          exit 1
+
       - name: Checkout
         uses: actions/checkout@v7
 
@@ -19,6 +103,10 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+          cache: gradle
+          cache-dependency-path: |
+            android/**/*.gradle*
+            android/**/gradle-wrapper.properties
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -47,7 +135,23 @@ jobs:
 
   ios:
     name: iOS simulator build
+    needs: [changes, android]
     runs-on: macos-latest
+    timeout-minutes: 40
+    # needs the Linux job so a failed analyze or test does not start macOS.
+    # A skipped Linux job (docs-only) still allows this job when an iOS path
+    # changed or the pull request has the ios label.
+    if: |
+      !cancelled() &&
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      needs.changes.result == 'success' &&
+      (needs.android.result == 'success' || needs.android.result == 'skipped') &&
+      (
+        github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch' ||
+        needs.changes.outputs.ios == 'true' ||
+        contains(github.event.pull_request.labels.*.name, 'ios')
+      )
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -58,6 +162,17 @@ jobs:
           channel: stable
           flutter-version: "3.50.0"
           cache: true
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cocoapods
+            ~/Library/Caches/CocoaPods
+            ios/Pods
+          key: ${{ runner.os }}-cocoapods-${{ hashFiles('pubspec.lock', 'ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cocoapods-
 
       - name: Install dependencies
         run: flutter pub get
