@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
-import 'package:flutter/services.dart' show MethodChannel;
 import 'package:material_ui/material_ui.dart';
 
 import 'theme/st_theme.dart';
@@ -56,9 +55,8 @@ const splashAndroid12MarkLightAsset =
 const splashAndroid12MarkDarkAsset =
     'assets/splash/splash-android12-dark-1152.png';
 
-const _splashSdkChannel = MethodChannel('saints_trivia/splash');
-
-/// SDK_INT once [prepareSplashHandoff] has read it. Null on iOS and in tests
+/// SDK_INT once [main] has read it from the Android entrypoint arguments.
+/// Null on iOS and in tests
 /// that never set it, which selects the pre-12 mark.
 int? _splashAndroidSdkInt;
 
@@ -139,16 +137,14 @@ Color splashLaunchColor(Brightness brightness) {
   return brightness == Brightness.dark ? splashLaunchDark : splashLaunchLight;
 }
 
-/// Reads the Android SDK, then decodes the splash mark before the first frame.
+/// Decodes the splash mark before the first frame.
 ///
 /// [FlutterNativeSplash.preserve] keeps the native splash up while this runs,
 /// so the first Flutter frame can paint the logo instead of an empty color.
-/// A failed lookup leaves the SDK unknown and the pre-12 mark is used.
+/// On Android, [main] must already have stored the SDK from the entrypoint
+/// arguments. An unknown SDK uses the pre-12 mark.
 Future<void> prepareSplashHandoff() async {
   final platform = defaultTargetPlatform;
-  if (platform == TargetPlatform.android) {
-    _splashAndroidSdkInt = await _readAndroidSdkInt();
-  }
   final light = splashMarkFor(
     platform: platform,
     brightness: Brightness.light,
@@ -197,17 +193,6 @@ Future<void> warmSplashMark(String asset) async {
   }
 }
 
-Future<int?> _readAndroidSdkInt() async {
-  try {
-    return await _splashSdkChannel
-        .invokeMethod<int>('sdkInt')
-        .timeout(const Duration(seconds: 1), onTimeout: () => null);
-  } catch (error) {
-    debugPrint('Splash SDK lookup failed: $error');
-    return null;
-  }
-}
-
 /// The Open Book + Spark asset and the logical size the native splash uses.
 @immutable
 class SplashMark {
@@ -237,6 +222,11 @@ void revealSplash() {
 void debugResetSplashHandoff() {
   splashHandoff.value = SplashHandoff.inactive;
   _splashAndroidSdkInt = null;
+}
+
+/// Stores the Android SDK read from the native entrypoint arguments.
+void setSplashAndroidSdkInt(int sdkInt) {
+  _splashAndroidSdkInt = sdkInt;
 }
 
 /// Pins the Android SDK the overlay uses. Null selects the pre-12 mark.
