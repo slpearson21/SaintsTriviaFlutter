@@ -41,8 +41,9 @@ abstract final class StMotion {
 
 const _serif = 'SourceSerif4';
 
-/// Primary (filled, elevated) and outlined pill height.
-const _pillHeight = 52.0;
+/// Finite minimum so a button can sit in a [Row]. [Size.fromHeight] is infinite
+/// in width and throws there.
+const _buttonMinSize = Size(64, 52);
 
 TextTheme _textTheme(Color on) => TextTheme(
   displaySmall: TextStyle(
@@ -280,34 +281,39 @@ ThemeData buildTheme(Brightness b) {
         side: BorderSide(color: scheme.outlineVariant),
       ),
     ),
-    // Primary pills are 52 tall (Mikey's spec). That is above the 48 dp /
-    // 44 pt minimum. Text buttons and icon buttons use the 48 dp minimum,
-    // which also covers the iOS 44 pt target.
+    // All four button types are 52 tall. Width is finite (64) so they can
+    // share a Row. Segmented controls and icon buttons stay at the 48 dp
+    // minimum, which also covers the 44 pt iOS target.
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        minimumSize: const Size.fromHeight(_pillHeight),
+        minimumSize: _buttonMinSize,
         shape: const StadiumBorder(),
         textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        minimumSize: const Size.fromHeight(_pillHeight),
+        minimumSize: _buttonMinSize,
         shape: const StadiumBorder(),
         textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        minimumSize: const Size.fromHeight(_pillHeight),
+        minimumSize: _buttonMinSize,
         shape: const StadiumBorder(),
         side: BorderSide(color: scheme.outline),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
-        minimumSize: const Size(StSpace.minTap, StSpace.minTap),
+        minimumSize: _buttonMinSize,
         tapTargetSize: MaterialTapTargetSize.padded,
+      ),
+    ),
+    segmentedButtonTheme: SegmentedButtonThemeData(
+      style: SegmentedButton.styleFrom(
+        minimumSize: const Size(StSpace.minTap, StSpace.minTap),
       ),
     ),
     iconButtonTheme: IconButtonThemeData(

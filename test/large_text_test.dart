@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saints_trivia_flutter/app.dart';
+import 'package:saints_trivia_flutter/app.dart'
+    show SaintsTriviaApp, darkTheme, lightTheme;
 import 'package:saints_trivia_flutter/layout/adaptive_actions.dart';
 import 'package:saints_trivia_flutter/layout/question_progress.dart';
 import 'package:saints_trivia_flutter/layout/screen_body.dart';
@@ -240,60 +241,89 @@ void main() {
     }
   });
 
-  testWidgets(
-    'primary and outlined buttons are at least 52, text buttons at least 48',
-    (tester) async {
-      const scales = <double>[1, 2];
-      for (final brightness in Brightness.values) {
-        for (final scale in scales) {
-          await tester.pumpWidget(
-            MaterialApp(
-              theme: buildTheme(brightness),
-              builder: (context, child) {
-                return MediaQuery(
-                  data: MediaQuery.of(context)
-                      .copyWith(textScaler: TextScaler.linear(scale)),
-                  child: child!,
-                );
-              },
-              home: const Scaffold(
-                body: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      FilledButton(onPressed: _noop, child: Text('Filled')),
-                      ElevatedButton(onPressed: _noop, child: Text('Elevated')),
-                      OutlinedButton(onPressed: _noop, child: Text('Outlined')),
-                      TextButton(onPressed: _noop, child: Text('Text')),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-          await tester.pumpAndSettle();
-          expect(tester.takeException(), isNull);
+  testWidgets('buttons are at least 52 and segmented buttons at least 48', (
+    tester,
+  ) async {
+    const scales = <double>[1, 2];
+    for (final brightness in Brightness.values) {
+      for (final scale in scales) {
+        await _pumpButtons(tester, theme: buildTheme(brightness), scale: scale);
+        expect(tester.takeException(), isNull);
+        _expectControlHeights(tester);
+      }
+    }
+  });
 
-          expect(
-            tester.getSize(find.widgetWithText(FilledButton, 'Filled')).height,
-            greaterThanOrEqualTo(52),
+  testWidgets('filled and text buttons share a row without throwing', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: lightTheme,
+        home: const Scaffold(
+          body: Row(
+            children: [
+              FilledButton(onPressed: _noop, child: Text('Filled')),
+              TextButton(onPressed: _noop, child: Text('Text')),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(
+      tester.getSize(find.widgetWithText(FilledButton, 'Filled')).height,
+      greaterThanOrEqualTo(52),
+    );
+    expect(
+      tester.getSize(find.widgetWithText(TextButton, 'Text')).height,
+      greaterThanOrEqualTo(52),
+    );
+  });
+
+  testWidgets(
+    'app theme controls at text scale 2, alone and together in a row',
+    (tester) async {
+      const controls = <Widget>[
+        FilledButton(onPressed: _noop, child: Text('Filled')),
+        ElevatedButton(onPressed: _noop, child: Text('Elevated')),
+        OutlinedButton(onPressed: _noop, child: Text('Outlined')),
+        TextButton(onPressed: _noop, child: Text('Text')),
+        _SampleSegmentedButton(),
+      ];
+
+      for (final theme in [lightTheme, darkTheme]) {
+        for (final control in controls) {
+          await _pumpButtons(
+            tester,
+            theme: theme,
+            scale: 2,
+            body: Center(child: control),
           );
-          expect(
-            tester
-                .getSize(find.widgetWithText(ElevatedButton, 'Elevated'))
-                .height,
-            greaterThanOrEqualTo(52),
-          );
-          expect(
-            tester
-                .getSize(find.widgetWithText(OutlinedButton, 'Outlined'))
-                .height,
-            greaterThanOrEqualTo(52),
-          );
-          expect(
-            tester.getSize(find.widgetWithText(TextButton, 'Text')).height,
-            greaterThanOrEqualTo(StSpace.minTap),
-          );
+          expect(tester.takeException(), isNull);
+          _expectControlHeights(tester);
         }
+
+        await tester.binding.setSurfaceSize(const Size(2400, 800));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+        await _pumpButtons(
+          tester,
+          theme: theme,
+          scale: 2,
+          body: const Row(
+            children: [
+              FilledButton(onPressed: _noop, child: Text('Filled')),
+              ElevatedButton(onPressed: _noop, child: Text('Elevated')),
+              OutlinedButton(onPressed: _noop, child: Text('Outlined')),
+              TextButton(onPressed: _noop, child: Text('Text')),
+              _SampleSegmentedButton(),
+            ],
+          ),
+        );
+        expect(tester.takeException(), isNull);
+        _expectControlHeights(tester);
       }
     },
   );
@@ -344,3 +374,75 @@ void main() {
 }
 
 void _noop() {}
+
+enum SegmentChoice { one, two }
+
+void _ignoreSegment(Set<SegmentChoice> selection) {}
+
+class _SampleSegmentedButton extends StatelessWidget {
+  const _SampleSegmentedButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return SegmentedButton<SegmentChoice>(
+      segments: const [
+        ButtonSegment(value: SegmentChoice.one, label: Text('One')),
+        ButtonSegment(value: SegmentChoice.two, label: Text('Two')),
+      ],
+      selected: const {SegmentChoice.one},
+      onSelectionChanged: _ignoreSegment,
+    );
+  }
+}
+
+Future<void> _pumpButtons(
+  WidgetTester tester, {
+  required ThemeData theme,
+  required double scale,
+  Widget? body,
+}) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      theme: theme,
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: TextScaler.linear(scale)),
+          child: child!,
+        );
+      },
+      home: Scaffold(
+        body:
+            body ??
+            const SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  FilledButton(onPressed: _noop, child: Text('Filled')),
+                  ElevatedButton(onPressed: _noop, child: Text('Elevated')),
+                  OutlinedButton(onPressed: _noop, child: Text('Outlined')),
+                  TextButton(onPressed: _noop, child: Text('Text')),
+                  _SampleSegmentedButton(),
+                ],
+              ),
+            ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+void _expectControlHeights(WidgetTester tester) {
+  void expectHeight(Finder finder, double minHeight) {
+    if (finder.evaluate().isEmpty) {
+      return;
+    }
+    expect(tester.getSize(finder).height, greaterThanOrEqualTo(minHeight));
+  }
+
+  expectHeight(find.widgetWithText(FilledButton, 'Filled'), 52);
+  expectHeight(find.widgetWithText(ElevatedButton, 'Elevated'), 52);
+  expectHeight(find.widgetWithText(OutlinedButton, 'Outlined'), 52);
+  expectHeight(find.widgetWithText(TextButton, 'Text'), 52);
+  expectHeight(find.byType(SegmentedButton<SegmentChoice>), StSpace.minTap);
+}
