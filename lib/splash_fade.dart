@@ -71,7 +71,8 @@ int? _splashAndroidSdkInt;
 ///
 /// Android 11 and earlier center `drawable/splash` (`android:gravity="center"`)
 /// in `launch_background`. Those density buckets are the same 192 dp artwork
-/// (mdpi 192 px through xxxhdpi 768 px).
+/// (mdpi 192 px through xxxhdpi 768 px). The window stops above the
+/// navigation bar, so the mark is centered in that area, not the full screen.
 ///
 /// Android 12+ ignores that window background and shows
 /// `windowSplashScreenAnimatedIcon`. With no icon background, AOSP sizes the
@@ -109,6 +110,26 @@ SplashMark splashMarkFor({
     asset: dark ? splashMarkDarkAsset : splashMarkLightAsset,
     extent: splashMarkExtent,
   );
+}
+
+/// How far above the screen center the mark sits.
+///
+/// Pre-Android-12 `launch_background` is centered in the window above the
+/// navigation bar. Android 12+ and iOS center on the full screen, including
+/// the home indicator and the system bars.
+@visibleForTesting
+double splashLogoBottomInset({
+  required TargetPlatform platform,
+  required int? androidSdkInt,
+  required double viewPaddingBottom,
+}) {
+  final android12 =
+      platform == TargetPlatform.android &&
+      (androidSdkInt ?? 0) >= splashAndroid12Api;
+  if (platform == TargetPlatform.android && !android12) {
+    return viewPaddingBottom;
+  }
+  return 0;
 }
 
 /// Launch background for [brightness]. These are the native splash colors,
@@ -336,10 +357,16 @@ class _SplashFadeState extends State<SplashFade>
   Widget build(BuildContext context) {
     if (!_showCover) return widget.child;
     final brightness = Theme.of(context).brightness;
+    final platform = defaultTargetPlatform;
     final mark = splashMarkFor(
-      platform: defaultTargetPlatform,
+      platform: platform,
       brightness: brightness,
       androidSdkInt: _splashAndroidSdkInt,
+    );
+    final bottomInset = splashLogoBottomInset(
+      platform: platform,
+      androidSdkInt: _splashAndroidSdkInt,
+      viewPaddingBottom: MediaQuery.viewPaddingOf(context).bottom,
     );
     return Stack(
       fit: StackFit.expand,
@@ -358,15 +385,18 @@ class _SplashFadeState extends State<SplashFade>
                       key: splashBackgroundKey,
                       color: splashLaunchColor(brightness),
                     ),
-                    Center(
-                      child: Image.asset(
-                        mark.asset,
-                        key: splashLogoKey,
-                        width: mark.extent,
-                        height: mark.extent,
-                        fit: BoxFit.fill,
-                        filterQuality: FilterQuality.medium,
-                        excludeFromSemantics: true,
+                    Padding(
+                      padding: EdgeInsets.only(bottom: bottomInset),
+                      child: Center(
+                        child: Image.asset(
+                          mark.asset,
+                          key: splashLogoKey,
+                          width: mark.extent,
+                          height: mark.extent,
+                          fit: BoxFit.fill,
+                          filterQuality: FilterQuality.medium,
+                          excludeFromSemantics: true,
+                        ),
                       ),
                     ),
                   ],

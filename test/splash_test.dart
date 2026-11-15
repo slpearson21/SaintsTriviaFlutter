@@ -235,6 +235,54 @@ void main() {
     );
   });
 
+  testWidgets('pre-12 logo centers above the navigation bar', (tester) async {
+    debugSetSplashAndroidSdkInt(30);
+    holdSplashForHandoff();
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) {
+          final media = MediaQuery.of(context);
+          return MediaQuery(
+            data: media.copyWith(
+              viewPadding: const EdgeInsets.only(bottom: 80),
+              padding: const EdgeInsets.only(bottom: 80),
+            ),
+            child: child!,
+          );
+        },
+        home: const SplashFade(child: SizedBox.expand()),
+      ),
+    );
+    final overlay = tester.getRect(find.byKey(splashFadeKey));
+    final logo = tester.getRect(find.byKey(splashLogoKey));
+    expect(logo.center.dx, closeTo(overlay.center.dx, 0.01));
+    expect(logo.center.dy, closeTo((overlay.height - 80) / 2, 0.01));
+  });
+
+  testWidgets('Android 12 and iOS ignore the navigation bar inset', (
+    tester,
+  ) async {
+    debugSetSplashAndroidSdkInt(34);
+    holdSplashForHandoff();
+    await tester.pumpWidget(_insetApp());
+    final overlay = tester.getRect(find.byKey(splashFadeKey));
+    expect(
+      tester.getRect(find.byKey(splashLogoKey)).center.dy,
+      closeTo(overlay.center.dy, 0.01),
+    );
+
+    debugResetSplashHandoff();
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    holdSplashForHandoff();
+    await tester.pumpWidget(_insetApp());
+    final iosOverlay = tester.getRect(find.byKey(splashFadeKey));
+    expect(
+      tester.getRect(find.byKey(splashLogoKey)).center.dy,
+      closeTo(iosOverlay.center.dy, 0.01),
+    );
+  });
+
   testWidgets('iOS first frame uses the centered 192 pt launch image', (
     tester,
   ) async {
@@ -366,6 +414,22 @@ Future<void> _expectCoverFade(
   expect(_coverOpacity(tester), isNull);
   expect(find.byKey(splashLogoKey), findsNothing);
   expect(find.byKey(splashBackgroundKey), findsNothing);
+}
+
+Widget _insetApp() {
+  return MaterialApp(
+    builder: (context, child) {
+      final media = MediaQuery.of(context);
+      return MediaQuery(
+        data: media.copyWith(
+          viewPadding: const EdgeInsets.only(bottom: 80),
+          padding: const EdgeInsets.only(bottom: 80),
+        ),
+        child: child!,
+      );
+    },
+    home: const SplashFade(child: SizedBox.expand()),
+  );
 }
 
 Future<void> _pumpHeldSplash(
