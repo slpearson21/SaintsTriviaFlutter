@@ -86,24 +86,22 @@ capture_run() {
   adb shell am force-stop "$PKG" || true
   night "$night_mode"
   dismiss_anr || true
-  adb shell am start -W -n "$ACT" || true
+  # Shoot immediately. Waiting for focus used up the splash hold.
+  adb shell am start -n "$ACT" || true
   log "started $label"
   local i
-  for i in 1 2 3 4 5 6 7 8 9 10; do
-    dismiss_anr || true
-    if app_focused; then
-      log "$label focused after ${i}s"
-      break
-    fi
+  for i in 1 2 3 4 5 6 8 10 12; do
     sleep 1
+    dismiss_anr || true
+    cap "t${i}-${label}.png"
+    if app_focused; then
+      log "$label focused by t${i}"
+    fi
   done
-  cap "launch-${label}.png"
-  sleep 3
-  cap "mid-${label}.png"
-  sleep $((HOLD_SECONDS))
-  cap "loaded-${label}.png"
-  sleep 3
-  cap "settled-${label}.png"
+  cp "$OUT/t1-${label}.png" "$OUT/launch-${label}.png"
+  cp "$OUT/t6-${label}.png" "$OUT/mid-${label}.png"
+  cp "$OUT/t12-${label}.png" "$OUT/loaded-${label}.png"
+  cp "$OUT/t12-${label}.png" "$OUT/settled-${label}.png"
 }
 
 capture_run no light
