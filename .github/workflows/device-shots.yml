@@ -72,6 +72,16 @@ jobs:
           sudo chmod 666 /dev/kvm || true
           ls -l /dev/kvm
 
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost \
+            /usr/local/share/chromium /usr/share/swift \
+            /usr/local/lib/android/sdk/ndk \
+            /usr/local/lib/android/sdk/system-images \
+            /opt/hostedtoolcache/CodeQL || true
+          sudo apt-get clean
+          df -h
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -99,6 +109,14 @@ jobs:
           disable-animations: false
           force-avd-creation: true
           script: bash tool/device_shots/android_capture.sh 34
+
+      - name: Drop the API 34 system image
+        if: always()
+        run: |
+          sudo rm -rf /usr/local/lib/android/sdk/system-images/android-34 \
+            "$HOME/Library/Android/sdk/system-images/android-34" \
+            "$HOME/.android/avd/api34.avd" "$HOME/.android/avd/api34.ini" || true
+          df -h
 
       - name: API 30 screenshots
         uses: reactivecircus/android-emulator-runner@v2
