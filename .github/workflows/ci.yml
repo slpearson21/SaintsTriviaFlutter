@@ -27,6 +27,11 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Validate question bank
+        # Structure only. The bank is still draft. Release builds pass
+        # --require-approved (see tool/validate_questions.dart).
+        run: dart run tool/validate_questions.dart
+
       - name: Analyze
         run: flutter analyze
 

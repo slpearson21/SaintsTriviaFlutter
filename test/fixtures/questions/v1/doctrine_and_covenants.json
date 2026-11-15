@@ -1,0 +1,77 @@
+[
+  {
+    "id": "dc-0001",
+    "volume": "DC",
+    "reference": "D&C 1:38",
+    "prompt": "D&C 1:38 teaches that whether by the Lord's own voice or by the voice of His servants, it is what?",
+    "options": [
+      "A mystery",
+      "Temporary",
+      "Optional",
+      "The same"
+    ],
+    "answerIndex": 3,
+    "explanation": "Whether by mine own voice or by the voice of my servants, it is the same.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0002",
+    "volume": "DC",
+    "reference": "D&C 1:30",
+    "prompt": "In D&C 1:30, the Lord calls His Church the only true and what church?",
+    "options": [
+      "Living",
+      "Perfect",
+      "Universal",
+      "Ancient"
+    ],
+    "answerIndex": 0,
+    "explanation": "The Lord describes the only true and living church.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0003",
+    "volume": "DC",
+    "reference": "D&C 3:1",
+    "prompt": "According to D&C 3:1, the works, designs, and purposes of God cannot be what?",
+    "options": [
+      "Changed by prayer",
+      "Frustrated",
+      "Written",
+      "Understood"
+    ],
+    "answerIndex": 1,
+    "explanation": "The works, and the designs, and the purposes of God cannot be frustrated.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0004",
+    "volume": "DC",
+    "reference": "D&C 4:2",
+    "prompt": "D&C 4:2 counsels those who embark in God's service to serve with all their heart, might, mind, and what?",
+    "options": [
+      "Strength",
+      "Time",
+      "Talents",
+      "Means"
+    ],
+    "answerIndex": 0,
+    "explanation": "Serve him with all your heart, might, mind and strength.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0005",
+    "volume": "DC",
+    "reference": "D&C 4:6",
+    "prompt": "Which of these is NOT among the attributes listed in D&C 4:6?",
+    "options": [
+      "Diligence",
+      "Courage",
+      "Virtue",
+      "Patience"
+    ],
+    "answerIndex": 1,
+    "explanation": "D&C 4:6 lists faith, virtue, knowledge, temperance, patience, brotherly kindness, godliness, charity, humility, diligence.",
+    "reviewStatus": "draft"
+  }
+]

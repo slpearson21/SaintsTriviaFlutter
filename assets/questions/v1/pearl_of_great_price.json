@@ -1,0 +1,1772 @@
+[
+  {
+    "id": "pgp-0001",
+    "volume": "PGP",
+    "reference": "Moses 1:1",
+    "prompt": "Where was Moses when God spoke the words recorded in Moses 1?",
+    "options": [
+      "Caught up into an exceedingly high mountain",
+      "At the Red Sea",
+      "In Pharaoh's court",
+      "In the land of Midian at a well"
+    ],
+    "answerIndex": 0,
+    "explanation": "Moses was caught up into an exceedingly high mountain.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0002",
+    "volume": "PGP",
+    "reference": "Moses 1:4",
+    "prompt": "In Moses 1:4, God calls Moses what?",
+    "options": [
+      "My friend",
+      "My prophet",
+      "My servant",
+      "My son"
+    ],
+    "answerIndex": 3,
+    "explanation": "God said, Behold, thou art my son.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0003",
+    "volume": "PGP",
+    "reference": "Moses 1:12-13",
+    "prompt": "Who came tempting Moses after God's presence withdrew in Moses 1?",
+    "options": [
+      "Pharaoh",
+      "A false prophet",
+      "Satan",
+      "Korah"
+    ],
+    "answerIndex": 2,
+    "explanation": "Satan came tempting him, saying, Moses, son of man, worship me.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0004",
+    "volume": "PGP",
+    "reference": "Moses 1:21",
+    "prompt": "In whose name did Moses finally command Satan to depart?",
+    "options": [
+      "Aaron",
+      "Jehovah's angel",
+      "The Only Begotten",
+      "Abraham"
+    ],
+    "answerIndex": 2,
+    "explanation": "Moses commanded Satan in the name of the Only Begotten to depart.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0005",
+    "volume": "PGP",
+    "reference": "Moses 1:33",
+    "prompt": "In Moses 1:33, by whom did God say He created worlds without number?",
+    "options": [
+      "The Son, mine Only Begotten",
+      "The angels",
+      "Moses",
+      "Michael"
+    ],
+    "answerIndex": 0,
+    "explanation": "Worlds without number have I created by the Son, mine Only Begotten.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0006",
+    "volume": "PGP",
+    "reference": "Moses 1:39",
+    "prompt": "According to Moses 1:39, what is God's work and glory?",
+    "options": [
+      "To bring to pass the immortality and eternal life of man",
+      "To judge the nations",
+      "To gather Israel",
+      "To create worlds without number"
+    ],
+    "answerIndex": 0,
+    "explanation": "God's work and glory is the immortality and eternal life of man.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0007",
+    "volume": "PGP",
+    "reference": "Moses 1:41",
+    "prompt": "Moses 1:41 foretells that God will raise up another like unto whom to restore His words?",
+    "options": [
+      "Enoch",
+      "Moses",
+      "Abraham",
+      "Elijah"
+    ],
+    "answerIndex": 1,
+    "explanation": "God would raise up another like unto Moses.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0008",
+    "volume": "PGP",
+    "reference": "Moses 2:1",
+    "prompt": "In Moses 2:1, who is speaking to Moses about the creation?",
+    "options": [
+      "Enoch",
+      "Adam",
+      "An angel",
+      "The Lord God"
+    ],
+    "answerIndex": 3,
+    "explanation": "I, God, spake unto Moses about the creation.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0009",
+    "volume": "PGP",
+    "reference": "Moses 3:5",
+    "prompt": "According to Moses 3:5, the Lord created all things how, before they were naturally upon the earth?",
+    "options": [
+      "Spiritually",
+      "On another world",
+      "In a vision",
+      "By angels"
+    ],
+    "answerIndex": 0,
+    "explanation": "I, the Lord God, created all things spiritually, before they were naturally upon the face of the earth.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0010",
+    "volume": "PGP",
+    "reference": "Moses 3:7",
+    "prompt": "From what did the Lord God form man, according to Moses 3:7?",
+    "options": [
+      "A rib",
+      "Clay from a river",
+      "Light",
+      "The dust of the ground"
+    ],
+    "answerIndex": 3,
+    "explanation": "The Lord God formed man from the dust of the ground.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0011",
+    "volume": "PGP",
+    "reference": "Moses 4:1",
+    "prompt": "In Moses 4:1, who proposed to redeem all mankind so that not one soul be lost?",
+    "options": [
+      "The Only Begotten",
+      "Satan",
+      "Michael",
+      "Enoch"
+    ],
+    "answerIndex": 1,
+    "explanation": "Satan sought to redeem all mankind that one soul shall not be lost, seeking God's honor.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0012",
+    "volume": "PGP",
+    "reference": "Moses 4:2",
+    "prompt": "According to Moses 4:2, to whom did the Beloved Son say, \"Thy will be done, and the glory be thine forever\"?",
+    "options": [
+      "The Father",
+      "Satan",
+      "Adam",
+      "Moses"
+    ],
+    "answerIndex": 0,
+    "explanation": "The Beloved Son said, Father, thy will be done.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0013",
+    "volume": "PGP",
+    "reference": "Moses 4:3",
+    "prompt": "Satan sought to destroy what, according to Moses 4:3?",
+    "options": [
+      "The Garden of Eden",
+      "The earth",
+      "The priesthood",
+      "The agency of man"
+    ],
+    "answerIndex": 3,
+    "explanation": "Satan sought to destroy the agency of man.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0014",
+    "volume": "PGP",
+    "reference": "Moses 4:26",
+    "prompt": "Why did Adam call his wife's name Eve?",
+    "options": [
+      "She was first to eat the fruit",
+      "It means beloved",
+      "She was the mother of all living",
+      "She came from his rib"
+    ],
+    "answerIndex": 2,
+    "explanation": "Adam called his wife Eve, because she was the mother of all living.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0015",
+    "volume": "PGP",
+    "reference": "Moses 5:5",
+    "prompt": "What did Adam and Eve offer, as the Lord commanded, after leaving the garden?",
+    "options": [
+      "Their first fruits only",
+      "Incense",
+      "The firstlings of their flocks",
+      "Doves"
+    ],
+    "answerIndex": 2,
+    "explanation": "They were commanded to offer the firstlings of their flocks.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0016",
+    "volume": "PGP",
+    "reference": "Moses 5:6-7",
+    "prompt": "Who explained to Adam that his sacrifice was a similitude of the sacrifice of the Only Begotten?",
+    "options": [
+      "An angel of the Lord",
+      "Satan",
+      "Seth",
+      "Enoch"
+    ],
+    "answerIndex": 0,
+    "explanation": "An angel of the Lord appeared and explained the sacrifice.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0017",
+    "volume": "PGP",
+    "reference": "Moses 5:11",
+    "prompt": "Who said that were it not for the transgression, they never should have had seed?",
+    "options": [
+      "Adam",
+      "Seth",
+      "Eve",
+      "Abel"
+    ],
+    "answerIndex": 2,
+    "explanation": "Eve, his wife, heard all these things and was glad.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0018",
+    "volume": "PGP",
+    "reference": "Moses 5:31",
+    "prompt": "What title did Cain take after making a secret combination with Satan?",
+    "options": [
+      "King of Nod",
+      "Prince of Nod",
+      "Lord of the field",
+      "Master Mahan"
+    ],
+    "answerIndex": 3,
+    "explanation": "Cain called himself Mahan, master of the great secret, and was called Master Mahan.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0019",
+    "volume": "PGP",
+    "reference": "Moses 5:41",
+    "prompt": "Where did Cain dwell after he was shut out from the presence of the Lord?",
+    "options": [
+      "The land of Havilah",
+      "The land of Nod",
+      "The land of Cainan",
+      "The land of Shinar"
+    ],
+    "answerIndex": 1,
+    "explanation": "Cain dwelt in the land of Nod, on the east of Eden.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0020",
+    "volume": "PGP",
+    "reference": "Moses 6:5",
+    "prompt": "According to Moses 6:5, a book of what was kept in the language of Adam?",
+    "options": [
+      "Covenants",
+      "Remembrance",
+      "Laws",
+      "Generations"
+    ],
+    "answerIndex": 1,
+    "explanation": "A book of remembrance was kept, in the language of Adam.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0021",
+    "volume": "PGP",
+    "reference": "Moses 6:31",
+    "prompt": "Why did Enoch say all the people hated him?",
+    "options": [
+      "He was young",
+      "He was a stranger",
+      "He was poor",
+      "He was slow of speech"
+    ],
+    "answerIndex": 3,
+    "explanation": "Enoch said he was but a lad, and slow of speech.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0022",
+    "volume": "PGP",
+    "reference": "Moses 6:35",
+    "prompt": "What did the Lord tell Enoch to anoint his eyes with?",
+    "options": [
+      "Oil",
+      "Clay",
+      "Water",
+      "Ashes"
+    ],
+    "answerIndex": 1,
+    "explanation": "Anoint thine eyes with clay, and wash them, and thou shalt see.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0023",
+    "volume": "PGP",
+    "reference": "Moses 6:36",
+    "prompt": "What did Enoch behold after anointing his eyes, which were not visible to the natural eye?",
+    "options": [
+      "The fallen angels",
+      "The great flood",
+      "The city of Zion",
+      "Spirits that God had created"
+    ],
+    "answerIndex": 3,
+    "explanation": "He beheld the spirits that God had created.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0024",
+    "volume": "PGP",
+    "reference": "Moses 6:38",
+    "prompt": "When people came to hear Enoch, what did they say they were going to behold?",
+    "options": [
+      "The king",
+      "The priest",
+      "The seer",
+      "The giant"
+    ],
+    "answerIndex": 2,
+    "explanation": "They went to behold the seer, for he prophesied.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0025",
+    "volume": "PGP",
+    "reference": "Moses 6:64",
+    "prompt": "In Moses 6:64, who was caught away by the Spirit and carried down into the water and baptized?",
+    "options": [
+      "Adam",
+      "Enoch",
+      "Noah",
+      "Seth"
+    ],
+    "answerIndex": 0,
+    "explanation": "Our father Adam was caught away by the Spirit of the Lord into the water.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0026",
+    "volume": "PGP",
+    "reference": "Moses 7:18",
+    "prompt": "What did the Lord call His people in Enoch's day because they were of one heart and one mind?",
+    "options": [
+      "Israel",
+      "Zion",
+      "Bountiful",
+      "Salem"
+    ],
+    "answerIndex": 1,
+    "explanation": "The Lord called his people Zion, because they were of one heart and one mind.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0027",
+    "volume": "PGP",
+    "reference": "Moses 7:18",
+    "prompt": "According to Moses 7:18, Zion had how many poor among them?",
+    "options": [
+      "Many poor",
+      "Few poor",
+      "One poor family",
+      "No poor"
+    ],
+    "answerIndex": 3,
+    "explanation": "There was no poor among them.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0028",
+    "volume": "PGP",
+    "reference": "Moses 7:19",
+    "prompt": "What was Enoch's city called?",
+    "options": [
+      "The City of Cainan",
+      "The City of Holiness, even Zion",
+      "The City of Jared",
+      "The City of Peace"
+    ],
+    "answerIndex": 1,
+    "explanation": "Enoch built a city called the City of Holiness, even Zion.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0029",
+    "volume": "PGP",
+    "reference": "Moses 7:21",
+    "prompt": "What happened to Zion in process of time?",
+    "options": [
+      "It moved to Egypt",
+      "It was scattered",
+      "It was destroyed by flood",
+      "It was taken up into heaven"
+    ],
+    "answerIndex": 3,
+    "explanation": "Zion, in process of time, was taken up into heaven.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0030",
+    "volume": "PGP",
+    "reference": "Moses 7:28",
+    "prompt": "In Moses 7:28, Enoch beheld the God of heaven do what over the residue of the people?",
+    "options": [
+      "Sleep",
+      "Weep",
+      "Sing",
+      "Laugh"
+    ],
+    "answerIndex": 1,
+    "explanation": "The God of heaven looked upon the residue of the people, and he wept.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0031",
+    "volume": "PGP",
+    "reference": "Moses 7:68",
+    "prompt": "How many years were all the days of Zion in Enoch's days?",
+    "options": [
+      "365",
+      "430",
+      "120",
+      "969"
+    ],
+    "answerIndex": 0,
+    "explanation": "All the days of Zion were three hundred and sixty-five years.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0032",
+    "volume": "PGP",
+    "reference": "Moses 8:2",
+    "prompt": "Methuselah was the son of whom?",
+    "options": [
+      "Jared",
+      "Enoch",
+      "Lamech",
+      "Seth"
+    ],
+    "answerIndex": 1,
+    "explanation": "Methuselah was the son of Enoch.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0033",
+    "volume": "PGP",
+    "reference": "Moses 8:2",
+    "prompt": "Why was Methuselah not taken with Zion?",
+    "options": [
+      "That the covenants of the Lord might be fulfilled",
+      "He refused to go",
+      "He was not yet born",
+      "He was wicked"
+    ],
+    "answerIndex": 0,
+    "explanation": "Methuselah was not taken, that the covenants the Lord made with Enoch might be fulfilled.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0034",
+    "volume": "PGP",
+    "reference": "Moses 8:13",
+    "prompt": "Moses 8:13 says Noah and his sons hearkened unto the Lord and were called what?",
+    "options": [
+      "The sons of God",
+      "The giants",
+      "The sons of men",
+      "The righteous ones"
+    ],
+    "answerIndex": 0,
+    "explanation": "Noah and his sons were called the sons of God.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0035",
+    "volume": "PGP",
+    "reference": "Moses 8:27",
+    "prompt": "Moses 8:27 describes Noah as a just man and perfect in his what?",
+    "options": [
+      "Speech",
+      "Heart",
+      "Generation",
+      "Ways"
+    ],
+    "answerIndex": 2,
+    "explanation": "Noah was a just man, and perfect in his generation.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0036",
+    "volume": "PGP",
+    "reference": "Abraham 1:1",
+    "prompt": "In Abraham 1, Abraham lived in which land when he sought a new place of residence?",
+    "options": [
+      "The land of the Chaldeans",
+      "The land of Canaan",
+      "The land of Haran",
+      "The land of Egypt"
+    ],
+    "answerIndex": 0,
+    "explanation": "In the land of the Chaldeans, Abraham saw it was needful to obtain another place.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0037",
+    "volume": "PGP",
+    "reference": "Abraham 1:2",
+    "prompt": "Abraham 1:2 says Abraham sought for the blessings of the fathers and the right to do what?",
+    "options": [
+      "Build a temple",
+      "Own land",
+      "Rule over nations",
+      "Administer the same"
+    ],
+    "answerIndex": 3,
+    "explanation": "He sought the right whereunto he should be ordained to administer the same.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0038",
+    "volume": "PGP",
+    "reference": "Abraham 1:7",
+    "prompt": "What had Abraham's fathers attempted to do to him because he refused their gods?",
+    "options": [
+      "Take away his life by sacrifice",
+      "Banish him to Egypt",
+      "Sell him into slavery",
+      "Imprison him"
+    ],
+    "answerIndex": 0,
+    "explanation": "They endeavored to take away his life by the hand of the priest of Elkenah.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0039",
+    "volume": "PGP",
+    "reference": "Abraham 1:15",
+    "prompt": "As Abraham was about to be offered up, who stood by him and immediately unloosed his bands?",
+    "options": [
+      "The angel of his presence",
+      "Terah, his father",
+      "Lot, his nephew",
+      "Melchizedek"
+    ],
+    "answerIndex": 0,
+    "explanation": "Abraham 1:15 says the angel of his presence stood by him and immediately unloosed his bands.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0040",
+    "volume": "PGP",
+    "reference": "Abraham 1:30",
+    "prompt": "What caused Abraham's father to repent of the evil he had planned against Abraham?",
+    "options": [
+      "A famine in the land of Chaldea",
+      "A vision from an angel",
+      "The death of the priest of Elkenah",
+      "Abraham's departure for Haran"
+    ],
+    "answerIndex": 0,
+    "explanation": "A famine prevailed throughout Chaldea, and Abraham's father repented.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0041",
+    "volume": "PGP",
+    "reference": "Abraham 2:2",
+    "prompt": "Whom did Abraham take to wife?",
+    "options": [
+      "Milcah",
+      "Keturah",
+      "Sarai",
+      "Hagar"
+    ],
+    "answerIndex": 2,
+    "explanation": "Abraham took Sarai to wife.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0042",
+    "volume": "PGP",
+    "reference": "Abraham 2:4",
+    "prompt": "Which nephew went with Abraham from Ur?",
+    "options": [
+      "Lot",
+      "Haran",
+      "Laban",
+      "Nahor"
+    ],
+    "answerIndex": 0,
+    "explanation": "Lot, my brother's son, and his wife went with me.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0043",
+    "volume": "PGP",
+    "reference": "Abraham 2:6",
+    "prompt": "Where did Abraham sojourn when he prayed and the Lord appeared, telling him to go to a strange land?",
+    "options": [
+      "Salem",
+      "Egypt",
+      "Ur",
+      "Haran"
+    ],
+    "answerIndex": 3,
+    "explanation": "Abraham dwelt in Haran when the Lord appeared unto him.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0044",
+    "volume": "PGP",
+    "reference": "Abraham 2:11",
+    "prompt": "Abraham 2:11 promises that in Abraham's seed shall all the families of the earth be what?",
+    "options": [
+      "Judged",
+      "Gathered",
+      "Blessed",
+      "Numbered"
+    ],
+    "answerIndex": 2,
+    "explanation": "In thee and thy seed shall all the families of the earth be blessed.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0045",
+    "volume": "PGP",
+    "reference": "Abraham 2:14",
+    "prompt": "How old was Abraham when he departed out of Haran?",
+    "options": [
+      "Sixty-two",
+      "Seventy-five",
+      "One hundred",
+      "Ninety-nine"
+    ],
+    "answerIndex": 0,
+    "explanation": "Abraham was sixty and two years old when he departed out of Haran.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0046",
+    "volume": "PGP",
+    "reference": "Abraham 2:15",
+    "prompt": "Besides Sarai, Lot, and their substance, whom did Abraham bring from Haran toward Canaan?",
+    "options": [
+      "The souls that we had won in Haran",
+      "The priests of Elkenah",
+      "Terah, his father",
+      "Pharaoh's servants"
+    ],
+    "answerIndex": 0,
+    "explanation": "Abraham took the souls that we had won in Haran and came forth toward the land of Canaan.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0047",
+    "volume": "PGP",
+    "reference": "Abraham 3:1",
+    "prompt": "What instrument did Abraham have, which the Lord gave him in Ur?",
+    "options": [
+      "A brass serpent",
+      "A rod of iron",
+      "The Liahona",
+      "The Urim and Thummim"
+    ],
+    "answerIndex": 3,
+    "explanation": "Abraham had the Urim and Thummim, which the Lord had given him in Ur.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0048",
+    "volume": "PGP",
+    "reference": "Abraham 3:3",
+    "prompt": "What is the name of the great star nearest to the throne of God, according to Abraham 3?",
+    "options": [
+      "Olea",
+      "Shinehah",
+      "Kokaubeam",
+      "Kolob"
+    ],
+    "answerIndex": 3,
+    "explanation": "The name of the great one is Kolob, near unto the throne of God.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0049",
+    "volume": "PGP",
+    "reference": "Abraham 3:4",
+    "prompt": "According to Abraham 3:4, one day of Kolob equals how many years by the reckoning of this earth?",
+    "options": [
+      "One hundred years",
+      "Seven years",
+      "A thousand years",
+      "Ten thousand years"
+    ],
+    "answerIndex": 2,
+    "explanation": "One revolution of Kolob is a day unto the Lord, a thousand years.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0050",
+    "volume": "PGP",
+    "reference": "Abraham 3:13",
+    "prompt": "In Abraham 3:13, what is Shinehah?",
+    "options": [
+      "The sun",
+      "The moon",
+      "Kolob",
+      "The stars"
+    ],
+    "answerIndex": 0,
+    "explanation": "Shinehah, which is the sun.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0051",
+    "volume": "PGP",
+    "reference": "Abraham 3:13",
+    "prompt": "In Abraham 3:13, what is Olea?",
+    "options": [
+      "Stars",
+      "The sun",
+      "The moon",
+      "Kolob"
+    ],
+    "answerIndex": 2,
+    "explanation": "Olea, which is the moon.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0052",
+    "volume": "PGP",
+    "reference": "Abraham 3:22",
+    "prompt": "Abraham was shown the intelligences organized before the world was. What were many of them?",
+    "options": [
+      "Stars",
+      "Noble and great ones",
+      "Unborn kings",
+      "Fallen angels"
+    ],
+    "answerIndex": 1,
+    "explanation": "Among them were many of the noble and great ones.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0053",
+    "volume": "PGP",
+    "reference": "Abraham 3:23",
+    "prompt": "In Abraham 3:23, God told Abraham he was chosen when?",
+    "options": [
+      "When he left Ur",
+      "Before he was born",
+      "At his baptism",
+      "At age ninety-nine"
+    ],
+    "answerIndex": 1,
+    "explanation": "Abraham, thou art one of them; thou wast chosen before thou wast born.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0054",
+    "volume": "PGP",
+    "reference": "Abraham 3:25",
+    "prompt": "According to Abraham 3:25, why is this life given?",
+    "options": [
+      "To rest from labor",
+      "To judge the angels",
+      "To build cities",
+      "To prove them herewith"
+    ],
+    "answerIndex": 3,
+    "explanation": "We will prove them herewith, to see if they will do all things God commands.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0055",
+    "volume": "PGP",
+    "reference": "Abraham 3:26",
+    "prompt": "According to Abraham 3:26, those who keep their first estate shall be what?",
+    "options": [
+      "Sent back",
+      "Added upon",
+      "Made kings",
+      "Forgotten"
+    ],
+    "answerIndex": 1,
+    "explanation": "They who keep their first estate shall be added upon.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0056",
+    "volume": "PGP",
+    "reference": "Abraham 3:27",
+    "prompt": "In Abraham 3:27, the Lord asked, \"Whom shall I send?\" How did one like unto the Son of Man answer?",
+    "options": [
+      "I will go, give me thine honor",
+      "Here am I, send me",
+      "Send another",
+      "Who am I that I should go"
+    ],
+    "answerIndex": 1,
+    "explanation": "One answered like unto the Son of Man: Here am I, send me.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0057",
+    "volume": "PGP",
+    "reference": "Abraham 3:28",
+    "prompt": "How did the second who offered react when the Lord chose the first?",
+    "options": [
+      "He offered to help",
+      "He wept",
+      "He was angry and kept not his first estate",
+      "He rejoiced"
+    ],
+    "answerIndex": 2,
+    "explanation": "The second was angry, and kept not his first estate.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0058",
+    "volume": "PGP",
+    "reference": "Abraham 4:1",
+    "prompt": "In Abraham 4:1, who went down at the beginning to form the heavens and the earth?",
+    "options": [
+      "Adam and Eve",
+      "The angels",
+      "The Gods",
+      "Michael alone"
+    ],
+    "answerIndex": 2,
+    "explanation": "They, that is the Gods, organized and formed the heavens and the earth.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0059",
+    "volume": "PGP",
+    "reference": "Joseph Smith—Matthew 1:4",
+    "prompt": "In Joseph Smith—Matthew, where was Jesus sitting when the disciples asked about the signs of His coming?",
+    "options": [
+      "At the well of Samaria",
+      "On a ship",
+      "In the temple",
+      "Upon the Mount of Olives"
+    ],
+    "answerIndex": 3,
+    "explanation": "Jesus sat upon the Mount of Olives, and the disciples came to Him privately.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0060",
+    "volume": "PGP",
+    "reference": "Joseph Smith—Matthew 1:37",
+    "prompt": "According to Joseph Smith—Matthew 1:37, whoso treasureth up whose word shall not be deceived?",
+    "options": [
+      "My word",
+      "The law",
+      "The angels' word",
+      "The prophet's word"
+    ],
+    "answerIndex": 0,
+    "explanation": "Whoso treasureth up my word, shall not be deceived.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0061",
+    "volume": "PGP",
+    "reference": "Joseph Smith—Matthew 1:41",
+    "prompt": "In Joseph Smith—Matthew, the coming of the Son of Man will be as it was in the days of whom?",
+    "options": [
+      "David",
+      "Moses",
+      "Noah",
+      "Abraham"
+    ],
+    "answerIndex": 2,
+    "explanation": "As it was in the days of Noah, so it shall be also at the coming of the Son of Man.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0062",
+    "volume": "PGP",
+    "reference": "Joseph Smith—Matthew 1:38",
+    "prompt": "Which tree's tender branches signal summer is nigh, in Joseph Smith—Matthew?",
+    "options": [
+      "The cedar",
+      "The palm",
+      "The olive tree",
+      "The fig tree"
+    ],
+    "answerIndex": 3,
+    "explanation": "Learn a parable of the fig-tree.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0063",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:3",
+    "prompt": "In what state was Joseph Smith born, according to his history?",
+    "options": [
+      "Massachusetts",
+      "Pennsylvania",
+      "Vermont",
+      "New York"
+    ],
+    "answerIndex": 2,
+    "explanation": "Joseph was born in Sharon, Windsor County, Vermont.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0064",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:3",
+    "prompt": "In what year was Joseph Smith born?",
+    "options": [
+      "1810",
+      "1800",
+      "1805",
+      "1820"
+    ],
+    "answerIndex": 2,
+    "explanation": "Joseph Smith was born on the twenty-third of December, 1805.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0065",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:3",
+    "prompt": "Into which town in New York did Joseph Smith's family later move, before Manchester?",
+    "options": [
+      "Fayette",
+      "Harmony",
+      "Palmyra",
+      "Colesville"
+    ],
+    "answerIndex": 2,
+    "explanation": "The family moved to Palmyra, Ontario (now Wayne) County, New York.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0066",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:4",
+    "prompt": "What was Joseph Smith's mother's maiden name?",
+    "options": [
+      "Hale",
+      "Mack",
+      "Whitmer",
+      "Cowdery"
+    ],
+    "answerIndex": 1,
+    "explanation": "His mother was Lucy Smith, whose name before marriage was Mack.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0067",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:5",
+    "prompt": "What occurred in the place where Joseph lived in the second year after the family moved to Manchester?",
+    "options": [
+      "A great famine",
+      "A war with Britain",
+      "An unusual excitement on the subject of religion",
+      "A flood"
+    ],
+    "answerIndex": 2,
+    "explanation": "There was an unusual excitement on the subject of religion.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0068",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:7",
+    "prompt": "How old was Joseph Smith during the religious excitement?",
+    "options": [
+      "Twenty-one",
+      "Seventeen",
+      "Twelve",
+      "In his fifteenth year"
+    ],
+    "answerIndex": 3,
+    "explanation": "Joseph was at that time in his fifteenth year.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0069",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:7",
+    "prompt": "Which church did four members of Joseph Smith's family join?",
+    "options": [
+      "The Methodist",
+      "The Episcopal",
+      "The Presbyterian",
+      "The Baptist"
+    ],
+    "answerIndex": 2,
+    "explanation": "His mother, Hyrum, Samuel Harrison, and Sophronia joined the Presbyterian faith.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0070",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:8",
+    "prompt": "Toward which sect did Joseph Smith say his mind became somewhat partial?",
+    "options": [
+      "The Presbyterian",
+      "The Baptist",
+      "The Methodist",
+      "The Quaker"
+    ],
+    "answerIndex": 2,
+    "explanation": "In process of time my mind became somewhat partial to the Methodist sect.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0071",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:11",
+    "prompt": "Which epistle did Joseph read while seeking which church to join?",
+    "options": [
+      "Hebrews",
+      "1 Peter",
+      "James",
+      "Romans"
+    ],
+    "answerIndex": 2,
+    "explanation": "Joseph read the Epistle of James, first chapter and fifth verse.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0072",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:14",
+    "prompt": "In what year did the First Vision occur?",
+    "options": [
+      "1823",
+      "1820",
+      "1830",
+      "1827"
+    ],
+    "answerIndex": 1,
+    "explanation": "It was early in the spring of eighteen hundred and twenty.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0073",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:15",
+    "prompt": "What happened as soon as Joseph Smith began to pray?",
+    "options": [
+      "A voice spoke from heaven",
+      "An angel appeared",
+      "He saw a pillar of light",
+      "He was seized by a power that bound his tongue"
+    ],
+    "answerIndex": 3,
+    "explanation": "He was seized upon by some power which entirely overcame him.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0074",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:16",
+    "prompt": "What descended upon Joseph Smith, brighter than the sun?",
+    "options": [
+      "A pillar of light",
+      "Fire from heaven",
+      "A cloud",
+      "A dove"
+    ],
+    "answerIndex": 0,
+    "explanation": "Joseph saw a pillar of light exactly over his head.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0075",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:17",
+    "prompt": "How many Personages did Joseph Smith see in the First Vision?",
+    "options": [
+      "One",
+      "Twelve",
+      "Two",
+      "Three"
+    ],
+    "answerIndex": 2,
+    "explanation": "Joseph saw two Personages standing above him in the air.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0076",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:19",
+    "prompt": "Joseph was told that the professors of the creeds draw near with their lips but their hearts are what?",
+    "options": [
+      "Divided",
+      "Far from me",
+      "Hardened",
+      "Full of pride"
+    ],
+    "answerIndex": 1,
+    "explanation": "They draw near to me with their lips, but their hearts are far from me.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0077",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:20",
+    "prompt": "Whom did Joseph first tell, upon returning home, that he had learned Presbyterianism was not true?",
+    "options": [
+      "A Methodist preacher",
+      "His mother",
+      "His father",
+      "Hyrum"
+    ],
+    "answerIndex": 1,
+    "explanation": "Joseph said to his mother, I have learned for myself that Presbyterianism is not true.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0078",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:21",
+    "prompt": "With whom did Joseph share his vision a few days after it occurred, who treated it with contempt?",
+    "options": [
+      "His father",
+      "A Presbyterian elder",
+      "A Methodist preacher",
+      "His schoolteacher"
+    ],
+    "answerIndex": 2,
+    "explanation": "Joseph told one of the Methodist preachers, who treated it with great contempt.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0079",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:24",
+    "prompt": "To whom did Joseph compare himself in feeling much like, when he told of seeing a vision?",
+    "options": [
+      "Peter",
+      "Daniel",
+      "Moses",
+      "Paul"
+    ],
+    "answerIndex": 3,
+    "explanation": "Joseph felt much like Paul when he made his defense before King Agrippa.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0080",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:29",
+    "prompt": "On what date in 1823 did Joseph pray and Moroni appear?",
+    "options": [
+      "May 15",
+      "December 23",
+      "September 21",
+      "April 6"
+    ],
+    "answerIndex": 2,
+    "explanation": "On the evening of the twenty-first of September, 1823, Joseph prayed.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0081",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:33",
+    "prompt": "What was the name of the messenger who appeared to Joseph Smith in 1823?",
+    "options": [
+      "Moroni",
+      "Mormon",
+      "Raphael",
+      "Gabriel"
+    ],
+    "answerIndex": 0,
+    "explanation": "The messenger said his name was Moroni.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0082",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:34",
+    "prompt": "On what was the book of record deposited by Moroni written?",
+    "options": [
+      "Parchment",
+      "Gold plates",
+      "Brass plates",
+      "Stone tablets"
+    ],
+    "answerIndex": 1,
+    "explanation": "There was a book deposited, written upon gold plates.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0083",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:35",
+    "prompt": "What two stones in silver bows were deposited with the plates?",
+    "options": [
+      "The Urim and Thummim",
+      "The Liahona and the rod",
+      "The breastplate and sword",
+      "The seer stone and the compass"
+    ],
+    "answerIndex": 0,
+    "explanation": "Two stones in silver bows constituted the Urim and Thummim.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0084",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:31",
+    "prompt": "How was Moroni dressed when he appeared at Joseph's bedside?",
+    "options": [
+      "In plain work clothes",
+      "In a purple robe",
+      "In armor of gold",
+      "In a loose robe of exquisite whiteness"
+    ],
+    "answerIndex": 3,
+    "explanation": "He had on a loose robe of most exquisite whiteness.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0085",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:30",
+    "prompt": "Where was Moroni standing when he appeared in Joseph's room?",
+    "options": [
+      "By the door",
+      "On the bed",
+      "At the window",
+      "In the air, his feet not touching the floor"
+    ],
+    "answerIndex": 3,
+    "explanation": "He stood in the air, for his feet did not touch the floor.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0086",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:36",
+    "prompt": "Which Old Testament prophet did Moroni quote first, with some variation?",
+    "options": [
+      "Malachi",
+      "Isaiah",
+      "Ezekiel",
+      "Joel"
+    ],
+    "answerIndex": 0,
+    "explanation": "Moroni first quoted part of the third chapter of Malachi.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0087",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:40",
+    "prompt": "Which chapter of Isaiah did Moroni say was about to be fulfilled?",
+    "options": [
+      "The eleventh",
+      "The second",
+      "The twenty-ninth",
+      "The fifty-third"
+    ],
+    "answerIndex": 0,
+    "explanation": "Moroni quoted the eleventh chapter of Isaiah.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0088",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:40",
+    "prompt": "Which chapter of Acts did Moroni quote?",
+    "options": [
+      "The third (verses 22-23)",
+      "The second",
+      "The ninth",
+      "The first"
+    ],
+    "answerIndex": 0,
+    "explanation": "Moroni quoted the third chapter of Acts, twenty-second and twenty-third verses.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0089",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:41",
+    "prompt": "Which chapter of Joel did Moroni quote?",
+    "options": [
+      "The third",
+      "The second",
+      "The first",
+      "The fourth"
+    ],
+    "answerIndex": 1,
+    "explanation": "He quoted the second chapter of Joel, from the twenty-eighth verse.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0090",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:46-47",
+    "prompt": "How many times did Moroni visit Joseph during the night of September 21-22, 1823?",
+    "options": [
+      "Three",
+      "Twice",
+      "Once",
+      "Four"
+    ],
+    "answerIndex": 0,
+    "explanation": "Moroni appeared three times that night with the same message.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0091",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:49",
+    "prompt": "What did Moroni instruct Joseph to do in the field the next day?",
+    "options": [
+      "Go directly to the hill",
+      "Return home and rest",
+      "Tell his father of the vision",
+      "Tell no one"
+    ],
+    "answerIndex": 2,
+    "explanation": "Moroni commanded him to go to his father and tell him of the vision.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0092",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:51",
+    "prompt": "In what lay the plates on the hill near Manchester?",
+    "options": [
+      "A wooden chest",
+      "A stone box",
+      "A clay jar",
+      "An iron case"
+    ],
+    "answerIndex": 1,
+    "explanation": "The plates were deposited in a box of stone.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0093",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:53",
+    "prompt": "When was Joseph told to come back to the hill after his first visit there?",
+    "options": [
+      "Never; he was not to return",
+      "After seven years",
+      "Every Sabbath day",
+      "Precisely in one year from that time"
+    ],
+    "answerIndex": 3,
+    "explanation": "The messenger told him to come to that place precisely in one year, and to continue doing so.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0094",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:56",
+    "prompt": "In which state was Joseph Smith working for Josiah Stoal?",
+    "options": [
+      "Vermont",
+      "Ohio",
+      "New York (Chenango County)",
+      "Pennsylvania"
+    ],
+    "answerIndex": 2,
+    "explanation": "Josiah Stoal lived in Chenango county, State of New York.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0095",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:57",
+    "prompt": "Whom did Joseph Smith marry on January 18, 1827?",
+    "options": [
+      "Sophronia Smith",
+      "Elizabeth Ann Whitney",
+      "Emma Hale",
+      "Lucy Mack"
+    ],
+    "answerIndex": 2,
+    "explanation": "Joseph met Emma Hale while boarding with her father; they married January 18, 1827.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0096",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:59",
+    "prompt": "On what date did Joseph receive the plates?",
+    "options": [
+      "September 22, 1827",
+      "April 6, 1830",
+      "May 15, 1829",
+      "September 21, 1823"
+    ],
+    "answerIndex": 0,
+    "explanation": "On the twenty-second of September, 1827, the messenger delivered them up to him.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0097",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:61",
+    "prompt": "Who helped Joseph with fifty dollars to move to Pennsylvania?",
+    "options": [
+      "Oliver Cowdery",
+      "Martin Harris",
+      "Joseph Knight",
+      "Josiah Stoal"
+    ],
+    "answerIndex": 1,
+    "explanation": "Martin Harris, a farmer, gave Joseph fifty dollars.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0098",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:64",
+    "prompt": "To which professor did Martin Harris show the characters in New York City?",
+    "options": [
+      "Josiah Quincy",
+      "Benjamin Silliman",
+      "Noah Webster",
+      "Charles Anthon"
+    ],
+    "answerIndex": 3,
+    "explanation": "Martin Harris went to Professor Charles Anthon.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0099",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:65",
+    "prompt": "Which phrase did Professor Anthon reportedly say when Martin said an angel revealed the plates?",
+    "options": [
+      "Bring me the plates",
+      "I cannot read a sealed book",
+      "These are Egyptian",
+      "This is a fraud"
+    ],
+    "answerIndex": 1,
+    "explanation": "Professor Anthon said, I cannot read a sealed book.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0100",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:66",
+    "prompt": "Who came to Joseph's home on April 5, 1829, and began to write for him?",
+    "options": [
+      "Martin Harris",
+      "Oliver Cowdery",
+      "Emma Smith",
+      "David Whitmer"
+    ],
+    "answerIndex": 1,
+    "explanation": "On the 5th day of April, 1829, Oliver Cowdery came to Joseph's house.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0101",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:68",
+    "prompt": "In which month of 1829 did Joseph and Oliver go into the woods to inquire about baptism?",
+    "options": [
+      "April",
+      "May",
+      "June",
+      "September"
+    ],
+    "answerIndex": 1,
+    "explanation": "In May 1829 they went into the woods to pray about baptism for the remission of sins.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0102",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:72",
+    "prompt": "Under the direction of which apostles did John the Baptist say he acted?",
+    "options": [
+      "Peter, Andrew, and Paul",
+      "Peter, James, and John",
+      "Peter, Thomas, and Philip",
+      "James, John, and Matthew"
+    ],
+    "answerIndex": 1,
+    "explanation": "John acted under the direction of Peter, James, and John.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0103",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:70-71",
+    "prompt": "Who baptized whom first in May 1829?",
+    "options": [
+      "Oliver baptized Joseph first",
+      "John the Baptist baptized both",
+      "Joseph baptized Oliver first",
+      "Hyrum baptized both"
+    ],
+    "answerIndex": 2,
+    "explanation": "Joseph first baptized Oliver, and afterward Oliver baptized him.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0104",
+    "volume": "PGP",
+    "reference": "Joseph Smith—History 1:73",
+    "prompt": "What did Joseph and Oliver experience immediately after their baptism?",
+    "options": [
+      "They received the gold plates",
+      "The Holy Ghost fell upon them and they prophesied",
+      "They were struck dumb",
+      "They saw the Savior"
+    ],
+    "answerIndex": 1,
+    "explanation": "The Holy Ghost fell upon them and they prophesied.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0105",
+    "volume": "PGP",
+    "reference": "Articles of Faith 1:1",
+    "prompt": "According to the first article of faith, we believe in God, the Eternal Father, His Son Jesus Christ, and whom?",
+    "options": [
+      "The apostles",
+      "The Holy Ghost",
+      "The prophets",
+      "The angels"
+    ],
+    "answerIndex": 1,
+    "explanation": "We believe in God, the Eternal Father, his Son, Jesus Christ, and the Holy Ghost.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0106",
+    "volume": "PGP",
+    "reference": "Articles of Faith 1:2",
+    "prompt": "According to the second article of faith, men will be punished for their own sins and not for whose?",
+    "options": [
+      "Cain's",
+      "Eve's",
+      "Their parents'",
+      "Adam's transgression"
+    ],
+    "answerIndex": 3,
+    "explanation": "Men will be punished for their own sins, and not for Adam's transgression.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0107",
+    "volume": "PGP",
+    "reference": "Articles of Faith 1:4",
+    "prompt": "According to the fourth article of faith, which is the first principle of the gospel?",
+    "options": [
+      "Baptism",
+      "Repentance",
+      "The gift of the Holy Ghost",
+      "Faith in the Lord Jesus Christ"
+    ],
+    "answerIndex": 3,
+    "explanation": "The first principles are faith, then repentance, then baptism, then the Holy Ghost.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0108",
+    "volume": "PGP",
+    "reference": "Articles of Faith 1:5",
+    "prompt": "The fifth article of faith says a man must be called of God by prophecy and by what?",
+    "options": [
+      "Inheritance",
+      "The laying on of hands",
+      "Election",
+      "A vision"
+    ],
+    "answerIndex": 1,
+    "explanation": "A man must be called of God by prophecy and by the laying on of hands.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0109",
+    "volume": "PGP",
+    "reference": "Articles of Faith 1:6",
+    "prompt": "Which of these officers is listed in the sixth article of faith?",
+    "options": [
+      "Evangelists",
+      "Deacons",
+      "Bishops",
+      "Elders"
+    ],
+    "answerIndex": 0,
+    "explanation": "The sixth article lists apostles, prophets, pastors, teachers, evangelists.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0110",
+    "volume": "PGP",
+    "reference": "Articles of Faith 1:8",
+    "prompt": "According to the eighth article of faith, we believe the Bible to be the word of God as far as it is what?",
+    "options": [
+      "Read faithfully",
+      "Translated correctly",
+      "Preserved",
+      "Understood"
+    ],
+    "answerIndex": 1,
+    "explanation": "As far as it is translated correctly.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0111",
+    "volume": "PGP",
+    "reference": "Articles of Faith 1:10",
+    "prompt": "According to the tenth article of faith, upon which continent will Zion (the New Jerusalem) be built?",
+    "options": [
+      "The American continent",
+      "Europe",
+      "Asia",
+      "Africa"
+    ],
+    "answerIndex": 0,
+    "explanation": "Zion will be built upon the American continent.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0112",
+    "volume": "PGP",
+    "reference": "Articles of Faith 1:11",
+    "prompt": "The eleventh article of faith claims the privilege of worshiping according to the dictates of what?",
+    "options": [
+      "The scriptures",
+      "The law",
+      "Our fathers",
+      "Our own conscience"
+    ],
+    "answerIndex": 3,
+    "explanation": "Worshiping Almighty God according to the dictates of our own conscience.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0113",
+    "volume": "PGP",
+    "reference": "Articles of Faith 1:12",
+    "prompt": "The twelfth article of faith says we believe in obeying, honoring, and sustaining what?",
+    "options": [
+      "The law",
+      "The scriptures",
+      "The bishops",
+      "The prophets"
+    ],
+    "answerIndex": 0,
+    "explanation": "We believe in obeying, honoring, and sustaining the law.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0114",
+    "volume": "PGP",
+    "reference": "Articles of Faith 1:13",
+    "prompt": "According to the thirteenth article of faith, we follow the admonition of which apostle?",
+    "options": [
+      "Peter",
+      "James",
+      "John",
+      "Paul"
+    ],
+    "answerIndex": 3,
+    "explanation": "We may say that we follow the admonition of Paul.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0115",
+    "volume": "PGP",
+    "reference": "Articles of Faith 1:13",
+    "prompt": "The thirteenth article of faith says we hope all things and have endured many things, and hope to be able to endure what?",
+    "options": [
+      "To the end",
+      "All things",
+      "Persecution",
+      "Trials"
+    ],
+    "answerIndex": 1,
+    "explanation": "We have endured many things, and hope to be able to endure all things.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0116",
+    "volume": "PGP",
+    "reference": "Articles of Faith 1:9",
+    "prompt": "According to the ninth article of faith, we believe God will yet reveal many great and important things pertaining to what?",
+    "options": [
+      "The creation",
+      "The Millennium",
+      "The Kingdom of God",
+      "The ancient prophets"
+    ],
+    "answerIndex": 2,
+    "explanation": "He will yet reveal many great and important things pertaining to the Kingdom of God.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0117",
+    "volume": "PGP",
+    "reference": "Articles of Faith 1:3",
+    "prompt": "According to the third article of faith, all mankind may be saved through Christ's Atonement by obedience to what?",
+    "options": [
+      "The Ten Commandments",
+      "The law of Moses",
+      "Their conscience",
+      "The laws and ordinances of the Gospel"
+    ],
+    "answerIndex": 3,
+    "explanation": "Through the Atonement, all mankind may be saved by obedience to the laws and ordinances.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "pgp-0118",
+    "volume": "PGP",
+    "reference": "Articles of Faith 1:7",
+    "prompt": "Which of these gifts is NOT named in the seventh article of faith?",
+    "options": [
+      "Tongues",
+      "Prophecy",
+      "Healing",
+      "Faith"
+    ],
+    "answerIndex": 3,
+    "explanation": "The seventh article names tongues, prophecy, revelation, visions, healing, interpretation of tongues.",
+    "reviewStatus": "draft"
+  }
+]

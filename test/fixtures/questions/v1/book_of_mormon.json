@@ -1,0 +1,77 @@
+[
+  {
+    "id": "bom-0001",
+    "volume": "BOM",
+    "reference": "1 Nephi 1:4",
+    "prompt": "In whose reign did Lehi's account in 1 Nephi begin?",
+    "options": [
+      "Josiah, king of Judah",
+      "Zedekiah, king of Judah",
+      "Nebuchadnezzar, king of Babylon",
+      "Hezekiah, king of Judah"
+    ],
+    "answerIndex": 1,
+    "explanation": "The account begins in the first year of the reign of Zedekiah.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "bom-0002",
+    "volume": "BOM",
+    "reference": "1 Nephi 2:5",
+    "prompt": "Who was Lehi's wife?",
+    "options": [
+      "Isabel",
+      "Abish",
+      "Sarah",
+      "Sariah"
+    ],
+    "answerIndex": 3,
+    "explanation": "Lehi departed into the wilderness with his family, including his wife Sariah.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "bom-0003",
+    "volume": "BOM",
+    "reference": "1 Nephi 2:5",
+    "prompt": "Which of these was NOT one of Lehi's four sons when he left Jerusalem?",
+    "options": [
+      "Laman",
+      "Sam",
+      "Lemuel",
+      "Jacob"
+    ],
+    "answerIndex": 3,
+    "explanation": "Lehi's sons were Laman, Lemuel, Sam, and Nephi; Jacob was born later.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "bom-0004",
+    "volume": "BOM",
+    "reference": "1 Nephi 2:8-9",
+    "prompt": "Lehi named a river after which of his sons?",
+    "options": [
+      "Lemuel",
+      "Laman",
+      "Nephi",
+      "Sam"
+    ],
+    "answerIndex": 1,
+    "explanation": "Lehi called the river Laman and the valley Lemuel.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "bom-0005",
+    "volume": "BOM",
+    "reference": "1 Nephi 3:2-4",
+    "prompt": "What record did Lehi send his sons back to Jerusalem to get?",
+    "options": [
+      "The twenty-four plates",
+      "The gold plates",
+      "The large plates of Nephi",
+      "The plates of brass"
+    ],
+    "answerIndex": 3,
+    "explanation": "The plates of brass were in the possession of Laban.",
+    "reviewStatus": "draft"
+  }
+]

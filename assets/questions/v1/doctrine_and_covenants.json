@@ -1,0 +1,1637 @@
+[
+  {
+    "id": "dc-0001",
+    "volume": "DC",
+    "reference": "D&C 1:38",
+    "prompt": "D&C 1:38 teaches that whether by the Lord's own voice or by the voice of His servants, it is what?",
+    "options": [
+      "A mystery",
+      "Temporary",
+      "Optional",
+      "The same"
+    ],
+    "answerIndex": 3,
+    "explanation": "Whether by mine own voice or by the voice of my servants, it is the same.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0002",
+    "volume": "DC",
+    "reference": "D&C 1:30",
+    "prompt": "In D&C 1:30, the Lord calls His Church the only true and what church?",
+    "options": [
+      "Living",
+      "Perfect",
+      "Universal",
+      "Ancient"
+    ],
+    "answerIndex": 0,
+    "explanation": "The Lord describes the only true and living church.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0003",
+    "volume": "DC",
+    "reference": "D&C 3:1",
+    "prompt": "According to D&C 3:1, the works, designs, and purposes of God cannot be what?",
+    "options": [
+      "Changed by prayer",
+      "Frustrated",
+      "Written",
+      "Understood"
+    ],
+    "answerIndex": 1,
+    "explanation": "The works, and the designs, and the purposes of God cannot be frustrated.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0004",
+    "volume": "DC",
+    "reference": "D&C 4:2",
+    "prompt": "D&C 4:2 counsels those who embark in God's service to serve with all their heart, might, mind, and what?",
+    "options": [
+      "Strength",
+      "Time",
+      "Talents",
+      "Means"
+    ],
+    "answerIndex": 0,
+    "explanation": "Serve him with all your heart, might, mind and strength.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0005",
+    "volume": "DC",
+    "reference": "D&C 4:6",
+    "prompt": "Which of these is NOT among the attributes listed in D&C 4:6?",
+    "options": [
+      "Diligence",
+      "Courage",
+      "Virtue",
+      "Patience"
+    ],
+    "answerIndex": 1,
+    "explanation": "D&C 4:6 lists faith, virtue, knowledge, temperance, patience, brotherly kindness, godliness, charity, humility, diligence.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0006",
+    "volume": "DC",
+    "reference": "D&C 6:23",
+    "prompt": "In D&C 6:23, after reminding Oliver He spoke peace to his mind, the Lord asks what greater witness can you have than from whom?",
+    "options": [
+      "God",
+      "Joseph Smith",
+      "An angel",
+      "The plates"
+    ],
+    "answerIndex": 0,
+    "explanation": "What greater witness can you have than from God?",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0007",
+    "volume": "DC",
+    "reference": "D&C 6:36",
+    "prompt": "D&C 6:36 counsels to look unto the Lord in every what?",
+    "options": [
+      "Prayer",
+      "Day",
+      "Trial",
+      "Thought"
+    ],
+    "answerIndex": 3,
+    "explanation": "Look unto me in every thought; doubt not, fear not.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0008",
+    "volume": "DC",
+    "reference": "D&C 8:2",
+    "prompt": "In D&C 8:2, the Lord says He will tell Oliver in his mind and in his heart by what?",
+    "options": [
+      "The Holy Ghost",
+      "A dream",
+      "The Urim and Thummim",
+      "An angel"
+    ],
+    "answerIndex": 0,
+    "explanation": "I will tell you in your mind and in your heart, by the Holy Ghost.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0009",
+    "volume": "DC",
+    "reference": "D&C 9:8",
+    "prompt": "In D&C 9:8, Oliver is told to study it out in his mind and then ask if it is right. If right, his bosom shall do what?",
+    "options": [
+      "Tremble",
+      "Be still",
+      "Be at peace only",
+      "Burn within"
+    ],
+    "answerIndex": 3,
+    "explanation": "If it is right I will cause that your bosom shall burn within you.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0010",
+    "volume": "DC",
+    "reference": "D&C 10:5",
+    "prompt": "D&C 10:5 counsels Joseph Smith to pray always that he may do what?",
+    "options": [
+      "Build a temple",
+      "Translate faster",
+      "Find the plates",
+      "Come off conqueror"
+    ],
+    "answerIndex": 3,
+    "explanation": "Pray always, that you may come off conqueror.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0011",
+    "volume": "DC",
+    "reference": "D&C 13:1",
+    "prompt": "Which priesthood is conferred in D&C 13?",
+    "options": [
+      "The patriarchal priesthood",
+      "The Melchizedek Priesthood",
+      "The Priesthood of Aaron",
+      "The high priesthood"
+    ],
+    "answerIndex": 2,
+    "explanation": "In the name of Messiah, the Priesthood of Aaron was conferred.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0012",
+    "volume": "DC",
+    "reference": "D&C 13:1",
+    "prompt": "The Priesthood of Aaron holds the keys of the ministering of angels, the gospel of repentance, and baptism by what?",
+    "options": [
+      "Fire",
+      "Immersion",
+      "Sprinkling",
+      "Proxy"
+    ],
+    "answerIndex": 1,
+    "explanation": "It holds the keys of baptism by immersion for the remission of sins.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0013",
+    "volume": "DC",
+    "reference": "D&C 18:10",
+    "prompt": "D&C 18:10 teaches that the worth of souls is great in the sight of whom?",
+    "options": [
+      "The prophets",
+      "God",
+      "The angels",
+      "The Church"
+    ],
+    "answerIndex": 1,
+    "explanation": "Remember the worth of souls is great in the sight of God.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0014",
+    "volume": "DC",
+    "reference": "D&C 18:27",
+    "prompt": "In D&C 18, how many apostles are spoken of as being called?",
+    "options": [
+      "Seventy",
+      "Three",
+      "Seven",
+      "Twelve"
+    ],
+    "answerIndex": 3,
+    "explanation": "The Twelve shall be my disciples, and they shall take upon them my name.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0015",
+    "volume": "DC",
+    "reference": "D&C 19:16-18",
+    "prompt": "D&C 19 describes suffering that caused the Lord to bleed at every what?",
+    "options": [
+      "Pore",
+      "Hour",
+      "Wound",
+      "Prayer"
+    ],
+    "answerIndex": 0,
+    "explanation": "It caused Him to bleed at every pore.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0016",
+    "volume": "DC",
+    "reference": "D&C 19:26",
+    "prompt": "In D&C 19:26, Martin Harris is told not to covet his own what?",
+    "options": [
+      "Wife",
+      "Home",
+      "Horses",
+      "Property"
+    ],
+    "answerIndex": 3,
+    "explanation": "Thou shalt not covet thine own property.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0017",
+    "volume": "DC",
+    "reference": "D&C 20:37",
+    "prompt": "According to D&C 20:37, candidates for baptism should show they have a determination to serve Him to what end?",
+    "options": [
+      "Their baptism",
+      "The end",
+      "The Millennium",
+      "Their mission"
+    ],
+    "answerIndex": 1,
+    "explanation": "They have a determination to serve him to the end.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0018",
+    "volume": "DC",
+    "reference": "D&C 20:77",
+    "prompt": "In D&C 20:77, the bread is blessed to the souls of all who partake that they may eat in remembrance of what?",
+    "options": [
+      "The Last Supper",
+      "The blood of thy Son",
+      "The body of thy Son",
+      "The covenant"
+    ],
+    "answerIndex": 2,
+    "explanation": "They may eat in remembrance of the body of thy Son.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0019",
+    "volume": "DC",
+    "reference": "D&C 21:1",
+    "prompt": "Which title is NOT among those D&C 21:1 says Joseph Smith shall be called?",
+    "options": [
+      "High priest",
+      "Seer",
+      "Translator",
+      "Prophet"
+    ],
+    "answerIndex": 0,
+    "explanation": "D&C 21:1 lists seer, translator, prophet, apostle of Jesus Christ, and elder.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0020",
+    "volume": "DC",
+    "reference": "D&C 25:1",
+    "prompt": "To whom is D&C 25 addressed?",
+    "options": [
+      "Eliza R. Snow",
+      "Mary Whitmer",
+      "Lucy Mack Smith",
+      "Emma Smith"
+    ],
+    "answerIndex": 3,
+    "explanation": "D&C 25 is addressed to Emma Smith, the Lord's daughter.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0021",
+    "volume": "DC",
+    "reference": "D&C 25:11",
+    "prompt": "What was Emma Smith asked to do concerning sacred hymns?",
+    "options": [
+      "Translate them",
+      "Write all the music",
+      "Make a selection of them",
+      "Teach them to children"
+    ],
+    "answerIndex": 2,
+    "explanation": "Emma was given to make a selection of sacred hymns.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0022",
+    "volume": "DC",
+    "reference": "D&C 25:12",
+    "prompt": "D&C 25:12 says the song of the righteous is what to the Lord?",
+    "options": [
+      "A sacrifice",
+      "A sign",
+      "A covenant",
+      "A prayer"
+    ],
+    "answerIndex": 3,
+    "explanation": "The song of the righteous is a prayer unto me.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0023",
+    "volume": "DC",
+    "reference": "D&C 27:2",
+    "prompt": "D&C 27:2 says it matters not what we eat or drink for the sacrament if we do it with what?",
+    "options": [
+      "Fasting",
+      "An eye single to His glory",
+      "Bread only",
+      "Proper vessels"
+    ],
+    "answerIndex": 1,
+    "explanation": "It mattereth not, if ye do it with an eye single to my glory.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0024",
+    "volume": "DC",
+    "reference": "D&C 28:2",
+    "prompt": "According to D&C 28:2, who alone was appointed to receive commandments and revelations for the Church?",
+    "options": [
+      "Hiram Page",
+      "Oliver Cowdery",
+      "Joseph Smith",
+      "Sidney Rigdon"
+    ],
+    "answerIndex": 2,
+    "explanation": "No one shall receive commandments and revelations save Joseph Smith.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0025",
+    "volume": "DC",
+    "reference": "D&C 28:11",
+    "prompt": "Which man's seer stone writings did D&C 28 say were not of the Lord?",
+    "options": [
+      "David Whitmer",
+      "Martin Harris",
+      "Hiram Page",
+      "Oliver Cowdery"
+    ],
+    "answerIndex": 2,
+    "explanation": "Those things which Hiram Page hath written from that stone are not of me.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0026",
+    "volume": "DC",
+    "reference": "D&C 29:34",
+    "prompt": "In D&C 29:34, the Lord says all things unto Him are what?",
+    "options": [
+      "Eternal",
+      "Hidden",
+      "Temporal",
+      "Spiritual"
+    ],
+    "answerIndex": 3,
+    "explanation": "All things unto me are spiritual.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0027",
+    "volume": "DC",
+    "reference": "D&C 38:27",
+    "prompt": "D&C 38:27 says: \"If ye are not one ye are not\" whose?",
+    "options": [
+      "Children of light",
+      "Saints",
+      "Mine",
+      "Worthy"
+    ],
+    "answerIndex": 2,
+    "explanation": "Be one; and if ye are not one ye are not mine.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0028",
+    "volume": "DC",
+    "reference": "D&C 38:30",
+    "prompt": "According to D&C 38:30, if ye are prepared ye shall not what?",
+    "options": [
+      "Fall",
+      "Hunger",
+      "Fear",
+      "Fail"
+    ],
+    "answerIndex": 2,
+    "explanation": "If ye are prepared ye shall not fear.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0029",
+    "volume": "DC",
+    "reference": "D&C 42:22",
+    "prompt": "D&C 42:22 commands a husband to love his wife with all his heart and cleave unto whom?",
+    "options": [
+      "The Lord",
+      "Her and none else",
+      "His family",
+      "The Church"
+    ],
+    "answerIndex": 1,
+    "explanation": "Thou shalt love thy wife with all thy heart, and cleave unto her and none else.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0030",
+    "volume": "DC",
+    "reference": "D&C 42:30",
+    "prompt": "In D&C 42:30, members are to remember whom when they consecrate properties?",
+    "options": [
+      "The poor",
+      "The missionaries",
+      "The widows only",
+      "The bishops"
+    ],
+    "answerIndex": 0,
+    "explanation": "Thou wilt remember the poor, and consecrate of thy properties for their support.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0031",
+    "volume": "DC",
+    "reference": "D&C 45:32",
+    "prompt": "D&C 45:32 says the Lord's disciples shall stand in what?",
+    "options": [
+      "High towers",
+      "Their homes",
+      "Their own strength",
+      "Holy places"
+    ],
+    "answerIndex": 3,
+    "explanation": "My disciples shall stand in holy places.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0032",
+    "volume": "DC",
+    "reference": "D&C 45:57",
+    "prompt": "In D&C 45:57, the wise virgins have taken what for their guide?",
+    "options": [
+      "The lamp",
+      "The prophet",
+      "The scriptures",
+      "The Holy Spirit"
+    ],
+    "answerIndex": 3,
+    "explanation": "They have taken the Holy Spirit for their guide.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0033",
+    "volume": "DC",
+    "reference": "D&C 46:11",
+    "prompt": "According to D&C 46:11, to every man is given what?",
+    "options": [
+      "All the gifts of the Spirit",
+      "A gift by the Spirit of God",
+      "Riches",
+      "A calling"
+    ],
+    "answerIndex": 1,
+    "explanation": "To every man is given a gift by the Spirit of God.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0034",
+    "volume": "DC",
+    "reference": "D&C 46:13",
+    "prompt": "According to D&C 46:13, to some it is given by the Holy Ghost to know what?",
+    "options": [
+      "All mysteries",
+      "The interpretation of tongues",
+      "That Jesus Christ is the Son of God",
+      "The day of His coming"
+    ],
+    "answerIndex": 2,
+    "explanation": "To some it is given to know that Jesus Christ is the Son of God.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0035",
+    "volume": "DC",
+    "reference": "D&C 90:24",
+    "prompt": "D&C 90:24 counsels: \"Search diligently, pray always, and be believing,\" and all things shall work together for what?",
+    "options": [
+      "The salvation of your family",
+      "Your glory",
+      "Your good",
+      "The building of Zion"
+    ],
+    "answerIndex": 2,
+    "explanation": "If ye walk uprightly, all things shall work together for your good.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0036",
+    "volume": "DC",
+    "reference": "D&C 58:27",
+    "prompt": "D&C 58:27 says men should be anxiously engaged in what?",
+    "options": [
+      "Their own affairs",
+      "A good cause",
+      "Missionary work only",
+      "Building temples"
+    ],
+    "answerIndex": 1,
+    "explanation": "Men should be anxiously engaged in a good cause.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0037",
+    "volume": "DC",
+    "reference": "D&C 58:42",
+    "prompt": "According to D&C 58:42, the Lord will remember the repented sins of men how much?",
+    "options": [
+      "Until judgment",
+      "Only once",
+      "Seventy times",
+      "No more"
+    ],
+    "answerIndex": 3,
+    "explanation": "Their sins the Lord remembers no more.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0038",
+    "volume": "DC",
+    "reference": "D&C 59:9",
+    "prompt": "According to D&C 59:9, on the Lord's holy day the Saints should go to the house of prayer and do what?",
+    "options": [
+      "Visit the sick",
+      "Offer up thy sacraments",
+      "Fast all day",
+      "Read the scriptures only"
+    ],
+    "answerIndex": 1,
+    "explanation": "Go to the house of prayer and offer up thy sacraments upon my holy day.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0039",
+    "volume": "DC",
+    "reference": "D&C 59:21",
+    "prompt": "In D&C 59:21, in nothing doth man offend God save those who confess not His hand in all things and obey not what?",
+    "options": [
+      "His prophets",
+      "His commandments",
+      "The law of Moses",
+      "The bishops"
+    ],
+    "answerIndex": 1,
+    "explanation": "Those who confess not his hand in all things and obey not his commandments.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0040",
+    "volume": "DC",
+    "reference": "D&C 64:10",
+    "prompt": "According to D&C 64:10, of you it is required to forgive whom?",
+    "options": [
+      "Your family",
+      "All men",
+      "Those who repent",
+      "The Saints"
+    ],
+    "answerIndex": 1,
+    "explanation": "Of you it is required to forgive all men.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0041",
+    "volume": "DC",
+    "reference": "D&C 64:33",
+    "prompt": "D&C 64:33 says: \"Out of small things proceedeth\" what?",
+    "options": [
+      "Eternal life",
+      "That which is great",
+      "Great faith",
+      "Mighty works"
+    ],
+    "answerIndex": 1,
+    "explanation": "Out of small things proceedeth that which is great.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0042",
+    "volume": "DC",
+    "reference": "D&C 64:34",
+    "prompt": "According to D&C 64:34, the Lord requires the heart and what kind of mind?",
+    "options": [
+      "A willing mind",
+      "A sober mind",
+      "A learned mind",
+      "A clear mind"
+    ],
+    "answerIndex": 0,
+    "explanation": "The Lord requireth the heart and a willing mind.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0043",
+    "volume": "DC",
+    "reference": "D&C 68:25",
+    "prompt": "D&C 68:25 says parents should teach children about faith, repentance, baptism, and the Holy Ghost by what age?",
+    "options": [
+      "Ten",
+      "Twelve",
+      "Six",
+      "Eight"
+    ],
+    "answerIndex": 3,
+    "explanation": "Parents are to teach their children when eight years old.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0044",
+    "volume": "DC",
+    "reference": "D&C 76:22",
+    "prompt": "In D&C 76:22, the testimony \"last of all\" given of Christ is that He what?",
+    "options": [
+      "Will come again",
+      "Lives",
+      "Was born in Bethlehem",
+      "Is the Firstborn"
+    ],
+    "answerIndex": 1,
+    "explanation": "This is the testimony, last of all, which we give of him: That he lives!",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0045",
+    "volume": "DC",
+    "reference": "D&C 76:70",
+    "prompt": "D&C 76:70 compares the glory of the celestial bodies to that of what?",
+    "options": [
+      "The sun",
+      "Lightning",
+      "The stars",
+      "The moon"
+    ],
+    "answerIndex": 0,
+    "explanation": "Their glory is that of the sun.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0046",
+    "volume": "DC",
+    "reference": "D&C 76:71",
+    "prompt": "D&C 76 describes the terrestrial world as differing from the celestial as what differs from the sun?",
+    "options": [
+      "The stars",
+      "A candle",
+      "The earth",
+      "The moon"
+    ],
+    "answerIndex": 3,
+    "explanation": "The terrestrial differeth from the celestial as the moon differs from the sun.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0047",
+    "volume": "DC",
+    "reference": "D&C 76:81",
+    "prompt": "D&C 76:81 compares the telestial glory to what?",
+    "options": [
+      "The stars",
+      "A candle",
+      "The earth",
+      "The moon"
+    ],
+    "answerIndex": 0,
+    "explanation": "The glory of the telestial is as the glory of the stars.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0048",
+    "volume": "DC",
+    "reference": "D&C 82:3",
+    "prompt": "According to D&C 82:3, unto whom much is given, much is what?",
+    "options": [
+      "Expected",
+      "Promised",
+      "Forgiven",
+      "Required"
+    ],
+    "answerIndex": 3,
+    "explanation": "For of him unto whom much is given much is required.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0049",
+    "volume": "DC",
+    "reference": "D&C 82:10",
+    "prompt": "According to D&C 82:10, the Lord is bound when we do what?",
+    "options": [
+      "Pay tithing",
+      "What He says",
+      "Pray often",
+      "Attend church"
+    ],
+    "answerIndex": 1,
+    "explanation": "I, the Lord, am bound when ye do what I say.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0050",
+    "volume": "DC",
+    "reference": "D&C 84:33",
+    "prompt": "D&C 84:33 speaks of those faithful unto obtaining these two priesthoods and magnifying their what?",
+    "options": [
+      "Talents",
+      "Office only",
+      "Calling",
+      "Ordination"
+    ],
+    "answerIndex": 2,
+    "explanation": "Whoso is faithful unto the obtaining these two priesthoods and the magnifying their calling.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0051",
+    "volume": "DC",
+    "reference": "D&C 87:1",
+    "prompt": "D&C 87 speaks of wars beginning with the rebellion of which state?",
+    "options": [
+      "Missouri",
+      "Virginia",
+      "South Carolina",
+      "Georgia"
+    ],
+    "answerIndex": 2,
+    "explanation": "The wars will shortly come to pass, beginning at the rebellion of South Carolina.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0052",
+    "volume": "DC",
+    "reference": "D&C 88:118",
+    "prompt": "D&C 88:118 counsels to seek learning by study and also by what?",
+    "options": [
+      "Fasting",
+      "Teachers",
+      "Faith",
+      "Revelation"
+    ],
+    "answerIndex": 2,
+    "explanation": "Seek learning, even by study and also by faith.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0053",
+    "volume": "DC",
+    "reference": "D&C 88:119",
+    "prompt": "D&C 88:119 commands to establish a house of prayer, a house of fasting, a house of faith, and a house of what?",
+    "options": [
+      "Worship only",
+      "Rest",
+      "Learning",
+      "Feasting"
+    ],
+    "answerIndex": 2,
+    "explanation": "A house of prayer, fasting, faith, learning, glory, order, a house of God.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0054",
+    "volume": "DC",
+    "reference": "D&C 89:7",
+    "prompt": "In the Word of Wisdom, strong drinks are not for the belly, but for the washing of what?",
+    "options": [
+      "Your bodies",
+      "The temple",
+      "Your garments",
+      "Your feet"
+    ],
+    "answerIndex": 0,
+    "explanation": "Strong drinks are for the washing of your bodies.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0055",
+    "volume": "DC",
+    "reference": "D&C 89:9",
+    "prompt": "According to D&C 89:9, hot drinks are not for what?",
+    "options": [
+      "The Sabbath",
+      "The sick",
+      "Children only",
+      "The body or belly"
+    ],
+    "answerIndex": 3,
+    "explanation": "Hot drinks are not for the body or belly.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0056",
+    "volume": "DC",
+    "reference": "D&C 89:14",
+    "prompt": "D&C 89:14 says all grain is ordained for the use of man and beasts to be what?",
+    "options": [
+      "The staff of life",
+      "A tithe",
+      "An offering",
+      "Food in winter"
+    ],
+    "answerIndex": 0,
+    "explanation": "All grain is ordained to be the staff of life.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0057",
+    "volume": "DC",
+    "reference": "D&C 89:20",
+    "prompt": "Those who keep the Word of Wisdom shall run and not be weary, and walk and not what?",
+    "options": [
+      "Stumble",
+      "Fall",
+      "Tire",
+      "Faint"
+    ],
+    "answerIndex": 3,
+    "explanation": "They shall run and not be weary, and shall walk and not faint.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0058",
+    "volume": "DC",
+    "reference": "D&C 89:21",
+    "prompt": "D&C 89:21 promises the destroying angel shall pass by them as the children of whom?",
+    "options": [
+      "Light",
+      "Israel",
+      "Abraham",
+      "Ephraim"
+    ],
+    "answerIndex": 1,
+    "explanation": "The destroying angel shall pass by them, as the children of Israel.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0059",
+    "volume": "DC",
+    "reference": "D&C 93:36",
+    "prompt": "According to D&C 93:36, the glory of God is what?",
+    "options": [
+      "Intelligence",
+      "Power",
+      "Wealth",
+      "Majesty"
+    ],
+    "answerIndex": 0,
+    "explanation": "The glory of God is intelligence.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0060",
+    "volume": "DC",
+    "reference": "D&C 93:24",
+    "prompt": "D&C 93:24 defines truth as knowledge of things as they are, as they were, and as they are to what?",
+    "options": [
+      "Be revealed",
+      "Come",
+      "Be known",
+      "Remain"
+    ],
+    "answerIndex": 1,
+    "explanation": "Truth is knowledge of things as they are, were, and are to come.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0061",
+    "volume": "DC",
+    "reference": "D&C 95:3",
+    "prompt": "The Lord chastened the Saints in D&C 95 for not building what?",
+    "options": [
+      "A wall",
+      "A storehouse",
+      "A school",
+      "His house"
+    ],
+    "answerIndex": 3,
+    "explanation": "They had not considered the commandment concerning the building of His house.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0062",
+    "volume": "DC",
+    "reference": "D&C 98:11",
+    "prompt": "D&C 98:11 commands to forsake all evil and cleave unto what?",
+    "options": [
+      "His family",
+      "The covenant",
+      "The prophet",
+      "All good"
+    ],
+    "answerIndex": 3,
+    "explanation": "I give unto you a commandment, that ye shall forsake all evil and cleave unto all good.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0063",
+    "volume": "DC",
+    "reference": "D&C 104:17",
+    "prompt": "According to D&C 104:17, the earth is what?",
+    "options": [
+      "Full, and there is enough and to spare",
+      "Cursed",
+      "Empty",
+      "Weary"
+    ],
+    "answerIndex": 0,
+    "explanation": "The earth is full, and there is enough and to spare.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0064",
+    "volume": "DC",
+    "reference": "D&C 107:1",
+    "prompt": "According to D&C 107:1, how many priesthoods are there in the Church?",
+    "options": [
+      "One",
+      "Four",
+      "Seven",
+      "Two"
+    ],
+    "answerIndex": 3,
+    "explanation": "There are, in the church, two priesthoods.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0065",
+    "volume": "DC",
+    "reference": "D&C 107:2-4",
+    "prompt": "Why is the greater priesthood called the Melchizedek Priesthood?",
+    "options": [
+      "Joseph Smith named it after a revelation of Moses",
+      "It came from the city of Melchizedek",
+      "Melchizedek was such a great high priest",
+      "It was first held by Melchizedek's son"
+    ],
+    "answerIndex": 2,
+    "explanation": "It is called after Melchizedek because he was such a great high priest.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0066",
+    "volume": "DC",
+    "reference": "D&C 107:20",
+    "prompt": "The Aaronic Priesthood holds the keys of the ministering of whom?",
+    "options": [
+      "Angels",
+      "Prophets",
+      "Bishops only",
+      "The apostles"
+    ],
+    "answerIndex": 0,
+    "explanation": "The lesser priesthood holds the keys of the ministering of angels.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0067",
+    "volume": "DC",
+    "reference": "D&C 107:23",
+    "prompt": "The traveling councilors called the Twelve are special witnesses of the name of Christ in where?",
+    "options": [
+      "Zion",
+      "The United States",
+      "The stakes",
+      "All the world"
+    ],
+    "answerIndex": 3,
+    "explanation": "The Twelve are special witnesses of the name of Christ in all the world.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0068",
+    "volume": "DC",
+    "reference": "D&C 107:25",
+    "prompt": "Which quorum is called to preach the gospel and be especial witnesses to the Gentiles in D&C 107:25?",
+    "options": [
+      "The high priests",
+      "The elders",
+      "The Twelve",
+      "The Seventy"
+    ],
+    "answerIndex": 3,
+    "explanation": "The Seventy are also called to preach the gospel.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0069",
+    "volume": "DC",
+    "reference": "D&C 107:85",
+    "prompt": "How many deacons are in a deacons quorum, according to D&C 107:85?",
+    "options": [
+      "Twelve",
+      "Ninety-six",
+      "Forty-eight",
+      "Twenty-four"
+    ],
+    "answerIndex": 0,
+    "explanation": "A deacons quorum consists of twelve deacons.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0070",
+    "volume": "DC",
+    "reference": "D&C 107:86",
+    "prompt": "How many teachers make up a teachers quorum, according to D&C 107:86?",
+    "options": [
+      "Forty-eight",
+      "Twenty-four",
+      "Seventy",
+      "Twelve"
+    ],
+    "answerIndex": 1,
+    "explanation": "The quorum of teachers consists of twenty-four teachers.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0071",
+    "volume": "DC",
+    "reference": "D&C 107:87",
+    "prompt": "How many priests make up a priests quorum, according to D&C 107:87?",
+    "options": [
+      "Forty-eight",
+      "Twenty-four",
+      "Ninety-six",
+      "Twelve"
+    ],
+    "answerIndex": 0,
+    "explanation": "The quorum of priests consists of forty-eight priests.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0072",
+    "volume": "DC",
+    "reference": "D&C 107:89",
+    "prompt": "How many elders make up an elders quorum, according to D&C 107:89?",
+    "options": [
+      "One hundred",
+      "Seventy",
+      "Forty-eight",
+      "Ninety-six"
+    ],
+    "answerIndex": 3,
+    "explanation": "The quorum of elders consists of ninety-six elders.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0073",
+    "volume": "DC",
+    "reference": "D&C 107:99",
+    "prompt": "D&C 107:99 says let every man learn his duty and act in the office in which he is appointed in all what?",
+    "options": [
+      "Diligence",
+      "Haste",
+      "Humility",
+      "Patience"
+    ],
+    "answerIndex": 0,
+    "explanation": "Let every man act in the office in which he is appointed, in all diligence.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0074",
+    "volume": "DC",
+    "reference": "D&C 110:2",
+    "prompt": "In D&C 110, the Lord appeared standing upon the breastwork of what?",
+    "options": [
+      "The temple wall",
+      "The pulpit",
+      "A mountain",
+      "An altar"
+    ],
+    "answerIndex": 1,
+    "explanation": "They saw the Lord standing upon the breastwork of the pulpit.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0075",
+    "volume": "DC",
+    "reference": "D&C 110:11",
+    "prompt": "Who committed the keys of the gathering of Israel in D&C 110?",
+    "options": [
+      "Elijah",
+      "Abraham",
+      "Moses",
+      "Elias"
+    ],
+    "answerIndex": 2,
+    "explanation": "Moses appeared and committed the keys of the gathering of Israel.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0076",
+    "volume": "DC",
+    "reference": "D&C 110:13",
+    "prompt": "Which prophet, taken to heaven without tasting death, appeared in D&C 110:13?",
+    "options": [
+      "John the Revelator",
+      "Elijah",
+      "Enoch",
+      "Isaiah"
+    ],
+    "answerIndex": 1,
+    "explanation": "Elijah the prophet stood before them.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0077",
+    "volume": "DC",
+    "reference": "D&C 115:4",
+    "prompt": "According to D&C 115:4, what is the name of the Lord's Church?",
+    "options": [
+      "The Church of Jesus Christ of Latter-day Saints",
+      "The Church of the Latter Day Saints",
+      "The Church of God",
+      "The Church of Christ"
+    ],
+    "answerIndex": 0,
+    "explanation": "Thus shall my church be called in the last days.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0078",
+    "volume": "DC",
+    "reference": "D&C 119:4",
+    "prompt": "According to D&C 119:4, those who have been tithed shall pay one-tenth of all their what?",
+    "options": [
+      "Wages monthly",
+      "Crops seasonally",
+      "Property once",
+      "Interest annually"
+    ],
+    "answerIndex": 3,
+    "explanation": "They shall pay one-tenth of all their interest annually.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0079",
+    "volume": "DC",
+    "reference": "D&C 121:7",
+    "prompt": "D&C 121:7 begins, \"My son, peace be unto thy\" what?",
+    "options": [
+      "Mind",
+      "House",
+      "Soul",
+      "Heart"
+    ],
+    "answerIndex": 2,
+    "explanation": "My son, peace be unto thy soul.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0080",
+    "volume": "DC",
+    "reference": "D&C 121:8",
+    "prompt": "D&C 121:8 promises that if Joseph endures it well, God shall exalt him on what?",
+    "options": [
+      "High",
+      "The mount",
+      "A throne",
+      "Zion's hill"
+    ],
+    "answerIndex": 0,
+    "explanation": "If thou endure it well, God shall exalt thee on high.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0081",
+    "volume": "DC",
+    "reference": "D&C 121:41",
+    "prompt": "Which of these is NOT among the ways D&C 121:41 says power should be maintained?",
+    "options": [
+      "By the office held",
+      "By love unfeigned",
+      "By persuasion",
+      "By long-suffering"
+    ],
+    "answerIndex": 0,
+    "explanation": "No power ought to be maintained by virtue of the priesthood, only by persuasion and love.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0082",
+    "volume": "DC",
+    "reference": "D&C 121:45",
+    "prompt": "D&C 121:45 says let virtue garnish thy thoughts how often?",
+    "options": [
+      "On the Sabbath",
+      "Daily",
+      "In prayer",
+      "Unceasingly"
+    ],
+    "answerIndex": 3,
+    "explanation": "Let virtue garnish thy thoughts unceasingly.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0083",
+    "volume": "DC",
+    "reference": "D&C 122:7",
+    "prompt": "According to D&C 122:7, all these things shall give thee what?",
+    "options": [
+      "Glory",
+      "Strength",
+      "Experience",
+      "Sorrow"
+    ],
+    "answerIndex": 2,
+    "explanation": "All these things shall give thee experience, and shall be for thy good.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0084",
+    "volume": "DC",
+    "reference": "D&C 122:8",
+    "prompt": "D&C 122:8 asks: \"The Son of Man hath descended below them all. Art thou\" what?",
+    "options": [
+      "Greater than he",
+      "Forgotten",
+      "Afraid",
+      "Alone"
+    ],
+    "answerIndex": 0,
+    "explanation": "Art thou greater than he?",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0085",
+    "volume": "DC",
+    "reference": "D&C 130:22",
+    "prompt": "According to D&C 130:22, the Father has a body of flesh and bones as tangible as whose?",
+    "options": [
+      "The earth's",
+      "A spirit's",
+      "Man's",
+      "An angel's"
+    ],
+    "answerIndex": 2,
+    "explanation": "The Father has a body of flesh and bones as tangible as man's.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0086",
+    "volume": "DC",
+    "reference": "D&C 130:19",
+    "prompt": "D&C 130:19 says a person who gains more knowledge through diligence will have so much the what in the world to come?",
+    "options": [
+      "Glory",
+      "Reward",
+      "Advantage",
+      "Priesthood"
+    ],
+    "answerIndex": 2,
+    "explanation": "He will have so much the advantage in the world to come.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0087",
+    "volume": "DC",
+    "reference": "D&C 121:46",
+    "prompt": "According to D&C 121:46, who shall be thy constant companion?",
+    "options": [
+      "Thy guardian spirit",
+      "The prophet",
+      "The Holy Ghost",
+      "An angel of the Lord"
+    ],
+    "answerIndex": 2,
+    "explanation": "D&C 121:46 promises that the Holy Ghost shall be thy constant companion.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0088",
+    "volume": "DC",
+    "reference": "D&C 131:7",
+    "prompt": "According to D&C 131:7, all spirit is what?",
+    "options": [
+      "Invisible",
+      "Matter",
+      "Eternal",
+      "Light"
+    ],
+    "answerIndex": 1,
+    "explanation": "There is no such thing as immaterial matter. All spirit is matter.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0089",
+    "volume": "DC",
+    "reference": "D&C 135:1",
+    "prompt": "D&C 135 records the martyrdom of Joseph Smith and his brother at which jail?",
+    "options": [
+      "Carthage",
+      "Liberty",
+      "Nauvoo",
+      "Richmond"
+    ],
+    "answerIndex": 0,
+    "explanation": "Joseph and Hyrum were shot in Carthage jail.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0090",
+    "volume": "DC",
+    "reference": "D&C 135:3",
+    "prompt": "According to D&C 135:3, Joseph Smith did more, save Jesus only, for what?",
+    "options": [
+      "Translating languages",
+      "The government",
+      "The salvation of men in this world",
+      "Building cities"
+    ],
+    "answerIndex": 2,
+    "explanation": "Joseph Smith has done more, save Jesus only, for the salvation of men.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0091",
+    "volume": "DC",
+    "reference": "D&C 136:28",
+    "prompt": "D&C 136:28 counsels, if thou art merry, praise the Lord with what?",
+    "options": [
+      "Fasting",
+      "Offerings",
+      "Silence",
+      "Singing, music, dancing, and prayer"
+    ],
+    "answerIndex": 3,
+    "explanation": "If thou art merry, praise the Lord with singing, music, dancing, prayer.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0092",
+    "volume": "DC",
+    "reference": "D&C 137:5",
+    "prompt": "In D&C 137, Joseph Smith saw his brother in the celestial kingdom. Which brother?",
+    "options": [
+      "Samuel",
+      "Alvin",
+      "Don Carlos",
+      "Hyrum"
+    ],
+    "answerIndex": 1,
+    "explanation": "Joseph saw his brother Alvin, who had long since slept.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0093",
+    "volume": "DC",
+    "reference": "D&C 138:1",
+    "prompt": "In what year did the pondering that opened D&C 138 take place?",
+    "options": [
+      "1918",
+      "1844",
+      "1890",
+      "1936"
+    ],
+    "answerIndex": 0,
+    "explanation": "D&C 138:1 dates it to the third of October, nineteen hundred and eighteen.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0094",
+    "volume": "DC",
+    "reference": "D&C 138:38-39",
+    "prompt": "In D&C 138, who among the great and mighty ones is named as the Ancient of Days and father of all?",
+    "options": [
+      "Noah",
+      "Abraham",
+      "Father Adam",
+      "Enoch"
+    ],
+    "answerIndex": 2,
+    "explanation": "Among the great and mighty ones was Father Adam, the Ancient of Days.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0095",
+    "volume": "DC",
+    "reference": "D&C 138:30",
+    "prompt": "In D&C 138:30, the Savior appointed messengers to carry the light of the gospel to whom?",
+    "options": [
+      "Them that were in darkness",
+      "The angels",
+      "The living Gentiles",
+      "The Lamanites"
+    ],
+    "answerIndex": 0,
+    "explanation": "Thus was the gospel preached to the dead, the spirits of men in darkness.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0096",
+    "volume": "DC",
+    "reference": "D&C 76:23",
+    "prompt": "In D&C 76, Joseph Smith and Sidney Rigdon saw Christ on the right hand of whom?",
+    "options": [
+      "Adam",
+      "God",
+      "Michael",
+      "Moses"
+    ],
+    "answerIndex": 1,
+    "explanation": "We saw him, even on the right hand of God.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0097",
+    "volume": "DC",
+    "reference": "D&C 76:11-12",
+    "prompt": "Who received the vision recorded in D&C 76 together with Joseph Smith?",
+    "options": [
+      "Sidney Rigdon",
+      "Frederick G. Williams",
+      "Hyrum Smith",
+      "Oliver Cowdery"
+    ],
+    "answerIndex": 0,
+    "explanation": "Joseph Smith and Sidney Rigdon were in the Spirit together.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0098",
+    "volume": "DC",
+    "reference": "D&C 84:88",
+    "prompt": "In D&C 84:88, the Lord says His angels will be round about His servants to do what?",
+    "options": [
+      "Feed you",
+      "Judge you",
+      "Bear you up",
+      "Teach you"
+    ],
+    "answerIndex": 2,
+    "explanation": "My angels round about you, to bear you up.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0099",
+    "volume": "DC",
+    "reference": "D&C 18:15-16",
+    "prompt": "D&C 18 says that if you labor and bring save one soul, great shall be your what?",
+    "options": [
+      "Glory",
+      "Joy",
+      "Blessing",
+      "Reward"
+    ],
+    "answerIndex": 1,
+    "explanation": "Great shall be your joy with him in the kingdom of my Father.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0100",
+    "volume": "DC",
+    "reference": "D&C 101:16",
+    "prompt": "In D&C 101:16, the Lord tells Zion to be still and know that He is what?",
+    "options": [
+      "King",
+      "Coming",
+      "God",
+      "Near"
+    ],
+    "answerIndex": 2,
+    "explanation": "Be still and know that I am God.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0101",
+    "volume": "DC",
+    "reference": "D&C 121:1",
+    "prompt": "D&C 121 begins with a prayer asking where God is and where is what?",
+    "options": [
+      "The ark of the covenant",
+      "The pavilion that covereth thy hiding place",
+      "The rod of iron",
+      "The temple of the Lord"
+    ],
+    "answerIndex": 1,
+    "explanation": "O God, where art thou? And where is the pavilion that covereth thy hiding place?",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0102",
+    "volume": "DC",
+    "reference": "D&C 128:22",
+    "prompt": "D&C 128:22 urges the Saints to go forward and not backward and asks: \"Shall we not go on in so\" what?",
+    "options": [
+      "Great a cause",
+      "Mighty a labor",
+      "Holy a work",
+      "Glorious a path"
+    ],
+    "answerIndex": 0,
+    "explanation": "Brethren, shall we not go on in so great a cause?",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0103",
+    "volume": "DC",
+    "reference": "D&C 132:19",
+    "prompt": "D&C 132:19 speaks of a marriage sealed by the Holy Spirit of what?",
+    "options": [
+      "Promise",
+      "Truth",
+      "Elijah",
+      "Glory"
+    ],
+    "answerIndex": 0,
+    "explanation": "It is sealed unto them by the Holy Spirit of promise.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0104",
+    "volume": "DC",
+    "reference": "D&C 50:24",
+    "prompt": "D&C 50:24 teaches that light grows brighter and brighter until what?",
+    "options": [
+      "The Millennium",
+      "Death",
+      "The perfect day",
+      "The resurrection"
+    ],
+    "answerIndex": 2,
+    "explanation": "That light groweth brighter and brighter until the perfect day.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0105",
+    "volume": "DC",
+    "reference": "D&C 6:33",
+    "prompt": "D&C 6:33 counsels, \"Fear not to do good,\" for whatsoever ye sow, that shall ye also do what?",
+    "options": [
+      "Keep",
+      "Reap",
+      "Lose",
+      "Give"
+    ],
+    "answerIndex": 1,
+    "explanation": "Whatsoever ye sow, that shall ye also reap.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0106",
+    "volume": "DC",
+    "reference": "D&C 19:23",
+    "prompt": "D&C 19:23 says: \"Learn of me, and listen to my words; walk in the meekness of my Spirit, and you shall have\" what?",
+    "options": [
+      "Eternal life",
+      "Peace in me",
+      "Great riches",
+      "A testimony"
+    ],
+    "answerIndex": 1,
+    "explanation": "Walk in the meekness of my Spirit, and you shall have peace in me.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0107",
+    "volume": "DC",
+    "reference": "D&C 88:63",
+    "prompt": "According to D&C 88:63, if we draw near unto the Lord, what will He do?",
+    "options": [
+      "Send His angels",
+      "Answer every prayer",
+      "Draw near unto you",
+      "Bless your house"
+    ],
+    "answerIndex": 2,
+    "explanation": "Draw near unto me and I will draw near unto you.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0108",
+    "volume": "DC",
+    "reference": "D&C 112:10",
+    "prompt": "D&C 112:10 counsels Thomas B. Marsh to be what?",
+    "options": [
+      "Wise",
+      "Bold",
+      "Humble",
+      "Diligent"
+    ],
+    "answerIndex": 2,
+    "explanation": "Be thou humble; and the Lord thy God shall lead thee by the hand.",
+    "reviewStatus": "draft"
+  },
+  {
+    "id": "dc-0109",
+    "volume": "DC",
+    "reference": "D&C 1:4",
+    "prompt": "D&C 1:4 says the voice of warning shall be unto all people by the mouths of whom?",
+    "options": [
+      "Kings",
+      "The prophets of old",
+      "My angels",
+      "My disciples"
+    ],
+    "answerIndex": 3,
+    "explanation": "The voice of warning shall be unto all people, by the mouths of my disciples.",
+    "reviewStatus": "draft"
+  }
+]
