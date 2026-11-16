@@ -7,7 +7,7 @@ Future<void> _openGame(WidgetTester tester) async {
   await pumpApp(tester);
   await tester.tap(find.text('Start a game'));
   await tester.pumpAndSettle();
-  await tester.tap(find.text('Start game'));
+  await tester.tap(find.textContaining('Start game'));
   await tester.pumpAndSettle();
   expect(find.text('Question'), findsOneWidget);
 }
