@@ -8,11 +8,21 @@ import 'package:saints_trivia_flutter/layout/question_progress.dart';
 import 'package:saints_trivia_flutter/layout/screen_body.dart';
 import 'package:saints_trivia_flutter/layout/st_icon.dart';
 import 'package:saints_trivia_flutter/layout/text_scale.dart';
+import 'package:saints_trivia_flutter/data/questions/scripture_volume.dart';
+import 'package:saints_trivia_flutter/progress/home_snapshot.dart';
 import 'package:saints_trivia_flutter/routing/app_router.dart';
 import 'package:saints_trivia_flutter/routing/routes.dart';
 import 'package:saints_trivia_flutter/theme/st_theme.dart';
 
 const _spoken = 'Question 7 of 10';
+
+/// `/game` with no settings is a restore that has nothing to resume, so the
+/// route opens setup. Pass a selection so this check still lands on the
+/// question screen.
+const _gameSettings = LastGameSettings(
+  volumes: [ScriptureVolume.ot],
+  questionCount: 10,
+);
 
 Future<void> _pumpScaled(
   WidgetTester tester, {
@@ -380,7 +390,7 @@ void main() {
       final router = container.read(appRouterProvider);
 
       for (final path in routes) {
-        router.go(path);
+        router.go(path, extra: path == AppRoutes.game ? _gameSettings : null);
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull, reason: '$path at $scale');
         if (scale == 2 && path == AppRoutes.game) {

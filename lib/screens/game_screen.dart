@@ -1,24 +1,58 @@
 import 'dart:async';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../data/questions/question_bank_provider.dart';
+import '../game/game_providers.dart';
 import '../layout/question_progress.dart';
 import '../layout/screen_body.dart';
 import '../layout/st_icon.dart';
+import '../progress/home_snapshot.dart';
 import '../routing/routes.dart';
 import '../theme/st_theme.dart';
 import 'placeholder_scaffold.dart';
 
-class GameScreen extends StatefulWidget {
-  const GameScreen({super.key});
+class GameScreen extends ConsumerStatefulWidget {
+  const GameScreen({super.key, this.settings});
+
+  /// Resolved by the game route. Null only if the route is built without
+  /// going through that redirect.
+  final LastGameSettings? settings;
 
   @override
-  State<GameScreen> createState() => _GameScreenState();
+  ConsumerState<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends State<GameScreen> {
+class _GameScreenState extends ConsumerState<GameScreen> {
   bool _confirming = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _dealIfBankReady());
+  }
+
+  /// Deals from the bank the splash already loaded.
+  ///
+  /// Reading [questionBankProvider] only when it [exists] keeps this screen
+  /// from starting a second load. Home never reads the bank either.
+  void _dealIfBankReady() {
+    if (!mounted) return;
+    final settings = widget.settings;
+    if (settings == null) return;
+    if (!ref.read(questionBankProvider.exists)) return;
+    final bank = ref.read(questionBankProvider).asData?.value;
+    if (bank == null) return;
+    ref
+        .read(gameControllerProvider.notifier)
+        .start(
+          bank: bank,
+          volumes: settings.volumes,
+          requestedCount: settings.questionCount,
+        );
+  }
 
   Future<void> _requestQuit() async {
     if (_confirming || !mounted) {
