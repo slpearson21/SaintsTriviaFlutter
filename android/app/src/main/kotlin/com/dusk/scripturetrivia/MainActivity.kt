@@ -1,4 +1,4 @@
-package com.dusk.saintstrivia.saints_trivia_flutter
+package com.dusk.scripturetrivia
 
 import android.os.Build
 import io.flutter.embedding.android.FlutterActivity
