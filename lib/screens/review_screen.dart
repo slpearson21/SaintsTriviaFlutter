@@ -255,65 +255,69 @@ class _AnswerCard extends StatelessWidget {
     final colors = theme.extension<StColors>()!;
     final correct = answer.correct;
     final mark = correct ? colors.correct : colors.wrong;
-    return Card(
+    return Semantics(
       key: Key('review-answer-${answer.question.id}'),
-      child: Padding(
-        padding: const EdgeInsets.all(StSpace.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+      container: true,
+      label: correct ? 'Correct' : 'Missed',
+      child: MergeSemantics(
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(StSpace.md),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ExcludeSemantics(
-                  child: StIcon(
-                    correct ? Icons.check_circle : Icons.cancel,
-                    size: 22,
-                    color: mark,
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ExcludeSemantics(
+                      child: StIcon(
+                        correct ? Icons.check_circle : Icons.cancel,
+                        size: 22,
+                        color: mark,
+                      ),
+                    ),
+                    const SizedBox(width: StSpace.sm),
+                    Expanded(
+                      child: Text(
+                        answer.question.prompt,
+                        style: theme.textTheme.titleMedium,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: StSpace.sm),
-                Expanded(
-                  child: Text(
-                    answer.question.prompt,
-                    style: theme.textTheme.titleMedium,
+                Padding(
+                  padding: const EdgeInsets.only(left: 22 + StSpace.sm),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: StSpace.xs),
+                      if (correct)
+                        _AnswerLine(
+                          label: 'Correct answer',
+                          value: answer.correctText,
+                          color: colors.correct,
+                        )
+                      else ...[
+                        _AnswerLine(
+                          label: 'Your answer',
+                          value: answer.selectedText,
+                          color: colors.wrong,
+                        ),
+                        const SizedBox(height: StSpace.xxs),
+                        _AnswerLine(
+                          label: 'Correct answer',
+                          value: answer.correctText,
+                          color: colors.correct,
+                        ),
+                      ],
+                      const SizedBox(height: StSpace.sm),
+                      _ReferenceChip(reference: answer.question.reference),
+                    ],
                   ),
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 22 + StSpace.sm),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: StSpace.xs),
-                  if (correct)
-                    Text(
-                      answer.correctText,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: colors.correct,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    )
-                  else ...[
-                    _AnswerLine(
-                      label: 'Your answer',
-                      value: answer.selectedText,
-                      color: colors.wrong,
-                    ),
-                    const SizedBox(height: StSpace.xxs),
-                    _AnswerLine(
-                      label: 'Correct',
-                      value: answer.correctText,
-                      color: colors.correct,
-                    ),
-                  ],
-                  const SizedBox(height: StSpace.sm),
-                  _ReferenceChip(reference: answer.question.reference),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -371,19 +375,26 @@ class _ReferenceChip extends StatelessWidget {
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ExcludeSemantics(
-              child: StIcon(
-                Icons.menu_book_rounded,
-                size: 16,
-                color: scheme.onPrimaryContainer,
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: ExcludeSemantics(
+                child: StIcon(
+                  Icons.menu_book_rounded,
+                  size: 16,
+                  color: scheme.onPrimaryContainer,
+                ),
               ),
             ),
             const SizedBox(width: StSpace.xxs),
-            Text(
-              reference,
-              style: theme.textTheme.labelLarge?.copyWith(
-                color: scheme.onPrimaryContainer,
+            Flexible(
+              child: Text(
+                reference,
+                softWrap: true,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: scheme.onPrimaryContainer,
+                ),
               ),
             ),
           ],

@@ -182,7 +182,10 @@ void main() {
       find.text('Where was the Church formally organized?'),
       findsOneWidget,
     );
-    expect(find.text('Nephi'), findsOneWidget);
+    expect(
+      find.textContaining('Correct answer: Nephi', findRichText: true),
+      findsOneWidget,
+    );
     expect(find.text('Missed'), findsWidgets);
     expect(find.text('Correct'), findsWidgets);
 
@@ -193,7 +196,10 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.textContaining('Correct: Fayette, New York', findRichText: true),
+      find.textContaining(
+        'Correct answer: Fayette, New York',
+        findRichText: true,
+      ),
       findsOneWidget,
     );
     expect(
@@ -201,7 +207,10 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.textContaining('Correct: Joseph Smith Sr.', findRichText: true),
+      find.textContaining(
+        'Correct answer: Joseph Smith Sr.',
+        findRichText: true,
+      ),
       findsOneWidget,
     );
     expect(find.text('D&C 20 heading'), findsOneWidget);
@@ -215,14 +224,85 @@ void main() {
 
     await tester.tap(find.byKey(const Key('review-filter-correct')));
     await tester.pumpAndSettle();
-    expect(find.text('Nephi'), findsOneWidget);
-    expect(find.text('King Noah'), findsOneWidget);
+    expect(
+      find.textContaining('Correct answer: Nephi', findRichText: true),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('Correct answer: King Noah', findRichText: true),
+      findsOneWidget,
+    );
     expect(find.text('1 Nephi 3–4'), findsOneWidget);
     expect(find.textContaining('Palmyra', findRichText: true), findsNothing);
     expect(
       find.textContaining('Your answer:', findRichText: true),
       findsNothing,
     );
+  });
+
+  testWidgets('review cards name missed or correct once for the reader', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    try {
+      await _openResults(tester, session: _mixed());
+      await _tap(tester, const Key('results-review'));
+
+      final missed = tester.getSemantics(
+        find.byKey(const Key('review-answer-dc-0020')),
+      );
+      expect(missed.label, 'Missed');
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('review-answer-dc-0020')),
+          matching: find.bySemanticsLabel('Missed'),
+        ),
+        findsNothing,
+      );
+
+      final correct = tester.getSemantics(
+        find.byKey(const Key('review-answer-bom-0003')),
+      );
+      expect(correct.label, 'Correct');
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('review-answer-bom-0003')),
+          matching: find.bySemanticsLabel('Correct'),
+        ),
+        findsNothing,
+      );
+    } finally {
+      handle.dispose();
+    }
+  });
+
+  testWidgets('a long reference wraps at 200% text', (tester) async {
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    Future<void> open(Size surface) async {
+      await tester.binding.setSurfaceSize(surface);
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      await _openResults(
+        tester,
+        session: _played(const [
+          _Pick(
+            'pgp-0001',
+            ScriptureVolume.pgp,
+            'Which verses record this?',
+            'Joseph Smith—History 1:70-71',
+            0,
+            0,
+          ),
+        ]),
+      );
+      await _tap(tester, const Key('results-review'));
+      expect(find.text('Joseph Smith—History 1:70-71'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }
+
+    await open(const Size(393, 852));
+    await open(const Size(320, 568));
   });
 
   testWidgets('personal best chip follows the snapshot seam', (tester) async {
@@ -336,6 +416,58 @@ void main() {
     );
   });
 
+  testWidgets('play again uses the dealt length when the stored count is 0', (
+    tester,
+  ) async {
+    final finished = _played(const [
+      _Pick('bom-0001', ScriptureVolume.bom, 'One', '1 Nephi 1:1', 0, 0),
+      _Pick('bom-0002', ScriptureVolume.bom, 'Two', '1 Nephi 1:2', 0, 0),
+      _Pick('bom-0003', ScriptureVolume.bom, 'Three', '1 Nephi 1:3', 0, 1),
+      _Pick('bom-0004', ScriptureVolume.bom, 'Four', '1 Nephi 1:4', 0, 0),
+    ], requested: 0);
+    final bank = QuestionBank(
+      schemaVersion: 1,
+      questions: [
+        for (var i = 0; i < 6; i++) _bankQuestion(ScriptureVolume.bom, i + 1),
+      ],
+    );
+    final container = await _pump(
+      tester,
+      overrides: [
+        _held(finished),
+        questionBankLoaderProvider.overrideWith(
+          (ref) =>
+              () async => bank,
+        ),
+        gameRandomProvider.overrideWith((ref) => Random(8)),
+      ],
+    );
+    await container.read(questionBankProvider.future);
+    container.read(appRouterProvider).go(AppRoutes.results);
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.byKey(const Key('results-play-again')));
+    await tester.tap(find.byKey(const Key('results-play-again')));
+    await tester.pumpAndSettle();
+
+    final settings = lastSettingsFor(finished);
+    expect(settings.questionCount, finished.questionCount);
+    final next = container.read(gameControllerProvider)!;
+    expect(next.requestedCount, settings.questionCount);
+    expect(next.currentIndex, 0);
+    expect(next.isComplete, isFalse);
+    final dealtOnce = startGame(
+      bank: bank,
+      volumes: settings.volumes,
+      requestedCount: settings.questionCount,
+      random: Random(8),
+    );
+    expect(
+      next.questions.map((question) => question.id).toList(),
+      dealtOnce.questions.map((question) => question.id).toList(),
+    );
+  });
+
   testWidgets('a played game records once, then play again starts question 1', (
     tester,
   ) async {
@@ -361,20 +493,25 @@ void main() {
     final container = await _pump(
       tester,
       overrides: [
-        questionBankLoaderProvider.overrideWith((ref) => () async => bank),
+        questionBankLoaderProvider.overrideWith(
+          (ref) =>
+              () async => bank,
+        ),
         gameRandomProvider.overrideWith((ref) => Random(5)),
         recordFinishedGameProvider.overrideWith((ref) => recorded.add),
       ],
       settle: false,
     );
     await container.read(questionBankProvider.future);
-    container.read(appRouterProvider).go(
-      AppRoutes.game,
-      extra: const LastGameSettings(
-        volumes: [ScriptureVolume.bom],
-        questionCount: 2,
-      ),
-    );
+    container
+        .read(appRouterProvider)
+        .go(
+          AppRoutes.game,
+          extra: const LastGameSettings(
+            volumes: [ScriptureVolume.bom],
+            questionCount: 2,
+          ),
+        );
     await tester.pump();
     await tester.pump();
 

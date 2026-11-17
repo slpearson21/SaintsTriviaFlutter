@@ -57,13 +57,17 @@ Future<void> dealAndPlayAgain(
     }
     if (!context.mounted) return;
   }
+  // The route extra and the deal use the same count. A stored 0 falls
+  // back to the dealt length here; passing that 0 into start would miss
+  // the game route's settings match and deal a second game.
+  final settings = lastSettingsFor(session);
   ref
       .read(gameControllerProvider.notifier)
       .start(
         bank: bank,
-        volumes: session.volumes,
-        requestedCount: session.requestedCount,
+        volumes: settings.volumes,
+        requestedCount: settings.questionCount,
       );
   if (!context.mounted) return;
-  context.go(AppRoutes.game, extra: lastSettingsFor(session));
+  context.go(AppRoutes.game, extra: settings);
 }
