@@ -37,7 +37,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   bool _confirming = false;
   bool _locked = false;
   bool _showingFeedback = false;
-  String? _announcement;
 
   /// Question ids of the deal this screen is already showing.
   ///
@@ -74,7 +73,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     _presentedQuestionIds = null;
     _locked = false;
     _showingFeedback = false;
-    _announcement = null;
     WidgetsBinding.instance.addPostFrameCallback((_) => _dealIfNeeded());
   }
 
@@ -107,7 +105,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     if (bank == null) return;
     _locked = false;
     _showingFeedback = false;
-    _announcement = null;
     _presentedQuestionIds = null;
     ref
         .read(gameControllerProvider.notifier)
@@ -153,13 +150,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     final question = session.questions[current];
     final correct = index == question.answerIndex;
     ref.read(gameControllerProvider.notifier).answer(index);
+    // One announcement. The sheet also shows the result, without a live
+    // region, so a screen reader does not speak it a second time.
     final message = correct
         ? 'Correct'
-        : 'Your answer. The correct answer is ${question.answer}.';
-    setState(() {
-      _showingFeedback = true;
-      _announcement = message;
-    });
+        : 'Not quite. The answer is ${question.answer}.';
+    setState(() => _showingFeedback = true);
     unawaited(
       SemanticsService.sendAnnouncement(
         View.of(context),
@@ -188,7 +184,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     setState(() {
       _showingFeedback = false;
       _locked = false;
-      _announcement = null;
     });
   }
 
@@ -256,7 +251,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               ? _QuestionBody(
                   session: session,
                   showingFeedback: _showingFeedback,
-                  announcement: _announcement,
                   onChoose: _choose,
                   onNext: _next,
                 )
@@ -456,14 +450,12 @@ class _QuestionBody extends StatelessWidget {
   const _QuestionBody({
     required this.session,
     required this.showingFeedback,
-    required this.announcement,
     required this.onChoose,
     required this.onNext,
   });
 
   final GameSession session;
   final bool showingFeedback;
-  final String? announcement;
   final ValueChanged<int> onChoose;
   final VoidCallback onNext;
 
@@ -517,10 +509,12 @@ class _QuestionBody extends StatelessWidget {
                 reduced: reduced,
                 child: _FeedbackSheet(
                   maxHeight: sheetCap,
+                  correct: answer.correct,
+                  answer: question.answer,
                   explanation: question.explanation,
                   reference: question.reference,
-                  announcement: announcement,
                   streak: session.currentStreak,
+                  isLast: session.isComplete,
                   onNext: onNext,
                 ),
               ),
@@ -592,6 +586,7 @@ class _QuestionColumn extends StatelessWidget {
             index: option,
             label: question.options[option],
             mark: _markFor(question, option, answer),
+            pickedCorrect: answer?.correct ?? false,
             locked: locked,
             large: large,
             reduced: reduced,
@@ -619,6 +614,7 @@ class _AnswerButton extends StatelessWidget {
     required this.index,
     required this.label,
     required this.mark,
+    required this.pickedCorrect,
     required this.locked,
     required this.large,
     required this.reduced,
@@ -628,6 +624,10 @@ class _AnswerButton extends StatelessWidget {
   final int index;
   final String label;
   final _AnswerMark mark;
+
+  /// True when the player picked the right option. A revealed right option
+  /// is tagged "Correct answer"; the option they picked is tagged "Correct".
+  final bool pickedCorrect;
   final bool locked;
   final bool large;
   final bool reduced;
@@ -658,7 +658,7 @@ class _AnswerButton extends StatelessWidget {
     final status = switch (mark) {
       _AnswerMark.correct => _StatusTag(
         icon: Icons.check,
-        label: 'Correct',
+        label: pickedCorrect ? 'Correct' : 'Correct answer',
         color: colors.correct,
         textColor: colors.onCorrectContainer,
         iconMotion: reduced ? _IconMotion.fade : _IconMotion.pop,
@@ -826,25 +826,32 @@ const _streakMarks = {3, 5, 10};
 class _FeedbackSheet extends StatelessWidget {
   const _FeedbackSheet({
     required this.maxHeight,
+    required this.correct,
+    required this.answer,
     required this.explanation,
     required this.reference,
-    required this.announcement,
     required this.streak,
+    required this.isLast,
     required this.onNext,
   });
 
   final double maxHeight;
+  final bool correct;
+  final String answer;
   final String explanation;
   final String reference;
-  final String? announcement;
   final int streak;
+  final bool isLast;
   final VoidCallback onNext;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
+    final colors = theme.extension<StColors>()!;
     final showStreak = _streakMarks.contains(streak);
+    final tone = correct ? colors.correct : colors.wrong;
+    final headline = correct ? 'Correct!' : 'Not quite';
     return ConstrainedBox(
       key: const Key('feedback-sheet'),
       constraints: BoxConstraints(maxHeight: maxHeight),
@@ -871,22 +878,53 @@ class _FeedbackSheet extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (announcement != null)
-                      Semantics(
-                        key: const Key('answer-announcement'),
-                        container: true,
-                        liveRegion: true,
-                        label: announcement,
-                        child: const SizedBox(width: 1, height: 1),
-                      ),
-                    if (showStreak) ...[
-                      _StreakChip(streak: streak),
+                    Row(
+                      children: [
+                        ExcludeSemantics(
+                          child: StIcon(
+                            correct ? Icons.check : Icons.close,
+                            size: 32,
+                            color: tone,
+                          ),
+                        ),
+                        const SizedBox(width: StSpace.sm),
+                        Flexible(
+                          child: Text(
+                            headline,
+                            key: const Key('result-headline'),
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              color: tone,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (!correct) ...[
                       const SizedBox(height: StSpace.sm),
+                      Text.rich(
+                        TextSpan(
+                          style: theme.textTheme.bodyLarge,
+                          children: [
+                            const TextSpan(text: 'The answer is '),
+                            TextSpan(
+                              text: answer,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const TextSpan(text: '.'),
+                          ],
+                        ),
+                      ),
                     ],
+                    if (showStreak) ...[
+                      const SizedBox(height: StSpace.sm),
+                      _StreakChip(streak: streak),
+                    ],
+                    const SizedBox(height: StSpace.sm),
                     Text(
                       explanation,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      key: const Key('explanation'),
                       style: theme.textTheme.bodyLarge,
                     ),
                     const SizedBox(height: StSpace.sm),
@@ -902,7 +940,10 @@ class _FeedbackSheet extends StatelessWidget {
                 StSpace.screenH,
                 StSpace.md,
               ),
-              child: PrimaryButton(label: 'Next', onPressed: onNext),
+              child: PrimaryButton(
+                label: isLast ? 'See results' : 'Next question',
+                onPressed: onNext,
+              ),
             ),
           ],
         ),

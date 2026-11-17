@@ -184,16 +184,24 @@ void main() {
       expect(find.byKey(const Key('reference-chip')), findsOneWidget);
       expect(find.text('1 Nephi 1:1'), findsOneWidget);
       expect(find.text('Because the record says so.'), findsOneWidget);
+      expect(find.text('Correct!'), findsOneWidget);
       _expectAnswerLocked(tester);
-
-      final announced = tester
-          .getSemantics(find.byKey(const Key('answer-announcement')))
-          .getSemanticsData();
-      expect(announced.label, 'Correct');
-      expect(announced.flagsCollection.isLiveRegion, isTrue);
-      expect(announcements, contains('Correct'));
+      expect(announcements, ['Correct']);
+      expect(
+        tester
+            .widgetList<Icon>(find.byIcon(Icons.check))
+            .map((icon) => icon.size),
+        contains(32),
+      );
 
       final colors = Theme.of(tester.element(button)).extension<StColors>()!;
+      expect(
+        tester
+            .widget<Text>(find.byKey(const Key('result-headline')))
+            .style
+            ?.color,
+        colors.correct,
+      );
       expect(
         tester
             .widget<Material>(
@@ -237,6 +245,13 @@ void main() {
           .color,
       StColors.dark.correct,
     );
+    expect(
+      tester
+          .widget<Text>(find.byKey(const Key('result-headline')))
+          .style
+          ?.color,
+      StColors.dark.correct,
+    );
   });
 
   testWidgets('a wrong answer marks your pick and reveals the correct one', (
@@ -268,8 +283,12 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.descendant(of: correct, matching: find.text('Correct')),
+        find.descendant(of: correct, matching: find.text('Correct answer')),
         findsOneWidget,
+      );
+      expect(
+        find.descendant(of: correct, matching: find.text('Correct')),
+        findsNothing,
       );
       expect(
         find.descendant(of: correct, matching: find.byIcon(Icons.check)),
@@ -284,12 +303,28 @@ void main() {
             .color,
         colors.wrongContainer,
       );
-      expect(
-        tester.getSemantics(find.byKey(const Key('answer-announcement'))).label,
-        contains('Your answer'),
+      expect(find.text('Not quite'), findsOneWidget);
+      expect(find.text('The answer is Alpha.'), findsOneWidget);
+      final answerLine = tester.widget<Text>(find.text('The answer is Alpha.'));
+      final spans = (answerLine.textSpan! as TextSpan).children!;
+      final bold = spans.whereType<TextSpan>().singleWhere(
+        (span) => span.text == 'Alpha',
       );
-      expect(announcements.single, contains('Your answer'));
-      expect(announcements.single, contains('Alpha'));
+      expect(bold.style?.fontWeight, FontWeight.w700);
+      expect(
+        tester
+            .widget<Text>(find.byKey(const Key('result-headline')))
+            .style
+            ?.color,
+        colors.wrong,
+      );
+      expect(announcements, ['Not quite. The answer is Alpha.']);
+      expect(
+        tester
+            .widgetList<Icon>(find.byIcon(Icons.close))
+            .map((icon) => icon.size),
+        contains(32),
+      );
     } finally {
       semantics.dispose();
     }
@@ -325,17 +360,18 @@ void main() {
     await tester.tap(find.text('Alpha'));
     await tester.pumpAndSettle();
     expect(find.text('Prompt 0'), findsOneWidget);
-    await tester.tap(find.text('Next'));
+    await tester.tap(find.text('Next question'));
     await tester.pumpAndSettle();
 
     expect(find.text('Prompt 1'), findsOneWidget);
     expect(find.text('Prompt 0'), findsNothing);
-    expect(find.text('Next'), findsNothing);
+    expect(find.text('Next question'), findsNothing);
     expect(find.text('Question 2 of 2'), findsOneWidget);
 
     await tester.tap(find.text('Alpha'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Next'));
+    expect(find.text('See results'), findsOneWidget);
+    await tester.tap(find.text('See results'));
     await tester.pumpAndSettle();
 
     expect(find.text('Results'), findsOneWidget);
@@ -354,7 +390,7 @@ void main() {
       await tester.tap(find.text('Alpha'));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('streak-chip')), findsNothing);
-      await tester.tap(find.text('Next'));
+      await tester.tap(find.text('Next question'));
       await tester.pumpAndSettle();
     }
 
@@ -430,7 +466,9 @@ void main() {
     expect(tester.takeException(), isNull);
     final sheet = tester.getRect(find.byKey(const Key('feedback-sheet')));
     expect(sheet.height, lessThanOrEqualTo(640 * 0.6 + 1));
-    final next = tester.getRect(find.widgetWithText(FilledButton, 'Next'));
+    final next = tester.getRect(
+      find.widgetWithText(FilledButton, 'Next question'),
+    );
     expect(next.top, greaterThanOrEqualTo(0));
     expect(next.bottom, lessThanOrEqualTo(640));
     final option = tester.getRect(find.text('Alpha'));
@@ -576,4 +614,120 @@ void main() {
     expect(kept.score, dealt.score);
     expect(kept.currentIndex, dealt.currentIndex);
   });
+
+  testWidgets('each answer is announced once', (tester) async {
+    final announcements = await _captureAnnouncements(tester);
+    await _pumpGame(
+      tester,
+      bank: _bank(2),
+      settings: _settings(2),
+      random: Random(13),
+    );
+
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+    expect(announcements, ['Correct']);
+
+    await tester.tap(find.text('Next question'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Beta'));
+    await tester.pumpAndSettle();
+
+    expect(announcements, ['Correct', 'Not quite. The answer is Alpha.']);
+  });
+
+  testWidgets('a long explanation wraps and Next stays on screen', (
+    tester,
+  ) async {
+    const explanation =
+        'Nephi left Jerusalem with his family, obtained the brass plates, built a ship and crossed the sea to the promised land because the Lord commanded him to go now.';
+    expect(explanation.length, 160);
+    await _pumpGame(
+      tester,
+      bank: _bank(1, explanation: explanation),
+      settings: _settings(1),
+      random: Random(14),
+      textScale: 2,
+      surface: const Size(320, 640),
+    );
+
+    await tester.ensureVisible(find.text('Alpha'));
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+
+    final explanationText = tester.widget<Text>(
+      find.byKey(const Key('explanation')),
+    );
+    expect(explanationText.data, explanation);
+    expect(explanationText.maxLines, isNull);
+    expect(explanationText.overflow, isNot(TextOverflow.ellipsis));
+    expect(tester.takeException(), isNull);
+
+    final nextBefore = tester.getRect(
+      find.widgetWithText(FilledButton, 'See results'),
+    );
+    expect(nextBefore.top, greaterThanOrEqualTo(0));
+    expect(nextBefore.bottom, lessThanOrEqualTo(640));
+
+    final sheetScroll = find.descendant(
+      of: find.byKey(const Key('feedback-sheet')),
+      matching: find.byType(Scrollable),
+    );
+    await tester.scrollUntilVisible(
+      find.text(explanation),
+      120,
+      scrollable: sheetScroll,
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    final textRect = tester.getRect(find.text(explanation));
+    final next = tester.getRect(
+      find.widgetWithText(FilledButton, 'See results'),
+    );
+    expect(next, nextBefore);
+    expect(textRect.top, lessThan(next.top));
+    expect(textRect.bottom, greaterThan(0));
+    final visibleBottom = textRect.bottom < next.top
+        ? textRect.bottom
+        : next.top;
+    expect(visibleBottom, greaterThan(textRect.top));
+  });
+
+  testWidgets('the question screen meets tap and contrast guidelines', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    try {
+      for (final brightness in Brightness.values) {
+        await _pumpGame(
+          tester,
+          bank: _bank(1),
+          settings: _settings(1),
+          random: Random(15),
+          brightness: brightness,
+        );
+        await _expectGuidelines(tester);
+
+        await tester.ensureVisible(find.text('Alpha'));
+        await tester.tap(find.text('Alpha'));
+        await tester.pumpAndSettle();
+        await _expectGuidelines(tester);
+
+        await tester.tap(find.byTooltip('Close'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Quit'));
+        await tester.pumpAndSettle();
+      }
+    } finally {
+      semantics.dispose();
+    }
+  });
+}
+
+Future<void> _expectGuidelines(WidgetTester tester) async {
+  await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+  await expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
+  await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+  await expectLater(tester, meetsGuideline(textContrastGuideline));
 }
