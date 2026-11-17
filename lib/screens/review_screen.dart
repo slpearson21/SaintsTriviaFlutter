@@ -255,68 +255,69 @@ class _AnswerCard extends StatelessWidget {
     final colors = theme.extension<StColors>()!;
     final correct = answer.correct;
     final mark = correct ? colors.correct : colors.wrong;
-    return Semantics(
+    final status = correct ? 'Correct' : 'Missed';
+    // The status label lives inside MergeSemantics. A label on a parent
+    // outside that boundary is a second screen-reader stop.
+    return MergeSemantics(
       key: Key('review-answer-${answer.question.id}'),
-      container: true,
-      label: correct ? 'Correct' : 'Missed',
-      child: MergeSemantics(
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.all(StSpace.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(StSpace.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Semantics(
+                    label: status,
+                    excludeSemantics: true,
+                    child: StIcon(
+                      correct ? Icons.check_circle : Icons.cancel,
+                      size: 22,
+                      color: mark,
+                    ),
+                  ),
+                  const SizedBox(width: StSpace.sm),
+                  Expanded(
+                    child: Text(
+                      answer.question.prompt,
+                      style: theme.textTheme.titleMedium,
+                    ),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 22 + StSpace.sm),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ExcludeSemantics(
-                      child: StIcon(
-                        correct ? Icons.check_circle : Icons.cancel,
-                        size: 22,
-                        color: mark,
+                    const SizedBox(height: StSpace.xs),
+                    if (correct)
+                      _AnswerLine(
+                        label: 'Correct answer',
+                        value: answer.correctText,
+                        color: colors.correct,
+                      )
+                    else ...[
+                      _AnswerLine(
+                        label: 'Your answer',
+                        value: answer.selectedText,
+                        color: colors.wrong,
                       ),
-                    ),
-                    const SizedBox(width: StSpace.sm),
-                    Expanded(
-                      child: Text(
-                        answer.question.prompt,
-                        style: theme.textTheme.titleMedium,
+                      const SizedBox(height: StSpace.xxs),
+                      _AnswerLine(
+                        label: 'Correct answer',
+                        value: answer.correctText,
+                        color: colors.correct,
                       ),
-                    ),
+                    ],
+                    const SizedBox(height: StSpace.sm),
+                    _ReferenceChip(reference: answer.question.reference),
                   ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 22 + StSpace.sm),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: StSpace.xs),
-                      if (correct)
-                        _AnswerLine(
-                          label: 'Correct answer',
-                          value: answer.correctText,
-                          color: colors.correct,
-                        )
-                      else ...[
-                        _AnswerLine(
-                          label: 'Your answer',
-                          value: answer.selectedText,
-                          color: colors.wrong,
-                        ),
-                        const SizedBox(height: StSpace.xxs),
-                        _AnswerLine(
-                          label: 'Correct answer',
-                          value: answer.correctText,
-                          color: colors.correct,
-                        ),
-                      ],
-                      const SizedBox(height: StSpace.sm),
-                      _ReferenceChip(reference: answer.question.reference),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -416,12 +417,13 @@ class _EmptyReview extends StatelessWidget {
     final scheme = theme.colorScheme;
     final colors = theme.extension<StColors>()!;
     final missed = filter == ReviewFilter.missed;
-    final title = missed ? "You didn't miss any" : 'None correct this time';
+    final title = missed
+        ? "You didn't miss any"
+        : 'No correct answers this time';
     final body = missed
         ? 'A perfect game! Try a longer game or '
               'add more scriptures for a new challenge.'
-        : 'Every question is in Missed, with the right answer and the '
-              'reference to look up.';
+        : 'Check Missed to see the right answers.';
     final icon = missed ? Icons.check_rounded : Icons.menu_book_rounded;
     final iconColor = missed ? colors.correct : scheme.primary;
     final disc = missed ? colors.correctContainer : scheme.primaryContainer;

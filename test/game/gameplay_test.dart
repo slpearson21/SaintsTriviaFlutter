@@ -4,6 +4,7 @@ import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:saints_trivia_flutter/app.dart';
@@ -56,6 +57,7 @@ Future<ProviderContainer> _pumpGame(
   FakeAccessibilityFeatures? accessibility,
   Brightness? brightness,
   TargetPlatform? platform,
+  List<Override> overrides = const [],
 }) async {
   await tester.binding.setSurfaceSize(surface);
   addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -81,6 +83,7 @@ Future<ProviderContainer> _pumpGame(
             () async => bank,
       ),
       if (random != null) gameRandomProvider.overrideWith((ref) => random),
+      ...overrides,
     ],
   );
   addTearDown(container.dispose);
@@ -134,11 +137,13 @@ Future<List<String>> _captureAnnouncements(WidgetTester tester) async {
 }
 
 void main() {
-  test('answer sounds stay off until settings exist', () {
+  test('answer sounds stay off by default', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);
 
     expect(container.read(soundEffectsEnabledProvider), isFalse);
+    expect(container.read(hapticsEnabledProvider), isTrue);
+    expect(container.read(showExplanationsProvider), isTrue);
     expect(
       () => playAnswerSound(enabled: false, correct: true),
       returnsNormally,
@@ -148,6 +153,70 @@ void main() {
       returnsNormally,
     );
   });
+
+  testWidgets('haptics off skips the vibration, and the default plays it', (
+    tester,
+  ) async {
+    final calls = <String>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'HapticFeedback.vibrate') {
+          calls.add('${call.arguments}');
+        }
+        return null;
+      },
+    );
+    addTearDown(() {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      );
+    });
+
+    await _pumpGame(
+      tester,
+      bank: _bank(1),
+      settings: _settings(1),
+      random: Random(1),
+      overrides: [hapticsEnabledProvider.overrideWith((ref) => false)],
+    );
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+    expect(calls, isEmpty);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    calls.clear();
+    await _pumpGame(
+      tester,
+      bank: _bank(1),
+      settings: _settings(1),
+      random: Random(1),
+    );
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+    expect(calls, ['HapticFeedbackType.lightImpact']);
+  });
+
+  testWidgets(
+    'turning explanations off hides the sentence and keeps the reference',
+    (tester) async {
+      await _pumpGame(
+        tester,
+        bank: _bank(1),
+        settings: _settings(1),
+        random: Random(1),
+        overrides: [showExplanationsProvider.overrideWith((ref) => false)],
+      );
+
+      await tester.tap(find.text('Alpha'));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('explanation')), findsNothing);
+      expect(find.byKey(const Key('reference-chip')), findsOneWidget);
+      expect(find.text('1 Nephi 1:1'), findsOneWidget);
+    },
+  );
 
   testWidgets('a correct answer shows the icon, tag, and reference', (
     tester,

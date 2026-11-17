@@ -11,6 +11,7 @@ import 'package:saints_trivia_flutter/routing/app_router.dart';
 import 'package:saints_trivia_flutter/theme/st_theme.dart';
 
 import 'pump_app.dart';
+import 'support/fixed_home_snapshot.dart';
 
 final _now = DateTime(2026, 11, 15, 9);
 
@@ -48,7 +49,7 @@ final _nov9 = HomeSnapshot(
 
 List<Override> _returning([HomeSnapshot? snapshot]) {
   return [
-    homeSnapshotProvider.overrideWith((ref) => snapshot ?? _yesterday),
+    fixedHomeSnapshot(snapshot ?? _yesterday),
     homeClockProvider.overrideWith(
       (ref) =>
           () => _now,
@@ -339,8 +340,8 @@ void main() {
     await pumpApp(
       tester,
       overrides: [
-        homeSnapshotProvider.overrideWith(
-          (ref) => const HomeSnapshot(
+        fixedHomeSnapshot(
+          const HomeSnapshot(
             gamesPlayed: 4,
             accuracyPercent: 50,
             bestStreak: 2,
@@ -500,19 +501,13 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Stats'));
     await tester.pumpAndSettle();
-    expect(
-      find.text('On-device stats will go here. No games yet.'),
-      findsOneWidget,
-    );
+    expect(find.text('No stats yet'), findsOneWidget);
 
     await tester.pageBack();
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Settings'));
     await tester.pumpAndSettle();
-    expect(
-      find.textContaining('Appearance follows the system'),
-      findsOneWidget,
-    );
+    expect(find.text('Sound effects'), findsOneWidget);
   });
 
   testWidgets('see all opens stats and play again carries last settings', (
@@ -522,10 +517,7 @@ void main() {
 
     await tester.tap(find.text('See all'));
     await tester.pumpAndSettle();
-    expect(
-      find.text('On-device stats will go here. No games yet.'),
-      findsOneWidget,
-    );
+    expect(find.text('No stats yet'), findsOneWidget);
     expect(find.text('Play again'), findsNothing);
 
     await tester.pageBack();
@@ -690,7 +682,7 @@ Future<ProviderContainer> _pumpHome(
   await tester.binding.setSurfaceSize(surface);
   final container = ProviderContainer(
     overrides: [
-      homeSnapshotProvider.overrideWith((ref) => snapshot),
+      fixedHomeSnapshot(snapshot),
       homeClockProvider.overrideWith(
         (ref) =>
             () => _now,

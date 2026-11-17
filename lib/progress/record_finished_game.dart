@@ -1,18 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../game/game_engine.dart';
+import 'home_providers.dart';
 
-/// Writes one finished game to the device. STRIV-16 replaces the body.
+/// Writes one finished game to the device.
 ///
-/// The default records nothing. Do not read shared_preferences here.
-/// [finishedGameRecorderProvider] is what Results calls, and it drops a
-/// second call for the same [GameSession] instance.
+/// The body does not touch shared_preferences. [HomeSnapshotController]
+/// owns the repository, and [finishedGameRecorderProvider] drops a second
+/// call for the same [GameSession] instance.
 typedef RecordFinishedGame = void Function(GameSession session);
 
-/// STRIV-16's persistence hook. The default is a no-op.
-final recordFinishedGameProvider = Provider<RecordFinishedGame>(
-  (ref) => _recordNothing,
-);
+/// Persists [session] through [homeSnapshotProvider].
+final recordFinishedGameProvider = Provider<RecordFinishedGame>((ref) {
+  return (GameSession session) {
+    ref.read(homeSnapshotProvider.notifier).recordFinishedGame(session);
+  };
+});
 
 /// Calls [recordFinishedGameProvider] once per session object.
 ///
@@ -28,5 +31,3 @@ final finishedGameRecorderProvider = Provider<RecordFinishedGame>((ref) {
     record(session);
   };
 });
-
-void _recordNothing(GameSession session) {}

@@ -96,10 +96,10 @@ final class HomeSnapshot {
 
   /// Best finished-game percent already on record, from 0 to 100.
   ///
-  /// Null when the snapshot has no score to compare, which is every
-  /// snapshot until STRIV-16 loads one. Results hides the personal-best
-  /// chip in that case. STRIV-16 should set this to the best percent from
-  /// before the game on screen, so a game is not compared with itself.
+  /// Null when no finished game is stored. This is the best whole percent
+  /// among stored games, including a game that was just recorded. Results
+  /// does not compare the game on screen with itself: it uses the best
+  /// from before that game, remembered when the game was recorded.
   final int? bestScorePercent;
 
   bool get isFirstRun => gamesPlayed == 0;
