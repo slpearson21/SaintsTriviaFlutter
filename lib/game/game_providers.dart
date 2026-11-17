@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/questions/question_bank.dart';
 import '../data/questions/scripture_volume.dart';
+import '../persistence/persistence_providers.dart';
 import 'game_engine.dart';
 
 /// Source of randomness for a deal.
@@ -55,9 +56,25 @@ class GameController extends Notifier<GameSession?> {
 
 /// Whether answer sounds play.
 ///
-/// Off until STRIV-16 adds the setting. Gameplay reads this and stays quiet
-/// while it is false. Tests and that settings screen override it.
-final soundEffectsEnabledProvider = Provider<bool>((ref) => false);
+/// Off by default. Settings writes this, and gameplay stays quiet while
+/// it is false.
+final soundEffectsEnabledProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider).soundEffects;
+});
+
+/// Whether a correct or wrong answer vibrates.
+///
+/// On by default. Gameplay reads this before the platform haptic.
+final hapticsEnabledProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider).haptics;
+});
+
+/// Whether the answer sheet shows the one-line explanation.
+///
+/// On by default. The scripture reference still shows when this is off.
+final showExplanationsProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider).showExplanations;
+});
 
 /// Plays the correct or wrong sound when [enabled] is true.
 ///

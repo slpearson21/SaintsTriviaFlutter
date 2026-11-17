@@ -150,9 +150,11 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         Directionality.of(context),
       ),
     );
-    unawaited(
-      correct ? HapticFeedback.lightImpact() : HapticFeedback.heavyImpact(),
-    );
+    if (ref.read(hapticsEnabledProvider)) {
+      unawaited(
+        correct ? HapticFeedback.lightImpact() : HapticFeedback.heavyImpact(),
+      );
+    }
     playAnswerSound(
       enabled: ref.read(soundEffectsEnabledProvider),
       correct: correct,
@@ -194,6 +196,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         ? ref.watch(questionBankProvider)
         : const AsyncLoading<QuestionBank>();
     final session = ref.watch(gameControllerProvider);
+    final showExplanations = ref.watch(showExplanationsProvider);
     final settings = widget.settings;
     final matches =
         session != null &&
@@ -247,6 +250,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               ? _QuestionBody(
                   session: session,
                   showingFeedback: _showingFeedback,
+                  showExplanations: showExplanations,
                   onChoose: _choose,
                   onNext: _next,
                 )
@@ -446,12 +450,14 @@ class _QuestionBody extends StatelessWidget {
   const _QuestionBody({
     required this.session,
     required this.showingFeedback,
+    required this.showExplanations,
     required this.onChoose,
     required this.onNext,
   });
 
   final GameSession session;
   final bool showingFeedback;
+  final bool showExplanations;
   final ValueChanged<int> onChoose;
   final VoidCallback onNext;
 
@@ -508,6 +514,7 @@ class _QuestionBody extends StatelessWidget {
                   correct: answer.correct,
                   answer: question.answer,
                   explanation: question.explanation,
+                  showExplanation: showExplanations,
                   reference: question.reference,
                   streak: session.currentStreak,
                   isLast: session.isComplete,
@@ -825,6 +832,7 @@ class _FeedbackSheet extends StatelessWidget {
     required this.correct,
     required this.answer,
     required this.explanation,
+    required this.showExplanation,
     required this.reference,
     required this.streak,
     required this.isLast,
@@ -835,6 +843,7 @@ class _FeedbackSheet extends StatelessWidget {
   final bool correct;
   final String answer;
   final String explanation;
+  final bool showExplanation;
   final String reference;
   final int streak;
   final bool isLast;
@@ -917,12 +926,14 @@ class _FeedbackSheet extends StatelessWidget {
                       const SizedBox(height: StSpace.sm),
                       _StreakChip(streak: streak),
                     ],
-                    const SizedBox(height: StSpace.sm),
-                    Text(
-                      explanation,
-                      key: const Key('explanation'),
-                      style: theme.textTheme.bodyLarge,
-                    ),
+                    if (showExplanation) ...[
+                      const SizedBox(height: StSpace.sm),
+                      Text(
+                        explanation,
+                        key: const Key('explanation'),
+                        style: theme.textTheme.bodyLarge,
+                      ),
+                    ],
                     const SizedBox(height: StSpace.sm),
                     _ReferenceChip(reference: reference),
                   ],

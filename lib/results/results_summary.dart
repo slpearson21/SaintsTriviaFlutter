@@ -35,14 +35,21 @@ String answeredCorrectlySentence(int correct, int total) {
   return 'You answered $correct of $total correctly.';
 }
 
+/// True when [percent] is strictly above [previous].
+///
+/// A null [previous] means nothing comparable is on record yet, which is
+/// the first game, so this is false. A tie is not a new best.
+bool isNewPersonalBestPercent(int percent, int? previous) {
+  if (previous == null) return false;
+  return percent > previous;
+}
+
 /// True when [percent] is strictly above [HomeSnapshot.bestScorePercent].
 ///
 /// A null best means the snapshot has nothing comparable yet, so this is
 /// false and the personal-best chip stays hidden. A tie is not a new best.
 bool isNewPersonalBest(int percent, HomeSnapshot snapshot) {
-  final previous = snapshot.bestScorePercent;
-  if (previous == null) return false;
-  return percent > previous;
+  return isNewPersonalBestPercent(percent, snapshot.bestScorePercent);
 }
 
 /// Delight spec: a small gold sparkle at 90% or above, or on a personal best.

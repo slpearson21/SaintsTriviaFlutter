@@ -2,9 +2,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
 import 'data/questions/question_bank_provider.dart';
+import 'persistence/persistence_providers.dart';
+import 'persistence/shared_preferences_progress_repository.dart';
 import 'routing/app_router.dart';
 import 'routing/routes.dart';
 import 'splash_fade.dart';
@@ -19,7 +22,14 @@ Future<void> main(List<String> args) async {
   }
   holdSplashForHandoff();
   await prepareSplashHandoff();
-  final container = ProviderContainer();
+  final prefs = await SharedPreferences.getInstance();
+  final container = ProviderContainer(
+    overrides: [
+      progressRepositoryProvider.overrideWithValue(
+        SharedPreferencesProgressRepository(prefs),
+      ),
+    ],
+  );
   runApp(
     UncontrolledProviderScope(
       container: container,

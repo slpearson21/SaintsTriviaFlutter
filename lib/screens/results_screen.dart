@@ -9,6 +9,7 @@ import '../data/questions/scripture_volume.dart';
 import '../game/game_engine.dart';
 import '../game/game_providers.dart';
 import '../layout/adaptive_actions.dart';
+import '../layout/screen_body.dart';
 import '../layout/section_label.dart';
 import '../layout/st_icon.dart';
 import '../layout/text_scale.dart';
@@ -58,8 +59,16 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
     _scheduleRecord(finished);
 
     final snapshot = ref.watch(homeSnapshotProvider);
+    final recorded = ref.watch(recordedBestProvider);
     final percent = scorePercent(finished.score, finished.questionCount);
-    final personalBest = isNewPersonalBest(percent, snapshot);
+    // Before this game is stored, the snapshot's best is every earlier
+    // game. Once it is stored, that best includes this game, so the
+    // comparison uses the percent remembered at record time. The first
+    // game remembers null and is never a personal best.
+    final previous = identical(recorded.session, finished)
+        ? recorded.previousBestPercent
+        : snapshot.bestScorePercent;
+    final personalBest = isNewPersonalBestPercent(percent, previous);
     final sparkle = showResultsSparkle(
       percent: percent,
       personalBest: personalBest,
@@ -73,6 +82,79 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
+    final score = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Semantics(
+          container: true,
+          label: sentence,
+          excludeSemantics: true,
+          child: _ScoreRing(
+            score: finished.score,
+            total: finished.questionCount,
+            percent: percent,
+            sparkle: sparkle,
+          ),
+        ),
+        const SizedBox(height: StSpace.lg),
+        Semantics(
+          header: true,
+          child: Text(
+            resultsHeadline(percent),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.headlineSmall,
+          ),
+        ),
+        const SizedBox(height: StSpace.xs),
+        ExcludeSemantics(
+          child: Text(
+            sentence,
+            key: const Key('results-summary'),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: scheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        const SizedBox(height: StSpace.md),
+        _ScoreChips(
+          bestStreak: finished.bestStreak,
+          personalBest: personalBest,
+        ),
+        const SizedBox(height: StSpace.lg),
+        const SectionLabel('By scripture'),
+        const SizedBox(height: StSpace.sm),
+        _VolumeCard(rows: breakdownByVolume(finished)),
+      ],
+    );
+    final playAgain = FilledButton.icon(
+      key: const Key('results-play-again'),
+      onPressed: () => unawaited(dealAndPlayAgain(ref, context, finished)),
+      icon: const StIcon(Icons.replay_rounded, size: 20),
+      label: const Text('Play again'),
+    );
+    final otherActions = <Widget>[
+      AdaptiveActions(
+        children: [
+          OutlinedButton(
+            key: const Key('results-new-game'),
+            onPressed: () => openPlayAgain(context, lastSettingsFor(finished)),
+            child: const Text('New game'),
+          ),
+          OutlinedButton(
+            key: const Key('results-review'),
+            onPressed: () => context.go(AppRoutes.review),
+            child: Text(large ? 'Review answers' : 'Review'),
+          ),
+        ],
+      ),
+      TextButton(
+        key: const Key('results-done'),
+        onPressed: () => context.go(AppRoutes.home),
+        child: const Text('Done'),
+      ),
+    ];
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: material,
@@ -80,90 +162,40 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
         toolbarHeight: largeTitleToolbarHeight(context),
         title: const Text('Results', maxLines: 2),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(
-            StSpace.screenH,
-            StSpace.md,
-            StSpace.screenH,
-            StSpace.xl,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Semantics(
-                container: true,
-                label: sentence,
-                excludeSemantics: true,
-                child: _ScoreRing(
-                  score: finished.score,
-                  total: finished.questionCount,
-                  percent: percent,
-                  sparkle: sparkle,
-                ),
-              ),
-              const SizedBox(height: StSpace.lg),
-              Semantics(
-                header: true,
-                child: Text(
-                  resultsHeadline(percent),
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.headlineSmall,
-                ),
-              ),
-              const SizedBox(height: StSpace.xs),
-              ExcludeSemantics(
-                child: Text(
-                  sentence,
-                  key: const Key('results-summary'),
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-              const SizedBox(height: StSpace.md),
-              _ScoreChips(
-                bestStreak: finished.bestStreak,
-                personalBest: personalBest,
-              ),
-              const SizedBox(height: StSpace.lg),
-              const SectionLabel('By scripture'),
-              const SizedBox(height: StSpace.sm),
-              _VolumeCard(rows: breakdownByVolume(finished)),
-              const SizedBox(height: StSpace.xl),
-              FilledButton.icon(
-                key: const Key('results-play-again'),
-                onPressed: () =>
-                    unawaited(dealAndPlayAgain(ref, context, finished)),
-                icon: const StIcon(Icons.replay_rounded, size: 20),
-                label: const Text('Play again'),
-              ),
-              const SizedBox(height: StSpace.sm),
-              AdaptiveActions(
+      // Large text pins Play again the way Home and Setup pin their
+      // primary action. New game, Review, and Done scroll with the score.
+      body: large
+          ? ScreenBody(
+              primary: playAgain,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  OutlinedButton(
-                    key: const Key('results-new-game'),
-                    onPressed: () =>
-                        openPlayAgain(context, lastSettingsFor(finished)),
-                    child: const Text('New game'),
-                  ),
-                  OutlinedButton(
-                    key: const Key('results-review'),
-                    onPressed: () => context.go(AppRoutes.review),
-                    child: Text(large ? 'Review answers' : 'Review'),
-                  ),
+                  score,
+                  const SizedBox(height: StSpace.xl),
+                  ...otherActions,
                 ],
               ),
-              TextButton(
-                key: const Key('results-done'),
-                onPressed: () => context.go(AppRoutes.home),
-                child: const Text('Done'),
+            )
+          : SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(
+                  StSpace.screenH,
+                  StSpace.md,
+                  StSpace.screenH,
+                  StSpace.xl,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    score,
+                    const SizedBox(height: StSpace.xl),
+                    playAgain,
+                    const SizedBox(height: StSpace.sm),
+                    ...otherActions,
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }

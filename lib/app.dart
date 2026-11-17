@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
+import 'persistence/persistence_providers.dart';
 import 'routing/app_router.dart';
 import 'splash_fade.dart';
 import 'theme/st_theme.dart';
@@ -24,11 +25,12 @@ class SaintsTriviaApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
+    final themeMode = ref.watch(settingsProvider).themeMode;
     return MaterialApp.router(
       title: 'Scripture Trivia',
       theme: lightTheme,
       darkTheme: darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
       routerConfig: router,
       builder: (context, child) {
         return SplashFade(child: child ?? const SizedBox.shrink());

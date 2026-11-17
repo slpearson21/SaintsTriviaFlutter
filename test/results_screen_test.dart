@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui' show Tristate;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
@@ -22,6 +23,8 @@ import 'package:saints_trivia_flutter/routing/routes.dart';
 import 'package:saints_trivia_flutter/screens/game_screen.dart';
 import 'package:saints_trivia_flutter/screens/results_screen.dart';
 import 'package:saints_trivia_flutter/theme/st_theme.dart';
+
+import 'support/fixed_home_snapshot.dart';
 
 const _guidelines = <AccessibilityGuideline>[
   androidTapTargetGuideline,
@@ -240,6 +243,28 @@ void main() {
     );
   });
 
+  testWidgets('the correct filter empty state points at missed', (
+    tester,
+  ) async {
+    final session = _played(const [
+      _Pick(
+        'dc-0001',
+        ScriptureVolume.dc,
+        'Where was the Church formally organized?',
+        'D&C 20 heading',
+        0,
+        1,
+      ),
+    ]);
+    await _openResults(tester, session: session);
+    await _tap(tester, const Key('results-review'));
+    await tester.tap(find.byKey(const Key('review-filter-correct')));
+    await tester.pumpAndSettle();
+    expect(find.text('No correct answers this time'), findsOneWidget);
+    expect(find.text('Check Missed to see the right answers.'), findsOneWidget);
+    expect(find.text('None correct this time'), findsNothing);
+  });
+
   testWidgets('review cards name missed or correct once for the reader', (
     tester,
   ) async {
@@ -248,28 +273,17 @@ void main() {
       await _openResults(tester, session: _mixed());
       await _tap(tester, const Key('results-review'));
 
-      final missed = tester.getSemantics(
-        find.byKey(const Key('review-answer-dc-0020')),
+      _expectOneReviewStop(
+        tester,
+        const Key('review-answer-dc-0020'),
+        'Missed',
+        'Where was the Church formally organized?',
       );
-      expect(missed.label, 'Missed');
-      expect(
-        find.descendant(
-          of: find.byKey(const Key('review-answer-dc-0020')),
-          matching: find.bySemanticsLabel('Missed'),
-        ),
-        findsNothing,
-      );
-
-      final correct = tester.getSemantics(
-        find.byKey(const Key('review-answer-bom-0003')),
-      );
-      expect(correct.label, 'Correct');
-      expect(
-        find.descendant(
-          of: find.byKey(const Key('review-answer-bom-0003')),
-          matching: find.bySemanticsLabel('Correct'),
-        ),
-        findsNothing,
+      _expectOneReviewStop(
+        tester,
+        const Key('review-answer-bom-0003'),
+        'Correct',
+        'Who returned to Jerusalem to obtain the brass plates from Laban?',
       );
     } finally {
       handle.dispose();
@@ -630,10 +644,7 @@ void main() {
       overrides: [
         _held(session),
         recordFinishedGameProvider.overrideWith((ref) => recorded.add),
-        homeSnapshotProvider.overrideWith((ref) {
-          ref.watch(_ticks);
-          return const HomeSnapshot.firstRun();
-        }),
+        homeSnapshotProvider.overrideWith(_TickingHome.new),
       ],
     );
     container.read(appRouterProvider).go(AppRoutes.results);
@@ -672,14 +683,49 @@ void main() {
       BoxFit.scaleDown,
     );
 
-    final play = tester.getRect(find.byKey(const Key('results-play-again')));
-    final newGame = tester.getRect(find.byKey(const Key('results-new-game')));
-    final review = tester.getRect(find.byKey(const Key('results-review')));
     expect(find.text('Review answers'), findsOneWidget);
-    expect(newGame.top, greaterThanOrEqualTo(play.bottom - 1));
-    expect(review.top, greaterThanOrEqualTo(newGame.bottom - 1));
-    expect(newGame.left, closeTo(play.left, 1));
-    expect(review.width, closeTo(play.width, 2));
+    final scroll = find.byType(SingleChildScrollView);
+    expect(
+      find.descendant(
+        of: scroll,
+        matching: find.byKey(const Key('results-play-again')),
+      ),
+      findsNothing,
+    );
+    expect(
+      find.descendant(
+        of: scroll,
+        matching: find.byKey(const Key('results-new-game')),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: scroll,
+        matching: find.byKey(const Key('results-review')),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: scroll,
+        matching: find.byKey(const Key('results-done')),
+      ),
+      findsOneWidget,
+    );
+    final play = tester.getRect(find.byKey(const Key('results-play-again')));
+    final screen = tester.getSize(find.byType(Scaffold));
+    expect(play.top, greaterThanOrEqualTo(0));
+    expect(play.bottom, lessThanOrEqualTo(screen.height));
+    expect(play.bottom, greaterThan(screen.height - 40));
+    final position = tester
+        .state<ScrollableState>(find.byType(Scrollable))
+        .position;
+    if (position.maxScrollExtent > 0) {
+      position.jumpTo(position.maxScrollExtent);
+      await tester.pumpAndSettle();
+      expect(tester.getRect(find.byKey(const Key('results-play-again'))), play);
+    }
 
     final streak = tester.getRect(find.byKey(const Key('results-best-streak')));
     final best = tester.getRect(find.byKey(const Key('results-personal-best')));
@@ -740,6 +786,20 @@ void main() {
     expect(find.text('BY SCRIPTURE'), findsNothing);
     expect(find.byType(BackButton), findsOneWidget);
   });
+}
+
+class _TickingHome extends HomeSnapshotController {
+  @override
+  HomeSnapshot build() {
+    ref.watch(_ticks);
+    return const HomeSnapshot.firstRun();
+  }
+
+  @override
+  void recordFinishedGame(GameSession session) {}
+
+  @override
+  void resetStats() {}
 }
 
 class _Ticks extends Notifier<int> {
@@ -915,6 +975,26 @@ TriviaQuestion _bankQuestion(ScriptureVolume volume, int n) {
   );
 }
 
+/// The card is one screen-reader stop: the status and the prompt share it.
+void _expectOneReviewStop(
+  WidgetTester tester,
+  Key key,
+  String status,
+  String prompt,
+) {
+  final node = tester.getSemantics(find.byKey(key));
+  expect(node.mergeAllDescendantsIntoThisNode, isTrue, reason: status);
+  final label = node.getSemanticsData().label;
+  expect(label, contains(status));
+  expect(label, contains(prompt));
+  final separate = <SemanticsNode>[];
+  node.visitChildren((child) {
+    if (!child.isMergedIntoParent) separate.add(child);
+    return true;
+  });
+  expect(separate, isEmpty, reason: status);
+}
+
 String _numeral(WidgetTester tester) {
   final fitted = tester.widget<FittedBox>(
     find.byKey(const Key('results-score-numeral')),
@@ -940,9 +1020,7 @@ Future<void> _pumpScreen(
     ProviderScope(
       overrides: [
         _held(session),
-        homeSnapshotProvider.overrideWith(
-          (ref) => const HomeSnapshot.firstRun(),
-        ),
+        fixedHomeSnapshot(const HomeSnapshot.firstRun()),
       ],
       child: MaterialApp(
         theme: buildTheme(Brightness.light),
@@ -981,11 +1059,7 @@ Future<ProviderContainer> _openResults(
 }) async {
   final container = await _pump(
     tester,
-    overrides: [
-      _held(session),
-      homeSnapshotProvider.overrideWith((ref) => snapshot),
-      ...extra,
-    ],
+    overrides: [_held(session), fixedHomeSnapshot(snapshot), ...extra],
   );
   container.read(appRouterProvider).go(AppRoutes.results);
   await tester.pumpAndSettle();

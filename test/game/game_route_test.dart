@@ -9,13 +9,13 @@ import 'package:saints_trivia_flutter/data/questions/questions.dart';
 import 'package:saints_trivia_flutter/data/questions/question_bank_provider.dart';
 import 'package:saints_trivia_flutter/game/game_launch.dart';
 import 'package:saints_trivia_flutter/game/game_providers.dart';
-import 'package:saints_trivia_flutter/progress/home_providers.dart';
 import 'package:saints_trivia_flutter/progress/home_snapshot.dart';
 import 'package:saints_trivia_flutter/routing/app_router.dart';
 import 'package:saints_trivia_flutter/routing/routes.dart';
 import 'package:saints_trivia_flutter/screens/game_screen.dart';
 
 import '../pump_app.dart';
+import '../support/fixed_home_snapshot.dart';
 
 const _routeSettings = LastGameSettings(
   volumes: [ScriptureVolume.bom],
@@ -60,10 +60,7 @@ void main() {
   testWidgets('a non-settings extra is not cast and falls back', (
     tester,
   ) async {
-    await pumpApp(
-      tester,
-      overrides: [homeSnapshotProvider.overrideWith((ref) => _returning)],
-    );
+    await pumpApp(tester, overrides: [fixedHomeSnapshot(_returning)]);
 
     final router = GoRouter.of(tester.element(find.text('Scripture Trivia')));
     router.go(AppRoutes.game, extra: 'deep link');
@@ -77,10 +74,7 @@ void main() {
   });
 
   testWidgets('route extra wins over the saved game', (tester) async {
-    await pumpApp(
-      tester,
-      overrides: [homeSnapshotProvider.overrideWith((ref) => _returning)],
-    );
+    await pumpApp(tester, overrides: [fixedHomeSnapshot(_returning)]);
 
     final router = GoRouter.of(tester.element(find.text('Scripture Trivia')));
     router.go(AppRoutes.game, extra: _routeSettings);
@@ -93,10 +87,7 @@ void main() {
   });
 
   testWidgets('a null extra uses the saved game', (tester) async {
-    await pumpApp(
-      tester,
-      overrides: [homeSnapshotProvider.overrideWith((ref) => _returning)],
-    );
+    await pumpApp(tester, overrides: [fixedHomeSnapshot(_returning)]);
 
     final router = GoRouter.of(tester.element(find.text('Scripture Trivia')));
     router.go(AppRoutes.game);
