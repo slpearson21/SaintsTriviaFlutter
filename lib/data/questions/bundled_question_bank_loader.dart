@@ -17,7 +17,8 @@ bool skipUnapprovedQuestions({bool? skipUnapproved}) {
 /// Reads the bundled question bank offline and returns it.
 ///
 /// Uses [rootBundle] and does not use the network. A schema problem throws
-/// `QuestionBankException`; show `QuestionBankException.userMessage`. Release
+/// `QuestionBankException`; the app shows the E1 error state, and
+/// `QuestionBankException.userMessage` is the log line. Release
 /// builds omit questions that are not approved. An empty bank, or an empty
 /// volume, is a successful load: use [QuestionBank.availableVolumes] and
 /// [QuestionBank.forVolume] for the "no questions for this selection" state.

@@ -100,7 +100,14 @@ void main() {
     expect(container.read(questionBankProvider).hasError, isTrue);
     expect(container.read(questionBankProvider).error, isA<TimeoutException>());
     expect(removed, isTrue);
-    expect(find.text(QuestionBankException.userMessage), findsOneWidget);
+    expect(find.text('Something went wrong'), findsOneWidget);
+    expect(
+      find.text(
+        "We couldn't load the questions on this device. "
+        'Please try again. If this keeps happening, reinstall the app.',
+      ),
+      findsOneWidget,
+    );
     expect(find.text('Try again'), findsOneWidget);
   });
 
@@ -145,7 +152,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(removed, isTrue);
-    expect(find.text(QuestionBankException.userMessage), findsOneWidget);
+    expect(find.text('Something went wrong'), findsOneWidget);
     expect(find.text('Try again'), findsOneWidget);
     expect(
       tester.getSize(find.widgetWithText(FilledButton, 'Try again')).height,
@@ -214,7 +221,7 @@ void main() {
     await tester.tap(find.text('Try again'));
     await tester.pumpAndSettle();
 
-    expect(find.text(QuestionBankException.userMessage), findsOneWidget);
+    expect(find.text('Something went wrong'), findsOneWidget);
     expect(find.text('Try again'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

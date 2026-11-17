@@ -1,7 +1,8 @@
 /// Why a question bank could not be loaded.
 ///
-/// The quiz UI should catch [QuestionBankException] and show
-/// [QuestionBankException.userMessage] rather than treating these as crashes.
+/// The quiz UI should catch [QuestionBankException] and show the E1 error
+/// state rather than treating these as crashes. [QuestionBankException.userMessage]
+/// stays on the exception for logs.
 enum QuestionBankViolationKind {
   /// The asset could not be read.
   missingAsset,
@@ -101,7 +102,7 @@ final class QuestionBankViolation {
 /// Typed failure for a question bank that cannot be shown.
 ///
 /// Throwing this is the "content failed to load" state. Callers should catch
-/// it and show [userMessage]. [violations] is the detail for logs and CI.
+/// it and show the E1 error state. [userMessage] and [violations] are for logs.
 final class QuestionBankException implements Exception {
   QuestionBankException(List<QuestionBankViolation> violations)
     : violations = List.unmodifiable(violations) {
@@ -114,7 +115,7 @@ final class QuestionBankException implements Exception {
     }
   }
 
-  /// Sentence the UI can show when the bank cannot be loaded.
+  /// Short sentence for logs. The screen shows the E1 copy instead.
   static const String userMessage = 'Content failed to load.';
 
   final List<QuestionBankViolation> violations;

@@ -169,7 +169,7 @@ void main() {
     expect(find.text('Question'), findsOneWidget);
   });
 
-  testWidgets('an empty deal returns to setup', (tester) async {
+  testWidgets('an empty deal shows the no-questions error', (tester) async {
     final bank = QuestionBank(
       schemaVersion: 1,
       questions: [
@@ -212,9 +212,12 @@ void main() {
         );
     await tester.pumpAndSettle();
 
-    expect(find.byType(GameScreen), findsNothing);
-    expect(find.text('New game'), findsOneWidget);
+    expect(find.byType(GameScreen), findsOneWidget);
+    expect(find.text("Couldn't start this game"), findsOneWidget);
+    expect(find.text('Back to setup'), findsOneWidget);
     expect(find.text('Question'), findsNothing);
+    expect(find.text('Prompt'), findsNothing);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('a previous session is hidden until the new deal is showing', (

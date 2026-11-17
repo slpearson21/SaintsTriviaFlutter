@@ -21,6 +21,8 @@ import '../layout/text_scale.dart';
 import '../progress/home_snapshot.dart';
 import '../routing/routes.dart';
 import '../theme/st_theme.dart';
+import 'content_load_error_screen.dart';
+import 'no_questions_screen.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key, this.settings});
@@ -93,10 +95,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     if (settings == null) return;
     final current = ref.read(gameControllerProvider);
     if (current != null && _isPresented(current)) return;
-    if (current != null && _sessionMatches(current, settings)) {
-      _redirectIfEmpty(current);
-      return;
-    }
+    // An empty deal still matches. Build shows E2; dealing again would
+    // only shuffle another empty list.
+    if (current != null && _sessionMatches(current, settings)) return;
     // Reading the provider when it does not exist starts the 5s load.
     // The splash is what starts it. This screen only deals a bank that
     // is already loading or already loaded.
@@ -113,20 +114,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           volumes: settings.volumes,
           requestedCount: settings.questionCount,
         );
-    final dealt = ref.read(gameControllerProvider);
-    if (dealt != null) _redirectIfEmpty(dealt);
-  }
-
-  /// A restore can deal zero questions. Send that back to setup so the
-  /// question screen never shows a 0/0 game.
-  void _redirectIfEmpty(GameSession session) {
-    if (session.questions.isNotEmpty || !mounted) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final current = ref.read(gameControllerProvider);
-      if (current == null || current.questions.isNotEmpty) return;
-      context.go(AppRoutes.setup);
-    });
   }
 
   bool _isPresented(GameSession session) {
@@ -201,6 +188,11 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Same rule as setup: watch a load that already started. Watching an
+    // untouched provider would open the 5s timeout from this screen.
+    final bankAsync = ref.read(questionBankProvider.exists)
+        ? ref.watch(questionBankProvider)
+        : const AsyncLoading<QuestionBank>();
     final session = ref.watch(gameControllerProvider);
     final settings = widget.settings;
     final matches =
@@ -218,11 +210,13 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     // screen is already presenting stays up, including its last answer.
     final hideStale =
         session != null && settings != null && !matches && !showingThisDeal;
-    final hideEmpty = session != null && matches && session.questions.isEmpty;
-    if (hideEmpty) return const SizedBox.shrink();
-
     final playing =
         session != null && !hideStale && session.questions.isNotEmpty;
+    final emptyDeal = session != null && matches && session.questions.isEmpty;
+    // A deal with nothing in it is E2. A bank that never arrived, while this
+    // screen is still waiting to deal, is E1. Neither path builds a question.
+    if (emptyDeal) return NoQuestionsScreen(settings: settings);
+    if (!playing && bankAsync.hasError) return const ContentLoadErrorView();
 
     return PopScope(
       canPop: false,
@@ -332,7 +326,7 @@ Future<bool> showQuitGameDialog(BuildContext context) async {
 /// Volume order does not matter. A finished game does not match: Play again
 /// opens `/game` with the same settings and has to deal a new game rather
 /// than reopen the one that just ended. An empty deal still matches so this
-/// screen can send it back to setup instead of dealing again.
+/// screen shows E2 instead of dealing again.
 bool _sessionMatches(GameSession session, LastGameSettings settings) {
   if (session.questions.isNotEmpty && session.isComplete) return false;
   if (session.requestedCount != settings.questionCount) return false;
