@@ -137,7 +137,7 @@ Future<List<String>> _captureAnnouncements(WidgetTester tester) async {
 }
 
 void main() {
-  test('answer sounds stay off until settings exist', () {
+  test('answer sounds stay off by default', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);
 
@@ -152,6 +152,50 @@ void main() {
       () => playAnswerSound(enabled: true, correct: false),
       returnsNormally,
     );
+  });
+
+  testWidgets('haptics off skips the vibration, and the default plays it', (
+    tester,
+  ) async {
+    final calls = <String>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'HapticFeedback.vibrate') {
+          calls.add('${call.arguments}');
+        }
+        return null;
+      },
+    );
+    addTearDown(() {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      );
+    });
+
+    await _pumpGame(
+      tester,
+      bank: _bank(1),
+      settings: _settings(1),
+      random: Random(1),
+      overrides: [hapticsEnabledProvider.overrideWith((ref) => false)],
+    );
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+    expect(calls, isEmpty);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    calls.clear();
+    await _pumpGame(
+      tester,
+      bank: _bank(1),
+      settings: _settings(1),
+      random: Random(1),
+    );
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+    expect(calls, ['HapticFeedbackType.lightImpact']);
   });
 
   testWidgets(

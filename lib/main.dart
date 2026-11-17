@@ -6,7 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
 import 'data/questions/question_bank_provider.dart';
+import 'persistence/memory_progress_repository.dart';
 import 'persistence/persistence_providers.dart';
+import 'persistence/progress_repository.dart';
 import 'persistence/shared_preferences_progress_repository.dart';
 import 'routing/app_router.dart';
 import 'routing/routes.dart';
@@ -22,13 +24,11 @@ Future<void> main(List<String> args) async {
   }
   holdSplashForHandoff();
   await prepareSplashHandoff();
-  final prefs = await SharedPreferences.getInstance();
+  final repository = await progressRepositoryForLaunch(
+    loadPrefs: SharedPreferences.getInstance,
+  );
   final container = ProviderContainer(
-    overrides: [
-      progressRepositoryProvider.overrideWithValue(
-        SharedPreferencesProgressRepository(prefs),
-      ),
-    ],
+    overrides: [progressRepositoryProvider.overrideWithValue(repository)],
   );
   runApp(
     UncontrolledProviderScope(
@@ -37,6 +37,24 @@ Future<void> main(List<String> args) async {
     ),
   );
   await removeSplashAfterBundledQuestionBank(container: container);
+}
+
+/// Opens on-device storage, or an empty in-memory store if that fails.
+///
+/// A thrown [SharedPreferences.getInstance] used to skip [runApp], which
+/// left the preserved native splash up. Stats from this launch are not
+/// written through, and the next launch tries the store again.
+@visibleForTesting
+Future<ProgressRepository> progressRepositoryForLaunch({
+  required Future<SharedPreferences> Function() loadPrefs,
+}) async {
+  try {
+    final prefs = await loadPrefs();
+    return SharedPreferencesProgressRepository(prefs);
+  } catch (error, stackTrace) {
+    debugPrint('Shared preferences failed to load: $error\n$stackTrace');
+    return MemoryProgressRepository();
+  }
 }
 
 /// Waits for the question bank, then takes the native splash down.

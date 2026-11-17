@@ -62,9 +62,22 @@ void main() {
     expect(isNewPersonalBest(79, previous), isFalse);
     expect(isNewPersonalBestPercent(0, 80), isFalse);
 
-    expect(showResultsSparkle(percent: 50, personalBest: false), isFalse);
-    expect(showResultsSparkle(percent: 90, personalBest: false), isTrue);
-    expect(showResultsSparkle(percent: 80, personalBest: true), isTrue);
+    expect(
+      showResultsSparkle(percent: 100, personalBest: false, firstGame: true),
+      isFalse,
+    );
+    expect(
+      showResultsSparkle(percent: 50, personalBest: false, firstGame: false),
+      isFalse,
+    );
+    expect(
+      showResultsSparkle(percent: 90, personalBest: false, firstGame: false),
+      isTrue,
+    );
+    expect(
+      showResultsSparkle(percent: 80, personalBest: true, firstGame: false),
+      isTrue,
+    );
   });
 
   test('recording compares each game with the best from before it', () {

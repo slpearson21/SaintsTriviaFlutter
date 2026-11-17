@@ -21,11 +21,14 @@ const scriptureTriviaDisclaimer =
     'Scripture Trivia is a free, unofficial app. It is not an official '
     'product of, or endorsed by, The Church of Jesus Christ of Latter-day Saints.';
 
-/// Opens the mail app with a subject and no address. The project has no
-/// public inbox yet, so the player picks the recipient.
-final feedbackUri = Uri(
-  scheme: 'mailto',
-  queryParameters: {'subject': 'Scripture Trivia feedback'},
+/// Feedback inbox. Empty until one is chosen; fill this in and the mailto
+/// gains a recipient. [feedbackUri] uses [Uri.encodeComponent] so a space
+/// in the subject stays `%20`. `Uri.queryParameters` would write `+`,
+/// which iOS Mail shows as a plus.
+const feedbackRecipient = '';
+
+final feedbackUri = Uri.parse(
+  'mailto:$feedbackRecipient?subject=${Uri.encodeComponent('Scripture Trivia feedback')}',
 );
 
 typedef OpenLink = Future<bool> Function(Uri uri);
@@ -106,8 +109,7 @@ class SettingsScreen extends ConsumerWidget {
                 _ToggleRow(
                   key: const Key('settings-explanations'),
                   title: 'Show explanations',
-                  subtitle:
-                      'One-line explanation and reference after each answer',
+                  subtitle: 'One-line explanation after each answer',
                   value: settings.showExplanations,
                   onChanged: controller.setShowExplanations,
                 ),
@@ -372,6 +374,7 @@ class _ThemeChoice extends StatelessWidget {
     return Semantics(
       selected: selected,
       button: true,
+      inMutuallyExclusiveGroup: true,
       child: InkWell(
         onTap: onPressed,
         child: ConstrainedBox(

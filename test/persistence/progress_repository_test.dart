@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:saints_trivia_flutter/data/questions/scripture_volume.dart';
+import 'package:saints_trivia_flutter/main.dart';
 import 'package:saints_trivia_flutter/persistence/app_settings.dart';
 import 'package:saints_trivia_flutter/persistence/finished_game_record.dart';
 import 'package:saints_trivia_flutter/persistence/memory_progress_repository.dart';
@@ -120,6 +121,29 @@ void main() {
       expect(stored.single.percent, 100);
       expect(stored.single.volumeTotal[ScriptureVolume.bom], 10);
     });
+  });
+
+  test('a prefs failure boots with an empty memory store', () async {
+    final printed = <String>[];
+    final previous = debugPrint;
+    debugPrint = (String? message, {int? wrapWidth}) {
+      printed.add(message ?? '');
+    };
+    addTearDown(() => debugPrint = previous);
+
+    final failed = await progressRepositoryForLaunch(
+      loadPrefs: () async => throw StateError('corrupt store'),
+    );
+    expect(failed, isA<MemoryProgressRepository>());
+    expect(failed.readGames(), isEmpty);
+    expect(failed.readSettings(), AppSettings.defaults);
+    expect(printed.single, contains('corrupt store'));
+
+    SharedPreferences.setMockInitialValues({});
+    final loaded = await progressRepositoryForLaunch(
+      loadPrefs: SharedPreferences.getInstance,
+    );
+    expect(loaded, isA<SharedPreferencesProgressRepository>());
   });
 
   test('the memory repository is the fake tests can share', () {

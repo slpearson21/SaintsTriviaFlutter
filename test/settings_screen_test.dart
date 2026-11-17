@@ -245,7 +245,10 @@ void main() {
     await tester.tap(find.byKey(const Key('settings-feedback')));
     await tester.pumpAndSettle();
     expect(opened, hasLength(1));
+    expect(opened.single, feedbackUri);
     expect(opened.single.scheme, 'mailto');
+    expect(feedbackRecipient, isEmpty);
+    expect(opened.single.query, 'subject=Scripture%20Trivia%20feedback');
     expect(
       opened.single.queryParameters['subject'],
       'Scripture Trivia feedback',

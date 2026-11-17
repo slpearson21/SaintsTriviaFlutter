@@ -52,8 +52,16 @@ bool isNewPersonalBest(int percent, HomeSnapshot snapshot) {
   return isNewPersonalBestPercent(percent, snapshot.bestScorePercent);
 }
 
-/// Delight spec: a small gold sparkle at 90% or above, or on a personal best.
-bool showResultsSparkle({required int percent, required bool personalBest}) {
+/// A small gold sparkle at 90% or above, or on a personal best.
+///
+/// The first game ever has nothing to beat, so it never sparkles, even
+/// at 100%. [firstGame] is that case: no earlier percent is on record.
+bool showResultsSparkle({
+  required int percent,
+  required bool personalBest,
+  required bool firstGame,
+}) {
+  if (firstGame) return false;
   return percent >= 90 || personalBest;
 }
 

@@ -12,6 +12,9 @@ import 'package:saints_trivia_flutter/app.dart';
 import 'package:saints_trivia_flutter/data/questions/question_bank_provider.dart';
 import 'package:saints_trivia_flutter/data/questions/questions.dart';
 import 'package:saints_trivia_flutter/game/game_engine.dart';
+import 'package:saints_trivia_flutter/persistence/finished_game_record.dart';
+import 'package:saints_trivia_flutter/persistence/memory_progress_repository.dart';
+import 'package:saints_trivia_flutter/persistence/persistence_providers.dart';
 import 'package:saints_trivia_flutter/game/game_providers.dart';
 import 'package:saints_trivia_flutter/progress/home_providers.dart';
 import 'package:saints_trivia_flutter/progress/home_snapshot.dart';
@@ -65,9 +68,22 @@ void main() {
       expect(isNewPersonalBest(80, tie), isFalse);
       expect(isNewPersonalBest(70, lower), isFalse);
       expect(isNewPersonalBest(69, lower), isFalse);
-      expect(showResultsSparkle(percent: 90, personalBest: false), isTrue);
-      expect(showResultsSparkle(percent: 80, personalBest: true), isTrue);
-      expect(showResultsSparkle(percent: 80, personalBest: false), isFalse);
+      expect(
+        showResultsSparkle(percent: 100, personalBest: false, firstGame: true),
+        isFalse,
+      );
+      expect(
+        showResultsSparkle(percent: 90, personalBest: false, firstGame: false),
+        isTrue,
+      );
+      expect(
+        showResultsSparkle(percent: 80, personalBest: true, firstGame: false),
+        isTrue,
+      );
+      expect(
+        showResultsSparkle(percent: 80, personalBest: false, firstGame: false),
+        isFalse,
+      );
     });
 
     test(
@@ -129,7 +145,7 @@ void main() {
         find.bySemanticsLabel('You answered 4 of 4 correctly.'),
         findsOneWidget,
       );
-      expect(find.byKey(const Key('results-sparkle')), findsOneWidget);
+      expect(find.byKey(const Key('results-sparkle')), findsNothing);
       expect(find.byKey(const Key('results-personal-best')), findsNothing);
       expect(
         find.textContaining('Best streak 4', findRichText: true),
@@ -319,6 +335,63 @@ void main() {
     await open(const Size(320, 568));
   });
 
+  testWidgets('a later perfect game sparkles, and the first one does not', (
+    tester,
+  ) async {
+    await _openResults(
+      tester,
+      session: _perfect(),
+      snapshot: const HomeSnapshot(
+        gamesPlayed: 2,
+        accuracyPercent: 50,
+        bestStreak: 2,
+        bestScorePercent: 50,
+      ),
+    );
+    expect(find.byKey(const Key('results-sparkle')), findsOneWidget);
+    expect(find.byKey(const Key('results-personal-best')), findsOneWidget);
+  });
+
+  testWidgets('the personal best chip stays after the game is recorded', (
+    tester,
+  ) async {
+    final repo = MemoryProgressRepository(
+      games: [
+        FinishedGameRecord(
+          score: 4,
+          total: 10,
+          percent: 40,
+          bestStreak: 2,
+          playedAt: DateTime(2026, 11, 1),
+          volumes: const [ScriptureVolume.bom],
+          questionCount: 10,
+          volumeCorrect: const {ScriptureVolume.bom: 4},
+          volumeTotal: const {ScriptureVolume.bom: 10},
+        ),
+      ],
+    );
+    final session = _perfect();
+    final container = await _pump(
+      tester,
+      overrides: [
+        _held(session),
+        progressRepositoryProvider.overrideWithValue(repo),
+      ],
+    );
+    container.read(appRouterProvider).go(AppRoutes.results);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('results-personal-best')), findsOneWidget);
+    expect(find.byKey(const Key('results-sparkle')), findsOneWidget);
+    expect(repo.readGames(), hasLength(2));
+    expect(container.read(recordedBestProvider).previousBestPercent, 40);
+    expect(container.read(homeSnapshotProvider).bestScorePercent, 100);
+
+    await tester.pump();
+    expect(find.byKey(const Key('results-personal-best')), findsOneWidget);
+    expect(find.byKey(const Key('results-sparkle')), findsOneWidget);
+  });
+
   testWidgets('personal best chip follows the snapshot seam', (tester) async {
     final session = _mixed();
     await _openResults(
@@ -373,7 +446,7 @@ void main() {
     await tester.pump();
     expect(_numeral(tester), '4 / 4');
     expect(find.text('100%'), findsOneWidget);
-    expect(find.byKey(const Key('results-sparkle')), findsOneWidget);
+    expect(find.byKey(const Key('results-sparkle')), findsNothing);
     expect(find.text('0 / 4'), findsNothing);
   });
 

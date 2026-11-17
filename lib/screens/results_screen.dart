@@ -69,9 +69,12 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
         ? recorded.previousBestPercent
         : snapshot.bestScorePercent;
     final personalBest = isNewPersonalBestPercent(percent, previous);
+    // previous == null is the first game ever. No chip and no sparkle,
+    // including a perfect score.
     final sparkle = showResultsSparkle(
       percent: percent,
       personalBest: personalBest,
+      firstGame: previous == null,
     );
     final sentence = answeredCorrectlySentence(
       finished.score,

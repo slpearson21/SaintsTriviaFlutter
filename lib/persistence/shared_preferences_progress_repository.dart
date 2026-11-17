@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_settings.dart';
@@ -42,7 +43,7 @@ final class SharedPreferencesProgressRepository implements ProgressRepository {
   @override
   void writeGames(List<FinishedGameRecord> games) {
     final encoded = jsonEncode([for (final game in games) game.toJson()]);
-    unawaited(_prefs.setString(gamesKey, encoded));
+    _write(gamesKey, encoded);
   }
 
   @override
@@ -60,6 +61,15 @@ final class SharedPreferencesProgressRepository implements ProgressRepository {
 
   @override
   void writeSettings(AppSettings settings) {
-    unawaited(_prefs.setString(settingsKey, jsonEncode(settings.toJson())));
+    _write(settingsKey, jsonEncode(settings.toJson()));
+  }
+
+  void _write(String key, String value) {
+    unawaited(
+      _prefs.setString(key, value).catchError((Object error, StackTrace stack) {
+        debugPrint('Could not save $key: $error\n$stack');
+        return false;
+      }),
+    );
   }
 }
