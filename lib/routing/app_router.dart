@@ -2,8 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../game/game_launch.dart';
+import '../game/game_providers.dart';
 import '../progress/home_providers.dart';
 import '../progress/home_snapshot.dart';
+import '../results/results_summary.dart';
 import '../screens/content_load_error_screen.dart';
 import '../screens/game_screen.dart';
 import '../screens/home_screen.dart';
@@ -63,6 +65,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'results',
             name: AppRouteNames.results,
+            redirect: (context, state) {
+              // A deep link or a restore has no finished game in memory.
+              // An in-progress session is not results either.
+              if (!isFinishedSession(ref.read(gameControllerProvider))) {
+                return AppRoutes.home;
+              }
+              return null;
+            },
             builder: (context, state) => const ResultsScreen(),
             routes: [
               GoRoute(
