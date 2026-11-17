@@ -362,6 +362,144 @@ void main() {
     );
   });
 
+  testWidgets('start is disabled when the bank fails to load', (tester) async {
+    final container = ProviderContainer(
+      overrides: [
+        questionBankLoaderProvider.overrideWith(
+          (ref) =>
+              () async => throw Exception('unreadable'),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    try {
+      await container.read(questionBankProvider.future);
+    } on Object {
+      // The failed future is the state this screen has to refuse.
+    }
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const SaintsTriviaApp(),
+      ),
+    );
+    container.read(appRouterProvider).go(AppRoutes.setup);
+    await tester.pumpAndSettle();
+
+    expect(find.text('5 of 5 selected'), findsOneWidget);
+    expect(
+      tester
+          .widget<FilledButton>(find.byKey(const Key('setup-start')))
+          .onPressed,
+      isNull,
+    );
+  });
+
+  testWidgets('presets and the stepper announce selection and the count', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    try {
+      await _openSetup(
+        tester,
+        bank: _bank(ot: 0, nt: 0, bom: 0, dc: 0, pgp: 23),
+      );
+
+      expect(
+        tester.getSemantics(find.byKey(const Key('setup-preset-10'))),
+        matchesSemantics(
+          label: '10 questions',
+          textDirection: TextDirection.ltr,
+          isButton: true,
+          isSelected: true,
+          hasSelectedState: true,
+          isEnabled: true,
+          hasEnabledState: true,
+          hasTapAction: true,
+        ),
+      );
+      expect(
+        tester.getSemantics(find.byKey(const Key('setup-preset-50'))),
+        matchesSemantics(
+          label: '50 questions',
+          textDirection: TextDirection.ltr,
+          isButton: true,
+          hasSelectedState: true,
+          hasEnabledState: true,
+        ),
+      );
+
+      final scheme = Theme.of(
+        tester.element(find.byKey(const Key('setup-preset-50'))),
+      ).colorScheme;
+      final disabled = scheme.onSurface.withValues(alpha: 0.38);
+      final material = tester.widget<Material>(
+        find.byKey(const Key('setup-preset-50')),
+      );
+      expect((material.shape! as RoundedRectangleBorder).side.color, disabled);
+      expect(
+        tester
+            .widget<Text>(
+              find.descendant(
+                of: find.byKey(const Key('setup-preset-50')),
+                matching: find.text('50'),
+              ),
+            )
+            .style
+            ?.color,
+        disabled,
+      );
+
+      expect(
+        tester.getSemantics(find.byKey(const Key('setup-count'))),
+        matchesSemantics(
+          label: '10 questions',
+          textDirection: TextDirection.ltr,
+          isLiveRegion: true,
+        ),
+      );
+      expect(
+        tester.getSemantics(find.byTooltip('More questions')),
+        matchesSemantics(
+          label: 'More questions',
+          value: '10 questions',
+          textDirection: TextDirection.ltr,
+          isButton: true,
+          isEnabled: true,
+          hasEnabledState: true,
+          hasTapAction: true,
+        ),
+      );
+
+      await tester.tap(find.byTooltip('More questions'));
+      await tester.pumpAndSettle();
+
+      expect(_countText(tester), '11');
+      expect(
+        tester.getSemantics(find.byTooltip('More questions')),
+        matchesSemantics(
+          label: 'More questions',
+          value: '11 questions',
+          textDirection: TextDirection.ltr,
+          isButton: true,
+          isEnabled: true,
+          hasEnabledState: true,
+          hasTapAction: true,
+        ),
+      );
+      expect(
+        tester.getSemantics(find.byKey(const Key('setup-count'))),
+        matchesSemantics(
+          label: '11 questions',
+          textDirection: TextDirection.ltr,
+          isLiveRegion: true,
+        ),
+      );
+    } finally {
+      handle.dispose();
+    }
+  });
+
   testWidgets('iOS uses check circles and Android uses checkboxes', (
     tester,
   ) async {

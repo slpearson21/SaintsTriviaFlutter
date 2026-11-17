@@ -116,11 +116,12 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     return max > 0 && _requested > max;
   }
 
-  bool _canStart(QuestionBank? bank) {
+  bool _canStart(AsyncValue<QuestionBank> bankAsync) {
     if (_selected.isEmpty) return false;
-    // The splash has not finished. Open the game and let it deal when the
-    // bank arrives, instead of trapping the player on a disabled button.
-    if (bank == null) return true;
+    final bank = bankAsync.asData?.value;
+    // Still loading: the game screen deals when the bank arrives. A failed
+    // load has nothing to deal, so Start stays off.
+    if (bank == null) return !bankAsync.hasError;
     final max = _max(bank);
     final count = _visibleCount(bank);
     return max > 0 &&
@@ -129,9 +130,10 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
         count <= maxQuestionsPerGame;
   }
 
-  void _start(QuestionBank? bank) {
+  void _start(AsyncValue<QuestionBank> bankAsync) {
+    final bank = bankAsync.asData?.value;
+    if (!_canStart(bankAsync)) return;
     final count = _visibleCount(bank);
-    if (!_canStart(bank)) return;
     final volumes = [
       for (final volume in ScriptureVolume.values)
         if (_selected.contains(volume)) volume,
@@ -157,7 +159,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     final bank = bankAsync.asData?.value;
     final visible = _visibleCount(bank);
     final cap = _cap(bank);
-    final canStart = _canStart(bank);
+    final canStart = _canStart(bankAsync);
     final banner = _showClampBanner(bank)
         ? _clampBanner(
             volumes: [
@@ -182,7 +184,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
         primary: _StartButton(
           label: _startLabel(enabled: canStart, count: visible),
           enabled: canStart,
-          onPressed: () => _start(bank),
+          onPressed: () => _start(bankAsync),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -712,26 +714,34 @@ class _CountCard extends StatelessWidget {
                   tooltip: 'Fewer questions',
                   icon: Icons.remove,
                   enabled: canDecrement,
+                  value: '$count ${_word(count)}',
                   onPressed: onDecrement,
                 ),
                 Expanded(
-                  child: large
-                      ? Column(children: [number, label])
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.alphabetic,
-                          children: [
-                            number,
-                            const SizedBox(width: StSpace.xs),
-                            Flexible(child: label),
-                          ],
-                        ),
+                  child: Semantics(
+                    container: true,
+                    liveRegion: true,
+                    label: '$count ${_word(count)}',
+                    excludeSemantics: true,
+                    child: large
+                        ? Column(children: [number, label])
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.baseline,
+                            textBaseline: TextBaseline.alphabetic,
+                            children: [
+                              number,
+                              const SizedBox(width: StSpace.xs),
+                              Flexible(child: label),
+                            ],
+                          ),
+                  ),
                 ),
                 _StepButton(
                   tooltip: 'More questions',
                   icon: Icons.add,
                   enabled: canIncrement,
+                  value: '$count ${_word(count)}',
                   onPressed: onIncrement,
                 ),
               ],
@@ -752,32 +762,45 @@ class _StepButton extends StatelessWidget {
     required this.tooltip,
     required this.icon,
     required this.enabled,
+    required this.value,
     required this.onPressed,
   });
 
   final String tooltip;
   final IconData icon;
   final bool enabled;
+
+  /// Current length, such as "11 questions", read after each tap.
+  final String value;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final target = minTapTarget(context);
-    return IconButton(
-      tooltip: tooltip,
-      onPressed: enabled ? onPressed : null,
-      style: IconButton.styleFrom(
-        minimumSize: Size.square(target),
-        tapTargetSize: MaterialTapTargetSize.padded,
-        shape: const CircleBorder(),
-        side: BorderSide(
-          color: enabled ? scheme.outline : scheme.outlineVariant,
+    return Semantics(
+      container: true,
+      button: true,
+      enabled: enabled,
+      label: tooltip,
+      value: value,
+      onTap: enabled ? onPressed : null,
+      excludeSemantics: true,
+      child: IconButton(
+        tooltip: tooltip,
+        onPressed: enabled ? onPressed : null,
+        style: IconButton.styleFrom(
+          minimumSize: Size.square(target),
+          tapTargetSize: MaterialTapTargetSize.padded,
+          shape: const CircleBorder(),
+          side: BorderSide(
+            color: enabled ? scheme.outline : scheme.outlineVariant,
+          ),
+          foregroundColor: scheme.onSurface,
+          disabledForegroundColor: scheme.outline,
         ),
-        foregroundColor: scheme.onSurface,
-        disabledForegroundColor: scheme.outline,
+        icon: StIcon(icon),
       ),
-      icon: StIcon(icon),
     );
   }
 }
@@ -848,45 +871,62 @@ class _PresetChip extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final target = minTapTarget(context);
     final on = selected && enabled;
-    return Material(
-      key: Key('setup-preset-$preset'),
-      color: on ? scheme.primaryContainer : scheme.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: const BorderRadius.all(StRadius.sm),
-        side: BorderSide(color: on ? scheme.primary : scheme.outlineVariant),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: enabled ? onSelected : null,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: target),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: StSpace.xs,
-              vertical: StSpace.xs,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (on) ...[
-                  StIcon(Icons.check, size: 16, color: scheme.primary),
-                  const SizedBox(width: 2),
-                ],
-                Flexible(
-                  child: Text(
-                    '$preset',
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.fade,
-                    style: TextStyle(
-                      color: enabled
-                          ? (on ? scheme.onPrimaryContainer : scheme.onSurface)
-                          : scheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w600,
+    // Material 3 disabled content and outline are onSurface at 38%.
+    final disabled = scheme.onSurface.withValues(alpha: 0.38);
+    return Semantics(
+      container: true,
+      button: true,
+      selected: on,
+      enabled: enabled,
+      label: '$preset questions',
+      onTap: enabled ? onSelected : null,
+      excludeSemantics: true,
+      child: Material(
+        key: Key('setup-preset-$preset'),
+        color: on ? scheme.primaryContainer : scheme.surfaceContainerLowest,
+        shape: RoundedRectangleBorder(
+          borderRadius: const BorderRadius.all(StRadius.sm),
+          side: BorderSide(
+            color: enabled
+                ? (on ? scheme.primary : scheme.outlineVariant)
+                : disabled,
+          ),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: enabled ? onSelected : null,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: target),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: StSpace.xs,
+                vertical: StSpace.xs,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (on) ...[
+                    StIcon(Icons.check, size: 16, color: scheme.primary),
+                    const SizedBox(width: 2),
+                  ],
+                  Flexible(
+                    child: Text(
+                      '$preset',
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.fade,
+                      style: TextStyle(
+                        color: enabled
+                            ? (on
+                                  ? scheme.onPrimaryContainer
+                                  : scheme.onSurface)
+                            : disabled,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
