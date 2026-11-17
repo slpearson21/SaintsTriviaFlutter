@@ -42,7 +42,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'setup',
             name: AppRouteNames.setup,
-            builder: (context, state) => const SetupScreen(),
+            builder: (context, state) {
+              final extra = state.extra;
+              return SetupScreen(
+                initial: extra is LastGameSettings ? extra : null,
+              );
+            },
           ),
           GoRoute(
             path: 'game',

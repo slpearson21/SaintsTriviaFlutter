@@ -490,12 +490,9 @@ void main() {
 
     await tester.tap(find.text('Start a game'));
     await tester.pumpAndSettle();
+    expect(find.text('Select all'), findsOneWidget);
     expect(
-      find.text('Volume picker and question count will go here.'),
-      findsOneWidget,
-    );
-    expect(
-      GoRouterState.of(tester.element(find.text('Game setup'))).extra,
+      GoRouterState.of(tester.element(find.text('New game'))).extra,
       isNull,
     );
 
@@ -535,12 +532,9 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Play again'));
     await tester.pumpAndSettle();
+    expect(find.text('Select all'), findsOneWidget);
     expect(
-      find.text('Volume picker and question count will go here.'),
-      findsOneWidget,
-    );
-    expect(
-      GoRouterState.of(tester.element(find.text('Game setup'))).extra,
+      GoRouterState.of(tester.element(find.text('New game'))).extra,
       _settings,
     );
   });

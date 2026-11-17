@@ -11,9 +11,9 @@ void main() {
 
     await tester.tap(find.text('Start a game'));
     await tester.pumpAndSettle();
-    expect(find.text('Game setup'), findsOneWidget);
+    expect(find.text('New game'), findsOneWidget);
 
-    await tester.tap(find.text('Start game'));
+    await tester.tap(find.textContaining('Start game'));
     await tester.pumpAndSettle();
     expect(find.text('Question'), findsOneWidget);
 
@@ -51,7 +51,7 @@ void main() {
     await pumpApp(tester);
     await tester.tap(find.text('Start a game'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Start game'));
+    await tester.tap(find.textContaining('Start game'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('See results'));
     await tester.pumpAndSettle();
@@ -69,19 +69,19 @@ void main() {
     await pumpApp(tester);
     await tester.tap(find.text('Start a game'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Start game'));
+    await tester.tap(find.textContaining('Start game'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('See results'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('New game'));
     await tester.pumpAndSettle();
-    expect(find.text('Game setup'), findsOneWidget);
+    expect(find.text('Select all'), findsOneWidget);
 
     await tester.pageBack();
     await tester.pumpAndSettle();
 
     expect(find.text('Scripture Trivia'), findsOneWidget);
-    expect(find.text('Game setup'), findsNothing);
+    expect(find.text('Select all'), findsNothing);
     expect(find.text('Question'), findsNothing);
   });
 }
