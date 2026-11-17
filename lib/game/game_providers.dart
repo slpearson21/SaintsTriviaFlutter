@@ -46,4 +46,26 @@ class GameController extends Notifier<GameSession?> {
     if (current == null) return;
     state = applyAnswer(current, selectedIndex);
   }
+
+  /// Drops the game in progress. Quit uses this so Home does not resume it.
+  void discard() {
+    state = null;
+  }
+}
+
+/// Whether answer sounds play.
+///
+/// Off until STRIV-16 adds the setting. Gameplay reads this and stays quiet
+/// while it is false. Tests and that settings screen override it.
+final soundEffectsEnabledProvider = Provider<bool>((ref) => false);
+
+/// Plays the correct or wrong sound when [enabled] is true.
+///
+/// No player is wired yet, so this returns without playing. [correct] chooses
+/// the clip once STRIV-16 turns [soundEffectsEnabledProvider] on.
+void playAnswerSound({required bool enabled, required bool correct}) {
+  if (!enabled) return;
+  // The cue is selected and then dropped. Playback waits for settings.
+  if (correct) return;
+  return;
 }
