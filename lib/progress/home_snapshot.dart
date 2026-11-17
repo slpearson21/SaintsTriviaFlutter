@@ -65,19 +65,26 @@ final class HomeSnapshot {
     required this.bestStreak,
     this.lastGame,
     this.lastSettings,
+    this.bestScorePercent,
   }) : assert(gamesPlayed >= 0),
        assert(
          accuracyPercent >= 0 && accuracyPercent <= 100,
          'Accuracy is a whole percent from 0 to 100.',
        ),
-       assert(bestStreak >= 0);
+       assert(bestStreak >= 0),
+       assert(
+         bestScorePercent == null ||
+             (bestScorePercent >= 0 && bestScorePercent <= 100),
+         'Best score percent is a whole percent from 0 to 100.',
+       );
 
   const HomeSnapshot.firstRun()
     : gamesPlayed = 0,
       accuracyPercent = 0,
       bestStreak = 0,
       lastGame = null,
-      lastSettings = null;
+      lastSettings = null,
+      bestScorePercent = null;
 
   final int gamesPlayed;
 
@@ -86,6 +93,14 @@ final class HomeSnapshot {
   final int bestStreak;
   final LastGameSummary? lastGame;
   final LastGameSettings? lastSettings;
+
+  /// Best finished-game percent already on record, from 0 to 100.
+  ///
+  /// Null when the snapshot has no score to compare, which is every
+  /// snapshot until STRIV-16 loads one. Results hides the personal-best
+  /// chip in that case. STRIV-16 should set this to the best percent from
+  /// before the game on screen, so a game is not compared with itself.
+  final int? bestScorePercent;
 
   bool get isFirstRun => gamesPlayed == 0;
 }
