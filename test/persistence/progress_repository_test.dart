@@ -146,6 +146,31 @@ void main() {
     expect(loaded, isA<SharedPreferencesProgressRepository>());
   });
 
+  test('an empty volume list falls back to the dealt volumes', () {
+    final game = FinishedGameRecord.tryParse({
+      'score': 8,
+      'total': 10,
+      'playedAt': '2026-11-09T08:00:00.000',
+      'byVolume': {
+        'NT': {'correct': 3, 'total': 4},
+        'OT': {'correct': 5, 'total': 6},
+      },
+    });
+    expect(game, isNotNull);
+    expect(game!.volumes, [ScriptureVolume.ot, ScriptureVolume.nt]);
+  });
+
+  test('a record with no volumes is dropped', () {
+    expect(
+      FinishedGameRecord.tryParse({
+        'score': 1,
+        'total': 1,
+        'playedAt': '2026-11-09T08:00:00.000',
+      }),
+      isNull,
+    );
+  });
+
   test('the memory repository is the fake tests can share', () {
     final repo = MemoryProgressRepository(games: [game], settings: settings);
     expect(repo.readGames().single.score, 8);

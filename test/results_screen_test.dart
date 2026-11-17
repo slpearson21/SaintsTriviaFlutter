@@ -63,11 +63,11 @@ void main() {
         bestScorePercent: 80,
       );
 
-      expect(isNewPersonalBest(100, none), isFalse);
-      expect(isNewPersonalBest(80, lower), isTrue);
-      expect(isNewPersonalBest(80, tie), isFalse);
-      expect(isNewPersonalBest(70, lower), isFalse);
-      expect(isNewPersonalBest(69, lower), isFalse);
+      expect(isNewPersonalBestPercent(100, none.bestScorePercent), isFalse);
+      expect(isNewPersonalBestPercent(80, lower.bestScorePercent), isTrue);
+      expect(isNewPersonalBestPercent(80, tie.bestScorePercent), isFalse);
+      expect(isNewPersonalBestPercent(70, lower.bestScorePercent), isFalse);
+      expect(isNewPersonalBestPercent(69, lower.bestScorePercent), isFalse);
       expect(
         showResultsSparkle(percent: 100, personalBest: false, firstGame: true),
         isFalse,
@@ -358,19 +358,19 @@ void main() {
     final repo = MemoryProgressRepository(
       games: [
         FinishedGameRecord(
-          score: 4,
+          score: 8,
           total: 10,
-          percent: 40,
-          bestStreak: 2,
+          percent: 80,
+          bestStreak: 4,
           playedAt: DateTime(2026, 11, 1),
           volumes: const [ScriptureVolume.bom],
           questionCount: 10,
-          volumeCorrect: const {ScriptureVolume.bom: 4},
+          volumeCorrect: const {ScriptureVolume.bom: 8},
           volumeTotal: const {ScriptureVolume.bom: 10},
         ),
       ],
     );
-    final session = _perfect();
+    final session = _ninetyPercent();
     final container = await _pump(
       tester,
       overrides: [
@@ -384,8 +384,8 @@ void main() {
     expect(find.byKey(const Key('results-personal-best')), findsOneWidget);
     expect(find.byKey(const Key('results-sparkle')), findsOneWidget);
     expect(repo.readGames(), hasLength(2));
-    expect(container.read(recordedBestProvider).previousBestPercent, 40);
-    expect(container.read(homeSnapshotProvider).bestScorePercent, 100);
+    expect(container.read(recordedBestProvider).previousBestPercent, 80);
+    expect(container.read(homeSnapshotProvider).bestScorePercent, 90);
 
     await tester.pump();
     expect(find.byKey(const Key('results-personal-best')), findsOneWidget);
@@ -1022,6 +1022,29 @@ GameSession _mixed() {
       0,
       0,
       options: ['King Noah', 'King Benjamin', 'King Mosiah', 'King Limhi'],
+    ),
+  ]);
+}
+
+/// Nine correct answers and one miss: 90%.
+GameSession _ninetyPercent() {
+  return _played([
+    for (var i = 0; i < 9; i++)
+      _Pick(
+        'bom-${(i + 1).toString().padLeft(4, '0')}',
+        ScriptureVolume.bom,
+        'Prompt $i',
+        '1 Nephi 1:${i + 1}',
+        0,
+        0,
+      ),
+    const _Pick(
+      'bom-0010',
+      ScriptureVolume.bom,
+      'Prompt 9',
+      '1 Nephi 1:10',
+      0,
+      1,
     ),
   ]);
 }

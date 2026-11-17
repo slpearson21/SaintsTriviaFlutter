@@ -21,6 +21,10 @@ const scriptureTriviaDisclaimer =
     'Scripture Trivia is a free, unofficial app. It is not an official '
     'product of, or endorsed by, The Church of Jesus Christ of Latter-day Saints.';
 
+/// v1 hides Send feedback. The row stays in source behind this flag, so
+/// turning it on is a one-line change.
+const bool kShowSendFeedback = false;
+
 /// Feedback inbox. Empty until one is chosen; fill this in and the mailto
 /// gains a recipient. [feedbackUri] uses [Uri.encodeComponent] so a space
 /// in the subject stays `%20`. `Uri.queryParameters` would write `+`,
@@ -83,7 +87,7 @@ class SettingsScreen extends ConsumerWidget {
                     onChanged: controller.setThemeMode,
                   ),
             const SizedBox(height: StSpace.lg),
-            const SectionLabel('Feedback'),
+            const SectionLabel('Sound & haptics'),
             const SizedBox(height: StSpace.sm),
             _Group(
               children: [
@@ -109,7 +113,7 @@ class SettingsScreen extends ConsumerWidget {
                 _ToggleRow(
                   key: const Key('settings-explanations'),
                   title: 'Show explanations',
-                  subtitle: 'One-line explanation after each answer',
+                  subtitle: 'One-line explanation after each answer.',
                   value: settings.showExplanations,
                   onChanged: controller.setShowExplanations,
                 ),
@@ -124,15 +128,13 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: StSpace.sm),
             _Group(
               children: [
-                _LinkRow(
-                  key: const Key('settings-feedback'),
-                  icon: Icons.mail_outline,
-                  title: 'Send feedback',
-                  onPressed: () {
-                    final open = ref.read(openLinkProvider);
-                    unawaited(open(feedbackUri));
-                  },
-                ),
+                if (kShowSendFeedback)
+                  _LinkRow(
+                    key: const Key('settings-feedback'),
+                    icon: Icons.mail_outline,
+                    title: 'Send feedback',
+                    onPressed: () => unawaited(_sendFeedback(context, ref)),
+                  ),
                 _LinkRow(
                   key: const Key('settings-about'),
                   icon: Icons.info_outline,
@@ -158,8 +160,23 @@ class SettingsScreen extends ConsumerWidget {
 
 Future<void> _confirmReset(BuildContext context, WidgetRef ref) async {
   final reset = await showResetStatsDialog(context);
-  if (!reset) return;
+  if (!reset || !context.mounted) return;
   ref.read(homeSnapshotProvider.notifier).resetStats();
+}
+
+/// Opens the mail app. A `false` result means nothing handled the mailto.
+Future<void> sendAppFeedback(
+  BuildContext context,
+  Future<bool> Function(Uri uri) open,
+) async {
+  final opened = await open(feedbackUri);
+  if (opened || !context.mounted) return;
+  ScaffoldMessenger.of(context)
+      .showSnackBar(const SnackBar(content: Text('No mail app was found.')));
+}
+
+Future<void> _sendFeedback(BuildContext context, WidgetRef ref) {
+  return sendAppFeedback(context, ref.read(openLinkProvider));
 }
 
 Future<void> _showAbout(BuildContext context) {

@@ -1,6 +1,5 @@
 import '../data/questions/scripture_volume.dart';
 import '../game/game_engine.dart';
-import '../progress/home_snapshot.dart';
 
 /// A finished game Results and Review can show.
 ///
@@ -37,19 +36,14 @@ String answeredCorrectlySentence(int correct, int total) {
 
 /// True when [percent] is strictly above [previous].
 ///
-/// A null [previous] means nothing comparable is on record yet, which is
-/// the first game, so this is false. A tie is not a new best.
+/// [previous] is the best whole percent from before this game. A null
+/// [previous] is the first game ever, so this is false. A tie is not a
+/// new best. Do not pass the best from a snapshot that already includes
+/// the game on screen: that best is at least [percent], so a real new
+/// best would look like a tie.
 bool isNewPersonalBestPercent(int percent, int? previous) {
   if (previous == null) return false;
   return percent > previous;
-}
-
-/// True when [percent] is strictly above [HomeSnapshot.bestScorePercent].
-///
-/// A null best means the snapshot has nothing comparable yet, so this is
-/// false and the personal-best chip stays hidden. A tie is not a new best.
-bool isNewPersonalBest(int percent, HomeSnapshot snapshot) {
-  return isNewPersonalBestPercent(percent, snapshot.bestScorePercent);
 }
 
 /// A small gold sparkle at 90% or above, or on a personal best.

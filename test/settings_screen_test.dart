@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -229,7 +231,30 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  testWidgets('feedback opens a mailto link and about shows the disclaimer', (
+  testWidgets('a failed feedback launch says no mail app was found', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) {
+              return FilledButton(
+                onPressed: () =>
+                    unawaited(sendAppFeedback(context, (_) async => false)),
+                child: const Text('Send'),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Send'));
+    await tester.pump();
+    expect(find.text('No mail app was found.'), findsOneWidget);
+  });
+
+  testWidgets('feedback is hidden and about shows the disclaimer', (
     tester,
   ) async {
     final opened = <Uri>[];
@@ -241,19 +266,19 @@ void main() {
       },
     );
 
-    await tester.ensureVisible(find.byKey(const Key('settings-feedback')));
-    await tester.tap(find.byKey(const Key('settings-feedback')));
-    await tester.pumpAndSettle();
-    expect(opened, hasLength(1));
-    expect(opened.single, feedbackUri);
-    expect(opened.single.scheme, 'mailto');
+    expect(kShowSendFeedback, isFalse);
+    expect(find.byKey(const Key('settings-feedback')), findsNothing);
+    expect(find.text('Send feedback'), findsNothing);
+    expect(find.text('Sound & haptics'), findsOneWidget);
+    expect(opened, isEmpty);
     expect(feedbackRecipient, isEmpty);
-    expect(opened.single.query, 'subject=Scripture%20Trivia%20feedback');
-    expect(
-      opened.single.queryParameters['subject'],
-      'Scripture Trivia feedback',
-    );
+    expect(feedbackUri.query, 'subject=Scripture%20Trivia%20feedback');
 
+    await tester.scrollUntilVisible(
+      find.textContaining('unofficial app'),
+      200,
+      scrollable: find.byType(Scrollable),
+    );
     expect(find.textContaining(scriptureTriviaDisclaimer), findsOneWidget);
     await tester.ensureVisible(find.byKey(const Key('settings-about')));
     await tester.tap(find.byKey(const Key('settings-about')));

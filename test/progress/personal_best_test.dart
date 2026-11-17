@@ -49,17 +49,17 @@ void main() {
       bestScorePercent: 80,
     );
 
-    expect(isNewPersonalBest(100, none), isFalse);
-    expect(isNewPersonalBest(50, none), isFalse);
+    expect(isNewPersonalBestPercent(100, none.bestScorePercent), isFalse);
+    expect(isNewPersonalBestPercent(50, none.bestScorePercent), isFalse);
     expect(isNewPersonalBestPercent(100, null), isFalse);
 
-    expect(isNewPersonalBest(80, previous), isFalse);
+    expect(isNewPersonalBestPercent(80, previous.bestScorePercent), isFalse);
     expect(isNewPersonalBestPercent(80, 80), isFalse);
 
-    expect(isNewPersonalBest(81, previous), isTrue);
+    expect(isNewPersonalBestPercent(81, previous.bestScorePercent), isTrue);
     expect(isNewPersonalBestPercent(81, 80), isTrue);
 
-    expect(isNewPersonalBest(79, previous), isFalse);
+    expect(isNewPersonalBestPercent(79, previous.bestScorePercent), isFalse);
     expect(isNewPersonalBestPercent(0, 80), isFalse);
 
     expect(

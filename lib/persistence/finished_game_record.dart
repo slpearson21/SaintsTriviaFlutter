@@ -97,6 +97,12 @@ final class FinishedGameRecord {
         correct[volume] = rowCorrect;
       }
     }
+    if (volumes.isEmpty) {
+      for (final volume in ScriptureVolume.values) {
+        if (dealt.containsKey(volume)) volumes.add(volume);
+      }
+    }
+    if (volumes.isEmpty) return null;
     var streak = _int(json['bestStreak']) ?? 0;
     if (streak < 0) streak = 0;
     if (streak > total) streak = total;
