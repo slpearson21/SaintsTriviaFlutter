@@ -1,58 +1,91 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
-import '../data/questions/question_bank_exception.dart';
 import '../data/questions/question_bank_provider.dart';
-import '../layout/screen_body.dart';
-import '../layout/st_icon.dart';
+import '../layout/error_state.dart';
+import '../layout/new_game_bar.dart';
 import '../routing/routes.dart';
-import '../theme/st_theme.dart';
-import 'placeholder_scaffold.dart';
 
-/// Placeholder for the E1 content-load error until STRIV-17.
+/// E1. Shown when [questionBankProvider] fails, including the splash timeout.
 ///
-/// The designed screen (icon, copy, Try again per ios-19) is still backlog.
-/// This shows [QuestionBankException.userMessage] and retries the same
-/// [questionBankProvider] the splash waited on.
-class ContentLoadErrorScreen extends ConsumerWidget {
-  const ContentLoadErrorScreen({super.key});
+/// [onLoaded] runs after Try again reads a bank. The splash route uses it to
+/// open Home. Setup and the preparing step omit it: they already watch the
+/// provider, so a successful retry rebuilds them in place.
+class ContentLoadErrorView extends ConsumerStatefulWidget {
+  const ContentLoadErrorView({
+    super.key,
+    this.onLoaded,
+    this.showNewGameBar = false,
+  });
+
+  final void Function(BuildContext context)? onLoaded;
+
+  /// Setup and the preparing step keep the New game bar, so there is a way
+  /// home. The splash route leaves this false: ios-19 has no bar.
+  final bool showNewGameBar;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final scheme = Theme.of(context).colorScheme;
-    return PlaceholderScaffold(
-      title: 'Content failed to load',
-      automaticallyImplyLeading: false,
-      primary: PrimaryButton(
-        label: 'Try again',
-        onPressed: () => _tryAgain(context, ref),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ExcludeSemantics(
-            child: StIcon(Icons.error_outline, size: 32, color: scheme.error),
-          ),
-          const SizedBox(height: StSpace.md),
-          Text(
-            QuestionBankException.userMessage,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-        ],
+  ConsumerState<ContentLoadErrorView> createState() =>
+      _ContentLoadErrorViewState();
+}
+
+class _ContentLoadErrorViewState extends ConsumerState<ContentLoadErrorView> {
+  /// How many times this view has landed on a failure after Try again.
+  ///
+  /// The first failure is announced by [ErrorState] at attempt 0. Each later
+  /// failure bumps this so the same copy is announced once more.
+  var _attempt = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final bank = ref.watch(questionBankProvider);
+    ref.listen(questionBankProvider, (previous, next) {
+      final wasLoading = previous?.isLoading ?? false;
+      if (wasLoading && !next.isLoading && next.hasError) {
+        setState(() => _attempt++);
+      }
+    });
+    return Scaffold(
+      appBar: widget.showNewGameBar ? newGameAppBar(context) : null,
+      body: ErrorState(
+        icon: Icons.info,
+        actionIcon: Icons.refresh,
+        title: contentLoadErrorTitle,
+        body: contentLoadErrorBody,
+        actionLabel: contentLoadErrorAction,
+        busy: bank.isLoading,
+        attempt: _attempt,
+        onAction: () => unawaited(_tryAgain()),
       ),
     );
   }
 
-  Future<void> _tryAgain(BuildContext context, WidgetRef ref) async {
+  Future<void> _tryAgain() async {
     ref.invalidate(questionBankProvider);
+    final onLoaded = widget.onLoaded;
+    if (onLoaded == null) return;
     try {
       await ref.read(questionBankProvider.future);
     } catch (error) {
       debugPrint('Question bank retry failed: $error');
       return;
     }
-    if (!context.mounted) return;
-    context.go(AppRoutes.home);
+    if (!mounted) return;
+    onLoaded(context);
+  }
+}
+
+/// Route for a bank that failed before Home opened.
+class ContentLoadErrorScreen extends StatelessWidget {
+  const ContentLoadErrorScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ContentLoadErrorView(
+      onLoaded: (context) => context.go(AppRoutes.home),
+    );
   }
 }

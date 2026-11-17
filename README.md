@@ -63,7 +63,7 @@ dart run tool/validate_questions.dart --bank test/fixtures/questions/v1
 
 ## Loading in the app
 
-`loadBundledQuestionBank()` reads the bundled JSON offline and returns the `QuestionBank`. It throws `QuestionBankException` for malformed content. Show `QuestionBankException.userMessage` (`Content failed to load.`) and use `violations` in logs.
+`loadBundledQuestionBank()` reads the bundled JSON offline and returns the `QuestionBank`. It throws `QuestionBankException` for malformed content. The app shows the E1 error state (Try again). `QuestionBankException.userMessage` (`Content failed to load.`) and `violations` are for logs.
 
 A release build skips questions that are not `approved`. Debug and profile builds still load drafts, so the full bank is available for development and performance testing. Skipping drafts does not throw. `QuestionBank.availableVolumes` lists the volumes that still have questions, and `forVolume` is empty when a volume has none. That is the "no questions for this selection" state. The loader is not wired into the home screen yet.
 

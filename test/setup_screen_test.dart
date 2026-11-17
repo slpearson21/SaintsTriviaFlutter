@@ -362,7 +362,9 @@ void main() {
     );
   });
 
-  testWidgets('start is disabled when the bank fails to load', (tester) async {
+  testWidgets('a failed bank replaces setup with the content error', (
+    tester,
+  ) async {
     final container = ProviderContainer(
       overrides: [
         questionBankLoaderProvider.overrideWith(
@@ -386,13 +388,10 @@ void main() {
     container.read(appRouterProvider).go(AppRoutes.setup);
     await tester.pumpAndSettle();
 
-    expect(find.text('5 of 5 selected'), findsOneWidget);
-    expect(
-      tester
-          .widget<FilledButton>(find.byKey(const Key('setup-start')))
-          .onPressed,
-      isNull,
-    );
+    expect(find.text('Something went wrong'), findsOneWidget);
+    expect(find.text('Try again'), findsOneWidget);
+    expect(find.byKey(const Key('setup-start')), findsNothing);
+    expect(find.text('5 of 5 selected'), findsNothing);
   });
 
   testWidgets('presets and the stepper announce selection and the count', (

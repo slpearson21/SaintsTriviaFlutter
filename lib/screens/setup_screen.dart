@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../data/questions/question_bank.dart';
-import '../data/questions/question_bank_exception.dart';
 import '../data/questions/question_bank_provider.dart';
 import '../data/questions/scripture_volume.dart';
 import '../game/game_engine.dart';
@@ -14,6 +13,7 @@ import '../layout/text_scale.dart';
 import '../progress/home_snapshot.dart';
 import '../routing/routes.dart';
 import '../theme/st_theme.dart';
+import 'content_load_error_screen.dart';
 
 /// Presets from the setup mockups. Anything above the cap is disabled.
 const _presets = <int>[5, 10, 20, 50];
@@ -156,6 +156,9 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     final bankAsync = ref.read(questionBankProvider.exists)
         ? ref.watch(questionBankProvider)
         : const AsyncLoading<QuestionBank>();
+    if (bankAsync.hasError) {
+      return const ContentLoadErrorView(showNewGameBar: true);
+    }
     final bank = bankAsync.asData?.value;
     final visible = _visibleCount(bank);
     final cap = _cap(bank);
@@ -210,7 +213,6 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
               canDecrement: visible > 1,
               canIncrement: visible < cap,
               helper: _countHelper(
-                bankAsync: bankAsync,
                 bank: bank,
                 hasSelection: _selected.isNotEmpty,
                 maxAvailable: _max(bank),
@@ -282,16 +284,12 @@ String _clampBanner({
 }
 
 String _countHelper({
-  required AsyncValue<QuestionBank> bankAsync,
   required QuestionBank? bank,
   required bool hasSelection,
   required int maxAvailable,
   required int count,
 }) {
-  if (bank == null) {
-    if (bankAsync.hasError) return QuestionBankException.userMessage;
-    return 'Loading questions…';
-  }
+  if (bank == null) return 'Loading questions…';
   if (!hasSelection) return 'Choose at least one book of scripture';
   if (maxAvailable <= 0) {
     return 'No questions available for this selection';
