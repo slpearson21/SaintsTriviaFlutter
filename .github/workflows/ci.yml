@@ -133,6 +133,15 @@ jobs:
       - name: Build debug APK
         run: flutter build apk --debug
 
+      - name: Upload debug APK
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: scripture-trivia-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 14
+          if-no-files-found: error
+
   ios:
     name: iOS simulator build
     needs: [changes, android]
