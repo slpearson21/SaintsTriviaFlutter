@@ -1,7 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:saints_trivia_flutter/routing/routes.dart';
 
 import 'pump_app.dart';
+
+/// Results opens from Next on the last question. This file checks the route
+/// stack, so it jumps there with the same `go` Next uses.
+Future<void> _openResults(WidgetTester tester) async {
+  GoRouter.of(tester.element(find.text('Question'))).go(AppRoutes.results);
+  await tester.pumpAndSettle();
+}
 
 void main() {
   testWidgets('every route renders and is reachable', (tester) async {
@@ -17,8 +26,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Question'), findsOneWidget);
 
-    await tester.tap(find.text('See results'));
-    await tester.pumpAndSettle();
+    await _openResults(tester);
     expect(find.text('Results'), findsOneWidget);
 
     await tester.tap(find.text('Review answers'));
@@ -53,8 +61,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Start game'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('See results'));
-    await tester.pumpAndSettle();
+    await _openResults(tester);
     expect(find.text('Results'), findsOneWidget);
 
     await tester.pageBack();
@@ -71,8 +78,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Start game'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('See results'));
-    await tester.pumpAndSettle();
+    await _openResults(tester);
     await tester.tap(find.text('New game'));
     await tester.pumpAndSettle();
     expect(find.text('Select all'), findsOneWidget);

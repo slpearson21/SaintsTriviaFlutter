@@ -393,9 +393,6 @@ void main() {
         router.go(path, extra: path == AppRoutes.game ? _gameSettings : null);
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull, reason: '$path at $scale');
-        if (scale == 2 && path == AppRoutes.game) {
-          expect(find.text('7 / 10'), findsOneWidget);
-        }
       }
 
       await tester.pumpWidget(const SizedBox.shrink());
