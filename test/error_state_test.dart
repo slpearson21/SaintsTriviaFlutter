@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,11 +14,11 @@ import 'package:saints_trivia_flutter/routing/routes.dart';
 
 const _contentTitle = 'Something went wrong';
 const _contentBody =
-    "We couldn't load the questions on this device. "
+    'We couldn’t load the questions on this device. '
     'Please try again. If this keeps happening, reinstall the app.';
-const _noQuestionsTitle = "Couldn't start this game";
+const _noQuestionsTitle = 'Couldn’t start this game';
 const _noQuestionsBody =
-    "There aren't any questions for this selection yet. "
+    'There aren’t any questions for this selection yet. '
     'Choose different scriptures and try again.';
 
 QuestionBank _bank({int ot = 4, int pgp = 0}) {
@@ -169,7 +171,17 @@ void main() {
     expect(find.text(_contentTitle), findsOneWidget);
     expect(find.text(_contentBody), findsOneWidget);
     expect(find.text('Try again'), findsOneWidget);
+    expect(find.text('New game'), findsOneWidget);
+    expect(find.byTooltip('Back'), findsOneWidget);
+    expect(find.byIcon(Icons.info), findsOneWidget);
     expect(find.byKey(const Key('setup-start')), findsNothing);
+    final action = tester.getSize(find.byKey(const Key('error-state-action')));
+    expect(action.width, greaterThanOrEqualTo(220));
+    expect(action.width, lessThan(300));
+    expect(
+      tester.getSize(find.byKey(const Key('error-state-body'))).width,
+      lessThanOrEqualTo(280),
+    );
 
     fail = false;
     await tester.tap(find.text('Try again'));
@@ -208,6 +220,8 @@ void main() {
     );
     expect(find.text(_contentTitle), findsOneWidget);
     expect(find.text(_contentBody), findsOneWidget);
+    expect(find.text('New game'), findsOneWidget);
+    expect(find.byTooltip('Back'), findsOneWidget);
     expect(find.textContaining('Old Testament prompt'), findsNothing);
     expect(find.byType(Card), findsNothing);
 
@@ -289,6 +303,10 @@ void main() {
     final tryAgain = tester.getRect(find.text('Try again'));
     expect(tryAgain.top, greaterThanOrEqualTo(0));
     expect(tryAgain.bottom, lessThanOrEqualTo(surface.height));
+    expect(
+      tester.getSize(find.byKey(const Key('error-state-action'))).width,
+      greaterThan(240),
+    );
 
     final dealt = await _pump(
       tester,
@@ -373,6 +391,68 @@ void main() {
       expect(messages, ['$_noQuestionsTitle. $_noQuestionsBody']);
       _expectHeader(tester, _noQuestionsTitle);
       _expectIconDecorative(tester);
+      expect(
+        tester.getSemantics(find.text('New game')).flagsCollection.isHeader,
+        isFalse,
+      );
+    } finally {
+      handle.dispose();
+    }
+  });
+
+  testWidgets('a second failed Try again stays on E1 and announces again', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    try {
+      final retry = Completer<QuestionBank>();
+      var calls = 0;
+      final messages = await _captureAnnouncements(tester);
+      final container = await _pump(
+        tester,
+        load: () {
+          calls += 1;
+          if (calls == 1) {
+            return Future<QuestionBank>.error(Exception('unreadable'));
+          }
+          return retry.future;
+        },
+      );
+      await _failBank(container);
+      messages.clear();
+      container.read(appRouterProvider).go(AppRoutes.setup);
+      await tester.pumpAndSettle();
+
+      expect(calls, 1);
+      expect(messages, ['$_contentTitle. $_contentBody']);
+      expect(find.text('New game'), findsOneWidget);
+      expect(find.text('Try again'), findsOneWidget);
+
+      await tester.tap(find.text('Try again'));
+      await tester.pump();
+
+      expect(calls, 2);
+      expect(find.byKey(const Key('error-state-progress')), findsOneWidget);
+      expect(
+        tester
+            .widget<FilledButton>(find.byKey(const Key('error-state-action')))
+            .onPressed,
+        isNull,
+      );
+      expect(messages, ['$_contentTitle. $_contentBody']);
+
+      retry.completeError(Exception('still unreadable'));
+      await tester.pumpAndSettle();
+      await tester.pump();
+
+      expect(find.text(_contentTitle), findsOneWidget);
+      expect(find.text('Try again'), findsOneWidget);
+      expect(find.byKey(const Key('error-state-progress')), findsNothing);
+      expect(calls, 2);
+      expect(messages, [
+        '$_contentTitle. $_contentBody',
+        '$_contentTitle. $_contentBody',
+      ]);
     } finally {
       handle.dispose();
     }

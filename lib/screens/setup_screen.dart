@@ -156,7 +156,9 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     final bankAsync = ref.read(questionBankProvider.exists)
         ? ref.watch(questionBankProvider)
         : const AsyncLoading<QuestionBank>();
-    if (bankAsync.hasError) return const ContentLoadErrorView();
+    if (bankAsync.hasError) {
+      return const ContentLoadErrorView(showNewGameBar: true);
+    }
     final bank = bankAsync.asData?.value;
     final visible = _visibleCount(bank);
     final cap = _cap(bank);

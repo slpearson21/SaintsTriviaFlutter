@@ -213,7 +213,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(GameScreen), findsOneWidget);
-    expect(find.text("Couldn't start this game"), findsOneWidget);
+    expect(find.text('Couldn’t start this game'), findsOneWidget);
     expect(find.text('Back to setup'), findsOneWidget);
     expect(find.text('Question'), findsNothing);
     expect(find.text('Prompt'), findsNothing);

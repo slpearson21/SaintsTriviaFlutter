@@ -103,7 +103,7 @@ void main() {
     expect(find.text('Something went wrong'), findsOneWidget);
     expect(
       find.text(
-        "We couldn't load the questions on this device. "
+        'We couldn’t load the questions on this device. '
         'Please try again. If this keeps happening, reinstall the app.',
       ),
       findsOneWidget,
@@ -154,6 +154,7 @@ void main() {
     expect(removed, isTrue);
     expect(find.text('Something went wrong'), findsOneWidget);
     expect(find.text('Try again'), findsOneWidget);
+    expect(find.text('New game'), findsNothing);
     expect(
       tester.getSize(find.widgetWithText(FilledButton, 'Try again')).height,
       greaterThanOrEqualTo(52),

@@ -216,7 +216,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     // A deal with nothing in it is E2. A bank that never arrived, while this
     // screen is still waiting to deal, is E1. Neither path builds a question.
     if (emptyDeal) return NoQuestionsScreen(settings: settings);
-    if (!playing && bankAsync.hasError) return const ContentLoadErrorView();
+    if (!playing && bankAsync.hasError) {
+      return const ContentLoadErrorView(showNewGameBar: true);
+    }
 
     return PopScope(
       canPop: false,

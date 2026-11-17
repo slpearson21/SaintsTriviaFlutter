@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../data/questions/question_bank_provider.dart';
 import '../layout/error_state.dart';
+import '../layout/new_game_bar.dart';
 import '../routing/routes.dart';
 
 /// E1. Shown when [questionBankProvider] fails, including the splash timeout.
@@ -13,28 +14,58 @@ import '../routing/routes.dart';
 /// [onLoaded] runs after Try again reads a bank. The splash route uses it to
 /// open Home. Setup and the preparing step omit it: they already watch the
 /// provider, so a successful retry rebuilds them in place.
-class ContentLoadErrorView extends ConsumerWidget {
-  const ContentLoadErrorView({super.key, this.onLoaded});
+class ContentLoadErrorView extends ConsumerStatefulWidget {
+  const ContentLoadErrorView({
+    super.key,
+    this.onLoaded,
+    this.showNewGameBar = false,
+  });
 
   final void Function(BuildContext context)? onLoaded;
 
+  /// Setup and the preparing step keep the New game bar, so there is a way
+  /// home. The splash route leaves this false: ios-19 has no bar.
+  final bool showNewGameBar;
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ContentLoadErrorView> createState() =>
+      _ContentLoadErrorViewState();
+}
+
+class _ContentLoadErrorViewState extends ConsumerState<ContentLoadErrorView> {
+  /// How many times this view has landed on a failure after Try again.
+  ///
+  /// The first failure is announced by [ErrorState] at attempt 0. Each later
+  /// failure bumps this so the same copy is announced once more.
+  var _attempt = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final bank = ref.watch(questionBankProvider);
+    ref.listen(questionBankProvider, (previous, next) {
+      final wasLoading = previous?.isLoading ?? false;
+      if (wasLoading && !next.isLoading && next.hasError) {
+        setState(() => _attempt++);
+      }
+    });
     return Scaffold(
+      appBar: widget.showNewGameBar ? newGameAppBar(context) : null,
       body: ErrorState(
-        icon: Icons.error_outline,
+        icon: Icons.info,
         actionIcon: Icons.refresh,
         title: contentLoadErrorTitle,
         body: contentLoadErrorBody,
         actionLabel: contentLoadErrorAction,
-        onAction: () => unawaited(_tryAgain(context, ref)),
+        busy: bank.isLoading,
+        attempt: _attempt,
+        onAction: () => unawaited(_tryAgain()),
       ),
     );
   }
 
-  Future<void> _tryAgain(BuildContext context, WidgetRef ref) async {
+  Future<void> _tryAgain() async {
     ref.invalidate(questionBankProvider);
-    final onLoaded = this.onLoaded;
+    final onLoaded = widget.onLoaded;
     if (onLoaded == null) return;
     try {
       await ref.read(questionBankProvider.future);
@@ -42,7 +73,7 @@ class ContentLoadErrorView extends ConsumerWidget {
       debugPrint('Question bank retry failed: $error');
       return;
     }
-    if (!context.mounted) return;
+    if (!mounted) return;
     onLoaded(context);
   }
 }
