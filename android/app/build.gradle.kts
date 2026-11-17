@@ -59,6 +59,11 @@ android {
             signingConfig = if (hasReleaseKeystore) {
                 signingConfigs.getByName("release")
             } else {
+                val debugSigningWarning =
+                    "android/key.properties not found: release is debug-signed and cannot be uploaded to Play"
+                logger.warn(debugSigningWarning)
+                // `flutter build` runs Gradle with -q, which hides warn.
+                logger.quiet(debugSigningWarning)
                 signingConfigs.getByName("debug")
             }
             isMinifyEnabled = true
