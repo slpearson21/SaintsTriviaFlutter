@@ -200,7 +200,7 @@ String lastGameSemanticsLabel(LastGameSummary game, DateTime now) {
     'Today' => 'today',
     'Yesterday' => 'yesterday',
     _ => date,
-  }
+  };
   return 'Last game: ${game.correct} out of ${game.total}, $spokenDate';
 }
 
