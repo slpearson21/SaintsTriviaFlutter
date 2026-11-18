@@ -5,6 +5,6 @@
 /// workflow is where this address has to be rejected.
 const kReportEmail = 'reports@example.com';
 
-/// Shown under About. Sending a report opens the player's own mail app.
+/// Shown under About. The apostrophe in "we’ll" is U+2019.
 const reportPrivacyLine =
-    'Sending a report opens your email app and shares your email address with us.';
+    'Reports are sent from your email app, so if you send one, we’ll see your email address.';

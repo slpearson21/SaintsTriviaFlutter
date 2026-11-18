@@ -155,10 +155,49 @@ void main() {
     expect(report.clipboardText, contains('😀' * maxReportNoteLength));
   });
 
-  test('iOS drops the Version prefix from the platform line', () {
-    expect(
-      formatReportPlatform(TargetPlatform.iOS, 'Version 18.1 (Build 22B83)'),
-      'iOS 18.1 (Build 22B83)',
-    );
+  test('the platform line is the name, with no kernel version', () {
+    expect(platformLabel(TargetPlatform.android), 'Android');
+    expect(platformLabel(TargetPlatform.iOS), 'iOS');
+  });
+
+  test('a realistic note is copied into the mailto body in full', () {
+    const files = [
+      'assets/questions/v1/old_testament.json',
+      'assets/questions/v1/new_testament.json',
+      'assets/questions/v1/book_of_mormon.json',
+      'assets/questions/v1/doctrine_and_covenants.json',
+      'assets/questions/v1/pearl_of_great_price.json',
+    ];
+    const note = 'The reference looks wrong.';
+    for (final path in files) {
+      final questions = jsonDecode(File(path).readAsStringSync()) as List;
+      for (final raw in questions) {
+        final question = raw as Map;
+        final options = (question['options'] as List).cast<String>();
+        final report = QuestionReport(
+          questionId: question['id'] as String,
+          prompt: question['prompt'] as String,
+          correctAnswer: options[question['answerIndex'] as int],
+          selectedAnswer: options.first,
+          reference: question['reference'] as String,
+          reason: ReportReason.wrongReference,
+          note: note,
+          appVersion: 'v1.0.0',
+          platform: 'Android',
+          bankVersion: 'v1',
+          source: 'game',
+          createdAtUtc: DateTime.utc(2026, 11, 18),
+        );
+        final body = Uri.decodeComponent(
+          report.mailto.query
+              .split('&')
+              .skip(1)
+              .join('&')
+              .replaceFirst('body=', ''),
+        );
+        expect(body, report.body, reason: question['id']);
+        expect(body, contains('Note: $note'));
+      }
+    }
   });
 }

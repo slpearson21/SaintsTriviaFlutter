@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
@@ -77,8 +75,8 @@ final class QuestionReport {
     final fullNote = note;
     var uri = _mailto(question, fullNote);
     if (uri.toString().length <= maxMailtoLength) return uri;
-    if (question.length > 120) {
-      question = '${question.substring(0, 120)}…';
+    if (question.characters.length > 120) {
+      question = '${question.characters.take(120)}…';
       uri = _mailto(question, fullNote);
       if (uri.toString().length <= maxMailtoLength) return uri;
     }
@@ -97,8 +95,9 @@ final class QuestionReport {
       }
     }
     if (uri.toString().length <= maxMailtoLength) return uri;
-    while (question.length > 1 && uri.toString().length > maxMailtoLength) {
-      question = question.substring(0, question.length - 1);
+    while (question.characters.length > 1 &&
+        uri.toString().length > maxMailtoLength) {
+      question = question.characters.skipLast(1).string;
       uri = _mailto(question, '');
     }
     return uri;
@@ -156,21 +155,13 @@ String formatReportUtc(DateTime time) {
       'T${two(utc.hour)}:${two(utc.minute)}:${two(utc.second)}Z';
 }
 
-/// `iOS 18.1` style label from the current platform.
-String reportPlatformLabel() {
-  return formatReportPlatform(
-    defaultTargetPlatform,
-    Platform.operatingSystemVersion,
-  );
-}
+/// Platform name only. Android's `operatingSystemVersion` is a kernel
+/// string, so the report does not include it.
+String reportPlatformLabel() => platformLabel(defaultTargetPlatform);
 
-/// Builds the platform line. iOS reports `Version 18.1 (Build …)`, so the
-/// leading "Version " is dropped.
-String formatReportPlatform(
-  TargetPlatform platform,
-  String operatingSystemVersion,
-) {
-  final name = switch (platform) {
+/// `iOS`, `Android`, and the other Flutter platform names.
+String platformLabel(TargetPlatform platform) {
+  return switch (platform) {
     TargetPlatform.iOS => 'iOS',
     TargetPlatform.android => 'Android',
     TargetPlatform.macOS => 'macOS',
@@ -178,10 +169,4 @@ String formatReportPlatform(
     TargetPlatform.linux => 'Linux',
     TargetPlatform.fuchsia => 'Fuchsia',
   };
-  final version = operatingSystemVersion.trim().replaceFirst(
-    RegExp(r'^Version\s+', caseSensitive: false),
-    '',
-  );
-  if (version.toLowerCase().startsWith(name.toLowerCase())) return version;
-  return '$name $version';
 }

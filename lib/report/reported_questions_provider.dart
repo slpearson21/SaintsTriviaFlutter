@@ -9,7 +9,11 @@ final class ReportDraft {
   final ReportReason? reason;
   final String note;
 
-  ReportDraft copyWith({ReportReason? reason, String? note, bool clearReason = false}) {
+  ReportDraft copyWith({
+    ReportReason? reason,
+    String? note,
+    bool clearReason = false,
+  }) {
     return ReportDraft(
       reason: clearReason ? null : (reason ?? this.reason),
       note: note ?? this.note,
@@ -52,7 +56,12 @@ class ReportedQuestions extends Notifier<ReportMemory> {
     );
   }
 
-  void saveDraft(String questionId, {ReportReason? reason, String? note, bool clearReason = false}) {
+  void saveDraft(
+    String questionId, {
+    ReportReason? reason,
+    String? note,
+    bool clearReason = false,
+  }) {
     final current = state.drafts[questionId] ?? const ReportDraft();
     final next = current.copyWith(
       reason: reason,

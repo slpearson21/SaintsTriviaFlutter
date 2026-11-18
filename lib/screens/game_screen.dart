@@ -949,7 +949,7 @@ class _FeedbackSheet extends ConsumerWidget {
                       children: [
                         Expanded(
                           child: Align(
-                            alignment: Alignment.centerLeft,
+                            alignment: AlignmentDirectional.centerStart,
                             child: ScriptureReferenceChip(
                               key: const Key('reference-chip'),
                               reference: reference,

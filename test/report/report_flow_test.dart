@@ -1,7 +1,9 @@
 import 'dart:math';
 
+import 'dart:async';
 import 'dart:ui' show CheckedState;
 
+import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
@@ -74,15 +76,20 @@ void main() {
     expect(find.text('0/280'), findsOneWidget);
     final semantics = tester.ensureSemantics();
     expect(
-      tester.getSemantics(find.byKey(const Key('report-continue'))).hint,
-      reportChooseReasonHint,
+      tester.getSemantics(find.byKey(const Key('report-continue'))),
+      matchesSemantics(
+        isButton: true,
+        hasEnabledState: true,
+        isEnabled: false,
+        hint: reportChooseReasonHint,
+        label: reportContinueLabel,
+        hasTapAction: false,
+        textDirection: TextDirection.ltr,
+      ),
     );
     semantics.dispose();
     final continueButton = tester.widget<FilledButton>(
-      find.descendant(
-        of: find.byKey(const Key('report-continue')),
-        matching: find.byType(FilledButton),
-      ),
+      find.byKey(const Key('report-continue')),
     );
     expect(continueButton.onPressed, isNull);
 
@@ -109,12 +116,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(
       tester
-          .widget<FilledButton>(
-            find.descendant(
-              of: find.byKey(const Key('report-continue')),
-              matching: find.byType(FilledButton),
-            ),
-          )
+          .widget<FilledButton>(find.byKey(const Key('report-continue')))
           .onPressed,
       isNotNull,
     );
@@ -147,7 +149,7 @@ void main() {
         return true;
       },
     );
-    await tester.tap(find.text('Alpha'));
+    await tester.tap(find.text('Beta'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip(reportFlagTooltip));
     await tester.pumpAndSettle();
@@ -172,7 +174,8 @@ void main() {
           .replaceFirst('body=', ''),
     );
     expect(body, contains('Correct answer (app): Alpha'));
-    expect(body, contains("Player's answer: Alpha"));
+    expect(body, contains("Player's answer: Beta"));
+    expect(body, isNot(contains("Player's answer: Alpha")));
     expect(body, contains('Source: game'));
 
     await tester.pump(const Duration(seconds: 2));
@@ -182,8 +185,13 @@ void main() {
 
     await tester.tap(find.text('Reported'));
     await tester.pumpAndSettle();
-    expect(find.text('Wrong reference'), findsOneWidget);
     expect(find.byKey(const Key('report-sheet')), findsOneWidget);
+    expect(
+      tester
+          .widget<FilledButton>(find.byKey(const Key('report-continue')))
+          .onPressed,
+      isNotNull,
+    );
   });
 
   testWidgets('a failed launch copies the report and shows the dialog', (
@@ -228,12 +236,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(
       tester
-          .widget<FilledButton>(
-            find.descendant(
-              of: find.byKey(const Key('report-continue')),
-              matching: find.byType(FilledButton),
-            ),
-          )
+          .widget<FilledButton>(find.byKey(const Key('report-continue')))
           .onPressed,
       isNotNull,
     );
@@ -327,13 +330,25 @@ void main() {
         reported.getSemanticsData().hasAction(SemanticsAction.tap),
         isTrue,
       );
-      tester.semantics.performAction(
-        find.semantics.byLabel('Reported'),
-        SemanticsAction.tap,
+      expect(
+        reported,
+        matchesSemantics(
+          isButton: true,
+          hasTapAction: true,
+          label: 'Reported',
+          hint: reportReportedHint,
+          textDirection: TextDirection.ltr,
+        ),
       );
+      tester.semantics.tap(find.semantics.byLabel('Reported'));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('report-sheet')), findsOneWidget);
-      expect(find.text('Typo or wording'), findsOneWidget);
+      expect(
+        tester
+            .widget<FilledButton>(find.byKey(const Key('report-continue')))
+            .onPressed,
+        isNotNull,
+      );
     } finally {
       semantics.dispose();
     }
@@ -371,10 +386,7 @@ void main() {
           reason: reason.name,
         );
       }
-      tester.semantics.performAction(
-        find.semantics.byLabel('Typo or wording'),
-        SemanticsAction.tap,
-      );
+      tester.semantics.tap(find.semantics.byLabel('Typo or wording'));
       await tester.pumpAndSettle();
       expect(
         tester
@@ -451,6 +463,222 @@ void main() {
     expect(opened.single.toString(), contains('Source%3A%20review'));
   });
 
+  testWidgets('a pause then resume announces once', (tester) async {
+    final messages = await _announcements(tester);
+    await _pumpGame(
+      tester,
+      canOpen: (_) async => true,
+      open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async {
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        return true;
+      },
+    );
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip(reportFlagTooltip));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Wrong answer'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('report-continue')));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 2));
+    expect(messages, isNot(contains(reportAnnouncement)));
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+    expect(messages.where((message) => message == reportAnnouncement), [
+      reportAnnouncement,
+    ]);
+    await tester.pump(const Duration(seconds: 2));
+    expect(messages.where((message) => message == reportAnnouncement), [
+      reportAnnouncement,
+    ]);
+  });
+
+  testWidgets('a thrown launch and a refused launch show the dialog', (
+    tester,
+  ) async {
+    _mockClipboard(tester);
+    await _pumpGame(
+      tester,
+      canOpen: (_) async => true,
+      open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async {
+        throw StateError('launch failed');
+      },
+    );
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip(reportFlagTooltip));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Other'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('report-continue')));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(find.byType(CupertinoAlertDialog), findsNothing);
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+
+    await _pumpGame(
+      tester,
+      canOpen: (_) async => true,
+      open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async =>
+          false,
+    );
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip(reportFlagTooltip));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Other'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('report-continue')));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+  });
+
+  testWidgets('the iOS no-mail dialog is a Cupertino alert', (tester) async {
+    _mockClipboard(tester);
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    await _pumpGame(
+      tester,
+      canOpen: (_) async => false,
+      open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async =>
+          false,
+    );
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip(reportFlagTooltip));
+    await tester.pumpAndSettle();
+    expect(find.byType(CupertinoAlertDialog), findsNothing);
+    await tester.tap(find.text('Wrong answer'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('report-continue')));
+    await tester.pumpAndSettle();
+    expect(find.byType(CupertinoAlertDialog), findsOneWidget);
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text(kReportEmail), findsOneWidget);
+  });
+
+  testWidgets('scrim, back, and a swipe dismiss the sheet without reporting', (
+    tester,
+  ) async {
+    Future<void> openSheet() async {
+      await tester.tap(find.byTooltip(reportFlagTooltip));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('report-sheet')), findsOneWidget);
+    }
+
+    await _pumpGame(tester);
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+
+    await openSheet();
+    await tester.tapAt(const Offset(20, 20));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('report-sheet')), findsNothing);
+    expect(find.text('Reported'), findsNothing);
+
+    await openSheet();
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('report-sheet')), findsNothing);
+
+    await openSheet();
+    final top = tester.getTopLeft(find.byKey(const Key('report-sheet')));
+    await tester.dragFrom(top + const Offset(80, -16), const Offset(0, 500));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('report-sheet')), findsNothing);
+    expect(find.text('Reported'), findsNothing);
+  });
+
+  testWidgets('a swipe during the launch still records the report', (
+    tester,
+  ) async {
+    final release = Completer<bool>();
+    await _pumpGame(
+      tester,
+      canOpen: (_) async => true,
+      open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) {
+        return release.future;
+      },
+    );
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip(reportFlagTooltip));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Typo or wording'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('report-continue')));
+    await tester.pump();
+    await tester.drag(
+      find.byKey(const Key('report-sheet')),
+      const Offset(0, 600),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Reported'), findsNothing);
+    release.complete(true);
+    await tester.pumpAndSettle();
+    expect(find.text('Reported'), findsOneWidget);
+    expect(find.text(reportThanksLine), findsOneWidget);
+  });
+
+  testWidgets('report surfaces meet tap and contrast guidelines', (
+    tester,
+  ) async {
+    const guidelines = <AccessibilityGuideline>[
+      androidTapTargetGuideline,
+      iOSTapTargetGuideline,
+      labeledTapTargetGuideline,
+      textContrastGuideline,
+    ];
+    _mockClipboard(tester);
+    final semantics = tester.ensureSemantics();
+    try {
+      final container = await _pumpGame(
+        tester,
+        count: 1,
+        canOpen: (_) async => false,
+        open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async =>
+            false,
+      );
+      await tester.tap(find.text('Alpha'));
+      await tester.pumpAndSettle();
+      for (final guideline in guidelines) {
+        await expectLater(tester, meetsGuideline(guideline));
+      }
+      await tester.tap(find.byTooltip(reportFlagTooltip));
+      await tester.pumpAndSettle();
+      for (final guideline in guidelines) {
+        if (guideline == textContrastGuideline) continue;
+        await expectLater(tester, meetsGuideline(guideline));
+      }
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip(reportFlagTooltip));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Other'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('report-continue')));
+      await tester.pumpAndSettle();
+      for (final guideline in guidelines) {
+        await expectLater(tester, meetsGuideline(guideline));
+      }
+      await tester.tap(find.text('Done'));
+      await tester.pumpAndSettle();
+
+      container.read(appRouterProvider).go(AppRoutes.review);
+      await tester.pumpAndSettle();
+      for (final guideline in guidelines) {
+        await expectLater(tester, meetsGuideline(guideline));
+      }
+    } finally {
+      semantics.dispose();
+    }
+  });
+
   test('a new deal clears reported questions', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);
@@ -505,6 +733,19 @@ QuestionBank _bank({int count = 1}) {
         ),
     ],
   );
+}
+
+void _mockClipboard(WidgetTester tester) {
+  tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+    SystemChannels.platform,
+    (MethodCall call) async => null,
+  );
+  addTearDown(() {
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      null,
+    );
+  });
 }
 
 Future<List<String>> _announcements(WidgetTester tester) async {

@@ -322,43 +322,43 @@ class _AnswerCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-            MergeSemantics(
-              key: Key('review-answer-${answer.question.id}'),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Semantics(
-                        label: status,
-                        excludeSemantics: true,
-                        child: StIcon(
-                          correct ? Icons.check_circle : Icons.cancel,
-                          size: 22,
-                          color: mark,
+                  MergeSemantics(
+                    key: Key('review-answer-${answer.question.id}'),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Semantics(
+                              label: status,
+                              excludeSemantics: true,
+                              child: StIcon(
+                                correct ? Icons.check_circle : Icons.cancel,
+                                size: 22,
+                                color: mark,
+                              ),
+                            ),
+                            const SizedBox(width: StSpace.sm),
+                            Expanded(
+                              child: Text(
+                                answer.question.prompt,
+                                style: theme.textTheme.titleMedium,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: StSpace.sm),
-                      Expanded(
-                        child: Text(
-                          answer.question.prompt,
-                          style: theme.textTheme.titleMedium,
-                        ),
-                      ),
-                    ],
+                        answers,
+                      ],
+                    ),
                   ),
-                  answers,
-                ],
-              ),
-            ),
-            if (linked) ...[
-              const SizedBox(height: StSpace.sm),
-              Padding(
-                padding: const EdgeInsets.only(left: 22 + StSpace.sm),
-                child: chip,
-              ),
-            ],
+                  if (linked) ...[
+                    const SizedBox(height: StSpace.sm),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 22 + StSpace.sm),
+                      child: chip,
+                    ),
+                  ],
                 ],
               ),
             ),

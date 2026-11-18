@@ -70,55 +70,89 @@ class _ReportFlagState extends ConsumerState<ReportFlag> {
 
   @override
   void dispose() {
+    _disposed = true;
+    _wantAnnouncement = false;
     _announceTimer?.cancel();
     _listener?.dispose();
     _focusNode.dispose();
     super.dispose();
   }
 
+  var _away = false;
+  var _announced = false;
+  var _wantAnnouncement = false;
+  var _disposed = false;
+
   Future<void> _open() async {
+    _watchLifecycle();
     final opened = await showReportSheet(context, ref, target: widget.target);
-    if (!mounted) return;
+    if (!mounted) {
+      _stopWatching();
+      return;
+    }
     _focusNode.requestFocus();
-    if (opened == true) {
+    if (opened == null) {
+      _stopWatching();
+      return;
+    }
+    ref
+        .read(reportedQuestionIdsProvider.notifier)
+        .markReported(widget.target.questionId);
+    if (opened) {
       _announceWhenBack();
       return;
     }
-    if (opened == false) await showNoMailDialog(context);
+    _stopWatching();
+    await showNoMailDialog(context);
+  }
+
+  void _watchLifecycle() {
+    _listener?.dispose();
+    _away = _lifecycleAway(WidgetsBinding.instance.lifecycleState);
+    _announced = false;
+    _wantAnnouncement = false;
+    _listener = AppLifecycleListener(
+      onPause: () => _away = true,
+      onInactive: () => _away = true,
+      onHide: () => _away = true,
+      onResume: () {
+        if (_wantAnnouncement && _away) _sendAnnouncement();
+      },
+    );
+  }
+
+  void _stopWatching() {
+    _wantAnnouncement = false;
+    _announceTimer?.cancel();
+    _listener?.dispose();
+    _listener = null;
   }
 
   void _announceWhenBack() {
-    var announced = false;
-    void announce() {
-      if (announced) return;
-      announced = true;
-      _announceTimer?.cancel();
-      _listener?.dispose();
-      _listener = null;
-      if (!mounted) return;
-      unawaited(
-        SemanticsService.sendAnnouncement(
-          View.of(context),
-          reportAnnouncement,
-          Directionality.of(context),
-        ),
-      );
-    }
-
-    _listener?.dispose();
-    var paused = false;
-    _listener = AppLifecycleListener(
-      onPause: () => paused = true,
-      onInactive: () => paused = true,
-      onResume: () {
-        if (paused) announce();
-      },
-    );
+    _wantAnnouncement = true;
+    _away = _away || _lifecycleAway(WidgetsBinding.instance.lifecycleState);
     _announceTimer?.cancel();
+    if (_away) return;
     _announceTimer = Timer(const Duration(seconds: 2), () {
-      if (paused) return;
-      announce();
+      if (_away || _lifecycleAway(WidgetsBinding.instance.lifecycleState)) {
+        return;
+      }
+      _sendAnnouncement();
     });
+  }
+
+  void _sendAnnouncement() {
+    if (_disposed || _announced || !mounted) return;
+    if (_lifecycleAway(WidgetsBinding.instance.lifecycleState)) return;
+    _announced = true;
+    _stopWatching();
+    unawaited(
+      SemanticsService.sendAnnouncement(
+        View.of(context),
+        reportAnnouncement,
+        Directionality.of(context),
+      ),
+    );
   }
 
   @override
@@ -172,6 +206,16 @@ class _ReportFlagState extends ConsumerState<ReportFlag> {
   }
 }
 
+bool _lifecycleAway(AppLifecycleState? state) {
+  return switch (state) {
+    AppLifecycleState.inactive ||
+    AppLifecycleState.hidden ||
+    AppLifecycleState.paused ||
+    AppLifecycleState.detached => true,
+    AppLifecycleState.resumed || null => false,
+  };
+}
+
 bool _reducedMotion(BuildContext context) {
   final media = MediaQuery.of(context);
   return media.disableAnimations || media.reduceMotion;
@@ -188,6 +232,17 @@ bool _reportUsesCupertino() {
 }
 
 /// Opens the report sheet. Returns when it closes.
+/// Tracks a launch that can outlive the sheet. A swipe while the mail
+/// app is opening dismisses the route before [openLink] returns.
+final class _SheetLaunch {
+  var inFlight = false;
+  final done = Completer<bool?>();
+
+  void complete(bool? opened) {
+    if (!done.isCompleted) done.complete(opened);
+  }
+}
+
 Future<bool?> showReportSheet(
   BuildContext context,
   WidgetRef ref, {
@@ -195,28 +250,33 @@ Future<bool?> showReportSheet(
 }) {
   final media = MediaQuery.of(context);
   final reduced = media.disableAnimations || media.reduceMotion;
-  return showModalBottomSheet<bool>(
+  final launch = _SheetLaunch();
+  showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
     showDragHandle: true,
     sheetAnimationStyle: reduced ? AnimationStyle.noAnimation : null,
     builder: (context) {
-      return ReportSheet(target: target);
+      return _ReportSheet(target: target, launch: launch);
     },
-  );
+  ).whenComplete(() {
+    if (!launch.inFlight) launch.complete(null);
+  });
+  return launch.done.future;
 }
 
-class ReportSheet extends ConsumerStatefulWidget {
-  const ReportSheet({super.key, required this.target});
+class _ReportSheet extends ConsumerStatefulWidget {
+  const _ReportSheet({required this.target, required this.launch});
 
   final ReportTarget target;
+  final _SheetLaunch launch;
 
   @override
-  ConsumerState<ReportSheet> createState() => _ReportSheetState();
+  ConsumerState<_ReportSheet> createState() => _ReportSheetState();
 }
 
-class _ReportSheetState extends ConsumerState<ReportSheet> {
+class _ReportSheetState extends ConsumerState<_ReportSheet> {
   final _scroll = ScrollController();
   final _note = TextEditingController();
   ReportReason? _reason;
@@ -263,7 +323,8 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
   Future<void> _continue() async {
     final reason = _reason;
     if (_busy || reason == null) return;
-    _busy = true;
+    setState(() => _busy = true);
+    widget.launch.inFlight = true;
     _saveDraft();
     final report = QuestionReport(
       questionId: widget.target.questionId,
@@ -295,11 +356,9 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
     if (!opened) {
       await Clipboard.setData(ClipboardData(text: report.clipboardText));
     }
+    widget.launch.complete(opened);
     if (!mounted) return;
-    ref
-        .read(reportedQuestionIdsProvider.notifier)
-        .markReported(widget.target.questionId);
-    Navigator.of(context).pop(opened);
+    Navigator.of(context).pop();
   }
 
   @override
@@ -330,14 +389,11 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Focus(
-                      autofocus: true,
-                      child: Semantics(
-                        header: true,
-                        child: Text(
-                          reportSheetTitle,
-                          style: theme.textTheme.titleLarge,
-                        ),
+                    Semantics(
+                      header: true,
+                      child: Text(
+                        reportSheetTitle,
+                        style: theme.textTheme.titleLarge,
                       ),
                     ),
                     const SizedBox(height: StSpace.xxs),
@@ -414,23 +470,20 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Semantics(
-                    key: const Key('report-continue'),
-                    button: true,
-                    enabled: _reason != null && !_busy,
-                    label: reportContinueLabel,
-                    hint: _reason == null ? reportChooseReasonHint : null,
-                    excludeSemantics: true,
-                    onTap: _reason == null || _busy ? null : _continue,
-                    child: FilledButton.icon(
-                      onPressed: _reason == null || _busy ? null : _continue,
-                      style: FilledButton.styleFrom(
-                        minimumSize: Size.fromHeight(
-                          cupertino ? 52 : StSpace.minTap,
+                  MergeSemantics(
+                    child: Semantics(
+                      hint: _reason == null ? reportChooseReasonHint : null,
+                      child: FilledButton.icon(
+                        key: const Key('report-continue'),
+                        onPressed: _reason == null || _busy ? null : _continue,
+                        style: FilledButton.styleFrom(
+                          minimumSize: Size.fromHeight(
+                            cupertino ? 52 : StSpace.minTap,
+                          ),
                         ),
+                        icon: const Icon(Icons.open_in_new),
+                        label: const Text(reportContinueLabel),
                       ),
-                      icon: const Icon(Icons.open_in_new),
-                      label: const Text(reportContinueLabel),
                     ),
                   ),
                   TextButton(
@@ -605,7 +658,10 @@ class _IosNoMailDialog extends StatelessWidget {
             ),
             child: const Padding(
               padding: EdgeInsets.all(StSpace.sm),
-              child: SelectableText(kReportEmail),
+              child: SizedBox(
+                height: StSpace.minTap,
+                child: SelectableText(kReportEmail),
+              ),
             ),
           ),
         ],
@@ -651,7 +707,10 @@ class _AndroidNoMailDialog extends StatelessWidget {
                 const Expanded(
                   child: Padding(
                     padding: EdgeInsets.all(StSpace.sm),
-                    child: SelectableText(kReportEmail),
+                    child: SizedBox(
+                      height: StSpace.minTap,
+                      child: SelectableText(kReportEmail),
+                    ),
                   ),
                 ),
                 IconButton(
