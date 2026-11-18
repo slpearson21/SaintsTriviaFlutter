@@ -27,7 +27,7 @@ const _savedSettings = LastGameSettings(
   questionCount: 6,
 );
 
-final _returning = HomeSnapshot(
+const _returning = HomeSnapshot(
   gamesPlayed: 2,
   accuracyPercent: 50,
   bestStreak: 3,

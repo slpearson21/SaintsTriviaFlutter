@@ -669,7 +669,7 @@ void main() {
 
   group('malformed fixture file', () {
     test('the on-disk malformed file fails as a typed error', () async {
-      final assets = const QuestionAssets(
+      const assets = QuestionAssets(
         directory: 'test/fixtures/questions/v1',
       );
       final files = <String, String>{};
@@ -677,7 +677,7 @@ void main() {
         final path = assets.pathFor(volume);
         files[path] = await File(path).readAsString();
       }
-      final malformedPath = 'test/fixtures/questions/malformed.json';
+      const malformedPath = 'test/fixtures/questions/malformed.json';
       files[assets.pathFor(ScriptureVolume.ot)] = await File(malformedPath)
           .readAsString();
 

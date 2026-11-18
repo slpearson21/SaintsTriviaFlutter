@@ -428,7 +428,7 @@ IconData _volumeIcon(ScriptureVolume volume) {
     ScriptureVolume.bom => Icons.auto_stories_rounded,
     ScriptureVolume.dc => Icons.menu_book_outlined,
     ScriptureVolume.pgp => Icons.diamond_rounded,
-  };
+  }
 }
 
 Volume _themeVolume(ScriptureVolume volume) {
@@ -438,5 +438,5 @@ Volume _themeVolume(ScriptureVolume volume) {
     ScriptureVolume.bom => Volume.bookOfMormon,
     ScriptureVolume.dc => Volume.doctrineAndCovenants,
     ScriptureVolume.pgp => Volume.pearlOfGreatPrice,
-  };
+  }
 }

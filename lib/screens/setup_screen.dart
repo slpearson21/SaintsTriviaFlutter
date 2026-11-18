@@ -237,7 +237,7 @@ bool _materialChrome(BuildContext context) {
     TargetPlatform.fuchsia ||
     TargetPlatform.linux ||
     TargetPlatform.windows => true,
-  };
+  }
 }
 
 double? _toolbarHeight(BuildContext context) {
@@ -454,7 +454,7 @@ IconData _volumeIcon(ScriptureVolume volume) {
     ScriptureVolume.bom => Icons.auto_stories_rounded,
     ScriptureVolume.dc => Icons.menu_book_outlined,
     ScriptureVolume.pgp => Icons.diamond_outlined,
-  };
+  }
 }
 
 Volume _themeVolume(ScriptureVolume volume) {
@@ -464,7 +464,7 @@ Volume _themeVolume(ScriptureVolume volume) {
     ScriptureVolume.bom => Volume.bookOfMormon,
     ScriptureVolume.dc => Volume.doctrineAndCovenants,
     ScriptureVolume.pgp => Volume.pearlOfGreatPrice,
-  };
+  }
 }
 
 Color _volumeColor(BuildContext context, ScriptureVolume volume) {

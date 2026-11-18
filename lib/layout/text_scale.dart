@@ -22,7 +22,7 @@ bool usesMaterialChrome(BuildContext context) {
     TargetPlatform.fuchsia ||
     TargetPlatform.linux ||
     TargetPlatform.windows => true,
-  };
+  }
 }
 
 /// Toolbar height when text is large enough to need a second title line.
@@ -47,5 +47,5 @@ double minTapTarget(BuildContext context) {
     TargetPlatform.fuchsia ||
     TargetPlatform.linux ||
     TargetPlatform.windows => StSpace.minTap,
-  };
+  }
 }

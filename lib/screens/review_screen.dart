@@ -55,7 +55,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       ReviewFilter.all => answers,
       ReviewFilter.missed => missed,
       ReviewFilter.correct => correct,
-    };
+    }
     final material = usesMaterialChrome(context);
     final large = isLargeText(context);
 

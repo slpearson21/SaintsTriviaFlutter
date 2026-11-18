@@ -151,7 +151,7 @@ String bestGameSemanticsLabel(FinishedGameRecord game, DateTime now) {
     'Today' => 'today',
     'Yesterday' => 'yesterday',
     _ => date,
-  };
+  }
   final score = '${game.score} out of ${game.total}';
   if (names.isEmpty) return 'Best game, $score, $spokenDate';
   return 'Best game, $score, ${names.join(', ')}, $spokenDate';

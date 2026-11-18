@@ -107,7 +107,7 @@ void main() {
     });
 
     test('setMockInitialValues seeds a later read', () async {
-      final encoded =
+      const encoded =
           '[{"score":10,"total":10,"percent":100,"bestStreak":10,'
           '"playedAt":"2026-11-09T08:00:00.000","volumes":["BOM"],'
           '"questionCount":10,"byVolume":{"BOM":{"correct":10,"total":10}}}]';

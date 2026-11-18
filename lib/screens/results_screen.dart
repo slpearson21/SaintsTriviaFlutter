@@ -364,7 +364,7 @@ Volume _themeVolume(ScriptureVolume volume) {
     ScriptureVolume.bom => Volume.bookOfMormon,
     ScriptureVolume.dc => Volume.doctrineAndCovenants,
     ScriptureVolume.pgp => Volume.pearlOfGreatPrice,
-  };
+  }
 }
 
 class _ScoreRing extends StatefulWidget {
