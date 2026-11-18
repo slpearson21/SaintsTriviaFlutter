@@ -231,7 +231,7 @@ bool _usesCupertino() {
     TargetPlatform.fuchsia ||
     TargetPlatform.linux ||
     TargetPlatform.windows => false,
-  }
+  };
 }
 
 /// Confirms a stats reset. Cancel leaves everything in place.
@@ -368,7 +368,7 @@ String _themeLabel(ThemeMode mode) {
     ThemeMode.system => 'System',
     ThemeMode.light => 'Light',
     ThemeMode.dark => 'Dark',
-  }
+  };
 }
 
 class _ThemeChoice extends StatelessWidget {
