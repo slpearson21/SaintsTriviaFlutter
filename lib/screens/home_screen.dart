@@ -71,7 +71,7 @@ bool _materialChrome(BuildContext context) {
     TargetPlatform.fuchsia ||
     TargetPlatform.linux ||
     TargetPlatform.windows => true,
-  }
+  };
 }
 
 /// Room for two serif lines at the current text scale, and at least 64 dp.

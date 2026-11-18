@@ -282,7 +282,7 @@ bool _usesCupertino() {
     TargetPlatform.fuchsia ||
     TargetPlatform.linux ||
     TargetPlatform.windows => false,
-  }
+  };
 }
 
 Future<bool> showQuitGameDialog(BuildContext context) async {
@@ -657,7 +657,7 @@ class _AnswerButton extends StatelessWidget {
         scheme.outlineVariant,
         locked ? scheme.onSurfaceVariant : scheme.onSurface,
       ),
-    }
+    };
     final status = switch (mark) {
       _AnswerMark.correct => _StatusTag(
         icon: Icons.check,
@@ -674,7 +674,7 @@ class _AnswerButton extends StatelessWidget {
         iconMotion: _IconMotion.none,
       ),
       _AnswerMark.none => null,
-    }
+    };
     final text = Text(label, style: theme.textTheme.bodyLarge);
     final content = status == null
         ? Align(alignment: Alignment.centerLeft, child: text)
@@ -759,7 +759,7 @@ class _StatusTag extends StatelessWidget {
         child: iconWidget,
       ),
       _IconMotion.none => iconWidget,
-    }
+    };
     return Wrap(
       crossAxisAlignment: WrapCrossAlignment.center,
       spacing: StSpace.xs,
@@ -821,7 +821,7 @@ Volume _themeVolume(ScriptureVolume volume) {
     ScriptureVolume.bom => Volume.bookOfMormon,
     ScriptureVolume.dc => Volume.doctrineAndCovenants,
     ScriptureVolume.pgp => Volume.pearlOfGreatPrice,
-  }
+  };
 }
 
 const _streakMarks = {3, 5, 10};
