@@ -20,7 +20,7 @@ class NoQuestionsScreen extends StatelessWidget {
     return Scaffold(
       appBar: newGameAppBar(context),
       body: ErrorState(
-        icon: Icons.info,
+        icon: errorStateIcon,
         title: noQuestionsErrorTitle,
         body: noQuestionsErrorBody,
         actionLabel: noQuestionsErrorAction,

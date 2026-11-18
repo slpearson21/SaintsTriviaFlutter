@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,9 +9,11 @@ import 'package:material_ui/material_ui.dart';
 import 'package:saints_trivia_flutter/app.dart';
 import 'package:saints_trivia_flutter/data/questions/question_bank_provider.dart';
 import 'package:saints_trivia_flutter/data/questions/questions.dart';
+import 'package:saints_trivia_flutter/layout/error_state.dart';
 import 'package:saints_trivia_flutter/progress/home_snapshot.dart';
 import 'package:saints_trivia_flutter/routing/app_router.dart';
 import 'package:saints_trivia_flutter/routing/routes.dart';
+import 'package:saints_trivia_flutter/theme/st_theme.dart';
 
 const _contentTitle = 'Something went wrong';
 const _contentBody =
@@ -132,6 +135,26 @@ void _expectHeader(WidgetTester tester, String title) {
   );
 }
 
+/// Headers a screen reader would land on. Merged children are not stops.
+List<String> _headerLabels(WidgetTester tester) {
+  final labels = <String>[];
+  void walk(SemanticsNode node) {
+    if (!node.isMergedIntoParent && node.flagsCollection.isHeader) {
+      labels.add(node.label);
+    }
+    node.visitChildren((child) {
+      walk(child);
+      return true;
+    });
+  }
+
+  for (final view in tester.binding.renderViews) {
+    final root = view.owner!.semanticsOwner?.rootSemanticsNode;
+    if (root != null) walk(root);
+  }
+  return labels;
+}
+
 void _expectIconDecorative(WidgetTester tester) {
   expect(
     find.ancestor(
@@ -173,7 +196,22 @@ void main() {
     expect(find.text('Try again'), findsOneWidget);
     expect(find.text('New game'), findsOneWidget);
     expect(find.byTooltip('Back'), findsOneWidget);
-    expect(find.byIcon(Icons.info), findsOneWidget);
+    expect(find.byIcon(errorStateIcon), findsOneWidget);
+    expect(find.byIcon(Icons.info), findsNothing);
+    final badgeIcon = tester.widget<Icon>(find.byIcon(errorStateIcon));
+    final tone = Theme.of(tester.element(find.byIcon(errorStateIcon)))
+        .extension<StColors>()!;
+    expect(badgeIcon.color, tone.wrong);
+    expect(badgeIcon.size, 44);
+    final disc = tester.widget<DecoratedBox>(
+      find.descendant(
+        of: find.byKey(const Key('error-state-icon')),
+        matching: find.byType(DecoratedBox),
+      ),
+    );
+    final decoration = disc.decoration as BoxDecoration;
+    expect(decoration.color, tone.wrongContainer);
+    expect(decoration.shape, BoxShape.circle);
     expect(find.byKey(const Key('setup-start')), findsNothing);
     final action = tester.getSize(find.byKey(const Key('error-state-action')));
     expect(action.width, greaterThanOrEqualTo(220));
@@ -247,6 +285,8 @@ void main() {
     expect(find.text(_noQuestionsTitle), findsOneWidget);
     expect(find.text(_noQuestionsBody), findsOneWidget);
     expect(find.text('Back to setup'), findsOneWidget);
+    expect(find.byIcon(errorStateIcon), findsOneWidget);
+    expect(find.byIcon(Icons.info), findsNothing);
     expect(find.textContaining('Old Testament prompt'), findsNothing);
     expect(find.byType(Card), findsNothing);
     expect(tester.takeException(), isNull);
@@ -390,6 +430,8 @@ void main() {
 
       expect(messages, ['$_noQuestionsTitle. $_noQuestionsBody']);
       _expectHeader(tester, _noQuestionsTitle);
+      expect(find.bySemanticsLabel(_noQuestionsTitle), findsOneWidget);
+      expect(_headerLabels(tester), [_noQuestionsTitle]);
       _expectIconDecorative(tester);
       expect(
         tester.getSemantics(find.text('New game')).flagsCollection.isHeader,
@@ -433,6 +475,18 @@ void main() {
 
       expect(calls, 2);
       expect(find.byKey(const Key('error-state-progress')), findsOneWidget);
+      expect(find.bySemanticsLabel(errorStateBusyLabel), findsOneWidget);
+      expect(find.bySemanticsLabel('Try again'), findsNothing);
+      expect(
+        tester.getSemantics(find.byKey(const Key('error-state-action'))),
+        matchesSemantics(
+          label: errorStateBusyLabel,
+          textDirection: TextDirection.ltr,
+          isButton: true,
+          hasEnabledState: true,
+          isFocusable: true,
+        ),
+      );
       expect(
         tester
             .widget<FilledButton>(find.byKey(const Key('error-state-action')))

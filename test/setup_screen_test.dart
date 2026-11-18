@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -96,6 +97,60 @@ Checkbox _checkbox(WidgetTester tester, Key key) {
   return tester.widget<Checkbox>(
     find.descendant(of: find.byKey(key), matching: find.byType(Checkbox)),
   );
+}
+
+/// Stops in the merged tree whose label or tooltip contains [needle].
+List<SemanticsNode> _stopsMentioning(WidgetTester tester, String needle) {
+  final found = <SemanticsNode>[];
+  void walk(SemanticsNode node) {
+    if (!node.isMergedIntoParent) {
+      final data = node.getSemanticsData();
+      if (data.label.contains(needle) ||
+          data.tooltip.contains(needle) ||
+          data.value.contains(needle)) {
+        found.add(node);
+      }
+    }
+    node.visitChildren((child) {
+      walk(child);
+      return true;
+    });
+  }
+
+  for (final view in tester.binding.renderViews) {
+    final root = view.owner!.semanticsOwner?.rootSemanticsNode;
+    if (root != null) walk(root);
+  }
+  return found;
+}
+
+void _expectOneStepperStop(
+  WidgetTester tester, {
+  required String label,
+  required String value,
+}) {
+  final stops = _stopsMentioning(tester, label);
+  expect(stops, hasLength(1), reason: label);
+  final node = stops.single;
+  expect(
+    node,
+    matchesSemantics(
+      label: label,
+      value: value,
+      tooltip: '',
+      textDirection: TextDirection.ltr,
+      isButton: true,
+      isEnabled: true,
+      hasEnabledState: true,
+      hasTapAction: true,
+    ),
+  );
+  final separate = <SemanticsNode>[];
+  node.visitChildren((child) {
+    if (!child.isMergedIntoParent) separate.add(child);
+    return true;
+  });
+  expect(separate, isEmpty, reason: label);
 }
 
 IconButton _stepper(WidgetTester tester, String tooltip) {
@@ -462,12 +517,41 @@ void main() {
         matchesSemantics(
           label: 'More questions',
           value: '10 questions',
+          tooltip: '',
           textDirection: TextDirection.ltr,
           isButton: true,
           isEnabled: true,
           hasEnabledState: true,
           hasTapAction: true,
         ),
+      );
+      _expectOneStepperStop(
+        tester,
+        label: 'Fewer questions',
+        value: '10 questions',
+      );
+      _expectOneStepperStop(
+        tester,
+        label: 'More questions',
+        value: '10 questions',
+      );
+      final counts = _stopsMentioning(
+        tester,
+        '10 questions',
+      ).where((node) => node.flagsCollection.isLiveRegion).toList();
+      expect(counts, hasLength(1));
+      expect(counts.single.label, '10 questions');
+      // The numeral and the word are one live region, not two text stops.
+      expect(
+        _stopsMentioning(tester, '10').where((node) => node.label == '10'),
+        isEmpty,
+      );
+      expect(
+        _stopsMentioning(
+          tester,
+          'questions',
+        ).where((node) => node.label == 'questions'),
+        isEmpty,
       );
 
       await tester.tap(find.byTooltip('More questions'));
@@ -479,6 +563,7 @@ void main() {
         matchesSemantics(
           label: 'More questions',
           value: '11 questions',
+          tooltip: '',
           textDirection: TextDirection.ltr,
           isButton: true,
           isEnabled: true,
@@ -486,6 +571,25 @@ void main() {
           hasTapAction: true,
         ),
       );
+      _expectOneStepperStop(
+        tester,
+        label: 'More questions',
+        value: '11 questions',
+      );
+      _expectOneStepperStop(
+        tester,
+        label: 'Fewer questions',
+        value: '11 questions',
+      );
+
+      for (final guideline in const <AccessibilityGuideline>[
+        androidTapTargetGuideline,
+        iOSTapTargetGuideline,
+        labeledTapTargetGuideline,
+        textContrastGuideline,
+      ]) {
+        await expectLater(tester, meetsGuideline(guideline));
+      }
       expect(
         tester.getSemantics(find.byKey(const Key('setup-count'))),
         matchesSemantics(
