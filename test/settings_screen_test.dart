@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:saints_trivia_flutter/app.dart';
 import 'package:saints_trivia_flutter/data/questions/scripture_volume.dart';
@@ -260,7 +261,7 @@ void main() {
     final opened = <Uri>[];
     await _pump(
       tester,
-      openLink: (uri) async {
+      openLink: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async {
         opened.add(uri);
         return true;
       },

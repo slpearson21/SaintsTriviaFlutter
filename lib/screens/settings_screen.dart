@@ -4,15 +4,16 @@ import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 import '../layout/home_back_button.dart';
 import '../layout/section_label.dart';
 import '../layout/st_icon.dart';
 import '../layout/text_scale.dart';
 import '../persistence/persistence_providers.dart';
 import '../progress/home_providers.dart';
+import '../services/open_link.dart';
 import '../theme/st_theme.dart';
+
+export '../services/open_link.dart';
 
 /// Shown on the About row. Matches the pubspec version.
 const scriptureTriviaVersionLabel = 'v1.0.0';
@@ -34,19 +35,6 @@ const feedbackRecipient = '';
 final feedbackUri = Uri.parse(
   'mailto:$feedbackRecipient?subject=${Uri.encodeComponent('Scripture Trivia feedback')}',
 );
-
-typedef OpenLink = Future<bool> Function(Uri uri);
-
-/// Sends [uri] to the platform. Tests override this.
-final openLinkProvider = Provider<OpenLink>((ref) => _openLink);
-
-Future<bool> _openLink(Uri uri) async {
-  try {
-    return await launchUrl(uri);
-  } on Object {
-    return false;
-  }
-}
 
 /// S12 / S13. Appearance, feedback, gameplay, and on-device data.
 class SettingsScreen extends ConsumerWidget {
