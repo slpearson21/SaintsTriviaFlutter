@@ -255,6 +255,18 @@ void main() {
     expect(find.text(reportNoMailTitle), findsWidgets);
     expect(find.text('Reported'), findsOneWidget);
     expect(find.byKey(const Key('report-no-mail-dialog')), findsOneWidget);
+    final reportedNode = tester
+        .widget<TextButton>(find.widgetWithText(TextButton, 'Reported'))
+        .focusNode;
+    final primary = FocusManager.instance.primaryFocus;
+    expect(primary, isNot(reportedNode));
+    final dialogScope = FocusScope.of(
+      tester.element(find.byKey(const Key('report-no-mail-dialog'))),
+    );
+    expect(
+      primary == dialogScope || primary!.ancestors.contains(dialogScope),
+      isTrue,
+    );
     expect(find.text(reportNoMailTitle), findsOneWidget);
     expect(find.text(kReportEmail), findsOneWidget);
     expect(clipboard, contains('To: $kReportEmail'));
@@ -271,6 +283,13 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Reported'), findsOneWidget);
     expect(find.text('Next question'), findsOneWidget);
+    expect(
+      tester
+          .widget<TextButton>(find.widgetWithText(TextButton, 'Reported'))
+          .focusNode
+          ?.hasFocus,
+      isTrue,
+    );
   });
 
   testWidgets('review flags sit outside the card and keep an in-game report', (

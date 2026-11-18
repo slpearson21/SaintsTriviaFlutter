@@ -1,7 +1,7 @@
 /// Inbox for question reports and the Settings feedback row.
 ///
 /// TODO(STRIV-19): replace this placeholder before a store build.
-/// The swap is tracked under STRIV-19. release-smoke does not check it.
+/// release-smoke does not check it.
 const kReportEmail = 'reports@example.com';
 
 /// Shown under About. The apostrophe in "we’ll" is U+2019.

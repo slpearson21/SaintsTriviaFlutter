@@ -98,17 +98,20 @@ class _ReportFlagState extends ConsumerState<ReportFlag> {
     ref
         .read(reportedQuestionIdsProvider.notifier)
         .markReported(widget.target.questionId);
-    // The idle flag is replaced by Reported in the next frame. Focus after
-    // that swap so the node is attached to the Reported button.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _focusNode.requestFocus();
-    });
     if (opened) {
+      // The idle flag is replaced by Reported in the next frame. Focus after
+      // that swap so the node is attached to the Reported button. A failed
+      // launch pushes the no-mail dialog in this same turn, and a post-frame
+      // request would move focus to the button behind that dialog.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _focusNode.requestFocus();
+      });
       _announceWhenBack();
       return;
     }
     _stopWatching();
     await showNoMailDialog(context);
+    if (mounted) _focusNode.requestFocus();
   }
 
   void _watchLifecycle() {
