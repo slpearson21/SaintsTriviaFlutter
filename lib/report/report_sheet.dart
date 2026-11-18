@@ -12,6 +12,7 @@ import '../layout/section_label.dart';
 import '../layout/st_icon.dart';
 import '../layout/text_scale.dart';
 import '../screens/settings_screen.dart';
+import '../services/open_link.dart';
 import '../theme/st_theme.dart';
 import 'question_report.dart';
 import 'report_config.dart';
