@@ -19,6 +19,8 @@ import '../layout/screen_body.dart';
 import '../layout/st_icon.dart';
 import '../layout/text_scale.dart';
 import '../progress/home_snapshot.dart';
+import '../report/report_sheet.dart';
+import '../report/reported_questions_provider.dart';
 import '../routing/routes.dart';
 import '../scripture/scripture_reference_chip.dart';
 import '../theme/st_theme.dart';
@@ -512,11 +514,9 @@ class _QuestionBody extends StatelessWidget {
                 reduced: reduced,
                 child: _FeedbackSheet(
                   maxHeight: sheetCap,
-                  correct: answer.correct,
-                  answer: question.answer,
-                  explanation: question.explanation,
+                  question: question,
+                  answer: answer,
                   showExplanation: showExplanations,
-                  reference: question.reference,
                   streak: session.currentStreak,
                   isLast: session.isComplete,
                   onNext: onNext,
@@ -827,34 +827,42 @@ Volume _themeVolume(ScriptureVolume volume) {
 
 const _streakMarks = {3, 5, 10};
 
-class _FeedbackSheet extends StatelessWidget {
+class _FeedbackSheet extends ConsumerWidget {
   const _FeedbackSheet({
     required this.maxHeight,
-    required this.correct,
+    required this.question,
     required this.answer,
-    required this.explanation,
     required this.showExplanation,
-    required this.reference,
     required this.streak,
     required this.isLast,
     required this.onNext,
   });
 
   final double maxHeight;
-  final bool correct;
-  final String answer;
-  final String explanation;
+  final GameQuestion question;
+  final GameAnswer answer;
   final bool showExplanation;
-  final String reference;
   final int streak;
   final bool isLast;
   final VoidCallback onNext;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final colors = theme.extension<StColors>()!;
+    final reported = ref.watch(
+      reportedQuestionIdsProvider.select(
+        (memory) => memory.isReported(question.id),
+      ),
+    );
+    final correct = answer.correct;
+    final reference = question.reference;
+    final explanation = question.explanation;
+    final selected = answer.selectedIndex;
+    final selectedAnswer = selected >= 0 && selected < question.options.length
+        ? question.options[selected]
+        : '';
     final showStreak = _streakMarks.contains(streak);
     final tone = correct ? colors.correct : colors.wrong;
     final headline = correct ? 'Correct!' : 'Not quite';
@@ -913,7 +921,7 @@ class _FeedbackSheet extends StatelessWidget {
                           children: [
                             const TextSpan(text: 'The answer is '),
                             TextSpan(
-                              text: answer,
+                              text: question.answer,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w700,
                               ),
@@ -936,12 +944,43 @@ class _FeedbackSheet extends StatelessWidget {
                       ),
                     ],
                     const SizedBox(height: StSpace.sm),
-                    ScriptureReferenceChip(
-                      key: const Key('reference-chip'),
-                      reference: reference,
-                      background: scheme.secondaryContainer,
-                      foreground: scheme.onSecondaryContainer,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Align(
+                            alignment: AlignmentDirectional.centerStart,
+                            child: ScriptureReferenceChip(
+                              key: const Key('reference-chip'),
+                              reference: reference,
+                              background: scheme.secondaryContainer,
+                              foreground: scheme.onSecondaryContainer,
+                            ),
+                          ),
+                        ),
+                        ReportFlag(
+                          key: Key('report-flag-${question.id}'),
+                          target: ReportTarget(
+                            questionId: question.id,
+                            prompt: question.prompt,
+                            correctAnswer: question.answer,
+                            selectedAnswer: selectedAnswer,
+                            reference: reference,
+                            source: 'game',
+                          ),
+                        ),
+                      ],
                     ),
+                    if (reported) ...[
+                      const SizedBox(height: StSpace.xs),
+                      Text(
+                        reportThanksLine,
+                        key: const Key('report-thanks'),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

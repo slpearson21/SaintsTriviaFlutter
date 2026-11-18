@@ -6,17 +6,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../app_info.dart';
 import '../layout/home_back_button.dart';
 import '../layout/section_label.dart';
 import '../layout/st_icon.dart';
 import '../layout/text_scale.dart';
 import '../persistence/persistence_providers.dart';
 import '../progress/home_providers.dart';
+import '../report/report_config.dart';
 import '../services/open_link.dart';
 import '../theme/st_theme.dart';
-
-/// Shown on the About row. Matches the pubspec version.
-const scriptureTriviaVersionLabel = 'v1.0.0';
 
 const scriptureTriviaDisclaimer =
     'Scripture Trivia is a free, unofficial app. It is not an official '
@@ -26,11 +25,10 @@ const scriptureTriviaDisclaimer =
 /// turning it on is a one-line change.
 const bool kShowSendFeedback = false;
 
-/// Feedback inbox. Empty until one is chosen; fill this in and the mailto
-/// gains a recipient. [feedbackUri] uses [Uri.encodeComponent] so a space
-/// in the subject stays `%20`. `Uri.queryParameters` would write `+`,
-/// which iOS Mail shows as a plus.
-const feedbackRecipient = '';
+/// Same inbox as question reports. [feedbackUri] uses [Uri.encodeComponent]
+/// so a space in the subject stays `%20`. `Uri.queryParameters` would
+/// write `+`, which iOS Mail shows as a plus.
+const feedbackRecipient = kReportEmail;
 
 final feedbackUri = Uri.parse(
   'mailto:$feedbackRecipient?subject=${Uri.encodeComponent('Scripture Trivia feedback')}',
@@ -139,6 +137,13 @@ class SettingsScreen extends ConsumerWidget {
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
+            const SizedBox(height: StSpace.sm),
+            Text(
+              reportPrivacyLine,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
           ],
         ),
       ),
@@ -167,7 +172,7 @@ Future<void> _sendFeedback(BuildContext context, WidgetRef ref) {
 Future<void> _showAbout(BuildContext context) {
   const title = Text('About Scripture Trivia');
   final message = Text(
-    '$scriptureTriviaVersionLabel\n\n$scriptureTriviaDisclaimer',
+    '$scriptureTriviaVersionLabel\n\n$scriptureTriviaDisclaimer\n\n$reportPrivacyLine',
   );
   if (_usesCupertino()) {
     return showDialog<void>(

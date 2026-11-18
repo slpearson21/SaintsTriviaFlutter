@@ -9,6 +9,7 @@ import '../layout/section_label.dart';
 import '../layout/st_icon.dart';
 import '../layout/text_scale.dart';
 import '../progress/play_again.dart';
+import '../report/report_sheet.dart';
 import '../results/results_summary.dart';
 import '../routing/routes.dart';
 import '../scripture/scripture_link.dart';
@@ -308,47 +309,70 @@ class _AnswerCard extends StatelessWidget {
     );
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(StSpace.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.fromLTRB(
+          StSpace.md,
+          StSpace.md,
+          StSpace.xxs,
+          StSpace.xxs,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            MergeSemantics(
-              key: Key('review-answer-${answer.question.id}'),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Semantics(
-                        label: status,
-                        excludeSemantics: true,
-                        child: StIcon(
-                          correct ? Icons.check_circle : Icons.cancel,
-                          size: 22,
-                          color: mark,
+                  MergeSemantics(
+                    key: Key('review-answer-${answer.question.id}'),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Semantics(
+                              label: status,
+                              excludeSemantics: true,
+                              child: StIcon(
+                                correct ? Icons.check_circle : Icons.cancel,
+                                size: 22,
+                                color: mark,
+                              ),
+                            ),
+                            const SizedBox(width: StSpace.sm),
+                            Expanded(
+                              child: Text(
+                                answer.question.prompt,
+                                style: theme.textTheme.titleMedium,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: StSpace.sm),
-                      Expanded(
-                        child: Text(
-                          answer.question.prompt,
-                          style: theme.textTheme.titleMedium,
-                        ),
-                      ),
-                    ],
+                        answers,
+                      ],
+                    ),
                   ),
-                  answers,
+                  if (linked) ...[
+                    const SizedBox(height: StSpace.sm),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 22 + StSpace.sm),
+                      child: chip,
+                    ),
+                  ],
                 ],
               ),
             ),
-            if (linked) ...[
-              const SizedBox(height: StSpace.sm),
-              Padding(
-                padding: const EdgeInsets.only(left: 22 + StSpace.sm),
-                child: chip,
+            ReportFlag(
+              key: Key('report-flag-${answer.question.id}'),
+              target: ReportTarget(
+                questionId: answer.question.id,
+                prompt: answer.question.prompt,
+                correctAnswer: answer.correctText,
+                selectedAnswer: answer.selectedText,
+                reference: reference,
+                source: 'review',
               ),
-            ],
+            ),
           ],
         ),
       ),

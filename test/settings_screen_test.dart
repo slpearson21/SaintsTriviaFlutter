@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:saints_trivia_flutter/app.dart';
+import 'package:saints_trivia_flutter/app_info.dart';
 import 'package:saints_trivia_flutter/data/questions/scripture_volume.dart';
 import 'package:saints_trivia_flutter/persistence/app_settings.dart';
 import 'package:saints_trivia_flutter/persistence/finished_game_record.dart';
@@ -18,6 +19,7 @@ import 'package:saints_trivia_flutter/persistence/persistence_providers.dart';
 import 'package:saints_trivia_flutter/persistence/shared_preferences_progress_repository.dart';
 import 'package:saints_trivia_flutter/routing/app_router.dart';
 import 'package:saints_trivia_flutter/routing/routes.dart';
+import 'package:saints_trivia_flutter/report/report_config.dart';
 import 'package:saints_trivia_flutter/screens/settings_screen.dart';
 import 'package:saints_trivia_flutter/services/open_link.dart';
 
@@ -311,20 +313,22 @@ void main() {
     expect(find.text('Send feedback'), findsNothing);
     expect(find.text('Sound & haptics'), findsOneWidget);
     expect(opened, isEmpty);
-    expect(feedbackRecipient, isEmpty);
+    expect(feedbackRecipient, kReportEmail);
     expect(feedbackUri.query, 'subject=Scripture%20Trivia%20feedback');
 
     await tester.scrollUntilVisible(
-      find.textContaining('unofficial app'),
+      find.text(reportPrivacyLine),
       200,
       scrollable: find.byType(Scrollable),
     );
     expect(find.textContaining(scriptureTriviaDisclaimer), findsOneWidget);
+    expect(find.text(reportPrivacyLine), findsOneWidget);
     await tester.ensureVisible(find.byKey(const Key('settings-about')));
     await tester.tap(find.byKey(const Key('settings-about')));
     await tester.pumpAndSettle();
     expect(find.text('About Scripture Trivia'), findsWidgets);
     expect(find.textContaining('not an official product'), findsWidgets);
+    expect(find.textContaining(reportPrivacyLine), findsWidgets);
     expect(find.text(scriptureTriviaVersionLabel), findsWidgets);
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
