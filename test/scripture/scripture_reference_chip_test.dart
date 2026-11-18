@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -40,10 +41,16 @@ void main() {
 
         expect(find.byKey(const Key('reference-chip')), findsOneWidget);
         expect(find.byIcon(Icons.open_in_new), findsOneWidget);
-        final node = tester.getSemantics(find.byKey(const Key('reference-chip')));
-        expect(node.label, 'Open Acts 3:2, 6-7 in Gospel Library');
-        expect(node.flagsCollection.isLink, isTrue);
-        expect(node.flagsCollection.isButton, isFalse);
+        expect(
+          tester.getSemantics(find.byKey(const Key('reference-chip'))),
+          matchesSemantics(
+            label: 'Open Acts 3:2, 6-7 in Gospel Library',
+            isLink: true,
+            isButton: false,
+            hasTapAction: true,
+            textDirection: TextDirection.ltr,
+          ),
+        );
 
         final chip = tester.getRect(find.byKey(const Key('reference-chip')));
         expect(chip.width, greaterThanOrEqualTo(StSpace.minTap));
@@ -53,7 +60,9 @@ void main() {
         );
         expect(chip.bottom, lessThanOrEqualTo(next.top));
 
-        await tester.tap(find.byKey(const Key('reference-chip')));
+        tester.semantics.tap(
+          find.semantics.byLabel('Open Acts 3:2, 6-7 in Gospel Library'),
+        );
         await tester.pumpAndSettle();
         expect(opened, hasLength(1));
         expect(opened.single.mode, LaunchMode.externalApplication);
@@ -134,10 +143,16 @@ void main() {
       final chipFinder = find.byType(ScriptureReferenceChip);
       expect(chipFinder, findsOneWidget);
       expect(find.byIcon(Icons.open_in_new), findsOneWidget);
-      final node = tester.getSemantics(chipFinder);
-      expect(node.label, 'Open D&C 1:38 in Gospel Library');
-      expect(node.flagsCollection.isLink, isTrue);
-      expect(node.flagsCollection.isButton, isFalse);
+      expect(
+        tester.getSemantics(chipFinder),
+        matchesSemantics(
+          label: 'Open D&C 1:38 in Gospel Library',
+          isLink: true,
+          isButton: false,
+          hasTapAction: true,
+          textDirection: TextDirection.ltr,
+        ),
+      );
 
       final chip = tester.getRect(chipFinder);
       expect(chip.width, greaterThanOrEqualTo(StSpace.minTap));
@@ -152,6 +167,45 @@ void main() {
       semantics.dispose();
     }
   });
+
+  testWidgets(
+    'a linked review card is one stop and the link is a separate stop',
+    (tester) async {
+      final semantics = tester.ensureSemantics();
+      try {
+        await _pumpReview(
+          tester,
+          reference: 'D&C 1:38',
+          open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async {
+            return true;
+          },
+        );
+
+        final card = tester.getSemantics(
+          find.byKey(const Key('review-answer-dc-0001')),
+        );
+        expect(card.label, isNot(contains('D&C 1:38')));
+        final separate = <SemanticsNode>[];
+        card.visitChildren((child) {
+          if (!child.isMergedIntoParent) separate.add(child);
+          return true;
+        });
+        expect(separate, isEmpty, reason: card.label);
+
+        final links = find.semantics
+            .byLabel('Open D&C 1:38 in Gospel Library')
+            .evaluate();
+        expect(links, hasLength(1));
+        expect(links.single.isMergedIntoParent, isFalse);
+        expect(
+          links.single.getSemanticsData().hasAction(SemanticsAction.tap),
+          isTrue,
+        );
+      } finally {
+        semantics.dispose();
+      }
+    },
+  );
 
   testWidgets('a failed launch on the review screen shows a SnackBar', (
     tester,

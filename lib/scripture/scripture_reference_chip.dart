@@ -74,6 +74,7 @@ class ScriptureReferenceChip extends ConsumerWidget {
       button: false,
       label: 'Open $reference in Gospel Library',
       excludeSemantics: true,
+      onTap: () => _open(context, ref, link),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final maxWidth = constraints.maxWidth.isFinite

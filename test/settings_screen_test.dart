@@ -18,6 +18,7 @@ import 'package:saints_trivia_flutter/persistence/shared_preferences_progress_re
 import 'package:saints_trivia_flutter/routing/app_router.dart';
 import 'package:saints_trivia_flutter/routing/routes.dart';
 import 'package:saints_trivia_flutter/screens/settings_screen.dart';
+import 'package:saints_trivia_flutter/services/open_link.dart';
 
 const _guidelines = <AccessibilityGuideline>[
   androidTapTargetGuideline,

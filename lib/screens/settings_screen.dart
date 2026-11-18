@@ -13,8 +13,6 @@ import '../progress/home_providers.dart';
 import '../services/open_link.dart';
 import '../theme/st_theme.dart';
 
-export '../services/open_link.dart';
-
 /// Shown on the About row. Matches the pubspec version.
 const scriptureTriviaVersionLabel = 'v1.0.0';
 
