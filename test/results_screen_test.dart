@@ -132,55 +132,56 @@ void main() {
     });
   });
 
-  testWidgets('a perfect game sparkles and the missed filter is empty', (
-    tester,
-  ) async {
-    final handle = tester.ensureSemantics();
-    try {
-      final session = _perfect();
-      await _openResults(tester, session: session);
-      expect(find.text('Well done, good and faithful!'), findsOneWidget);
-      expect(find.text('You answered 4 of 4 correctly.'), findsOneWidget);
-      expect(
-        find.bySemanticsLabel('You answered 4 of 4 correctly.'),
-        findsOneWidget,
-      );
-      expect(find.byKey(const Key('results-sparkle')), findsNothing);
-      expect(find.byKey(const Key('results-personal-best')), findsNothing);
-      expect(
-        find.textContaining('Best streak 4', findRichText: true),
-        findsOneWidget,
-      );
+  testWidgets(
+    'a first perfect game does not sparkle and the missed filter is empty',
+    (tester) async {
+      final handle = tester.ensureSemantics();
+      try {
+        final session = _perfect();
+        await _openResults(tester, session: session);
+        expect(find.text('Well done, good and faithful!'), findsOneWidget);
+        expect(find.text('You answered 4 of 4 correctly.'), findsOneWidget);
+        expect(
+          find.bySemanticsLabel('You answered 4 of 4 correctly.'),
+          findsOneWidget,
+        );
+        expect(find.byKey(const Key('results-sparkle')), findsNothing);
+        expect(find.byKey(const Key('results-personal-best')), findsNothing);
+        expect(
+          find.textContaining('Best streak 4', findRichText: true),
+          findsOneWidget,
+        );
 
-      await _tap(tester, const Key('results-review'));
-      await tester.pumpAndSettle();
-      expect(find.text('All (4)'), findsOneWidget);
-      expect(find.text('Missed (0)'), findsOneWidget);
-      expect(find.text('Correct (4)'), findsOneWidget);
+        await _tap(tester, const Key('results-review'));
+        await tester.pumpAndSettle();
+        expect(find.text('All (4)'), findsOneWidget);
+        expect(find.text('Missed (0)'), findsOneWidget);
+        expect(find.text('Correct (4)'), findsOneWidget);
 
-      await tester.tap(find.byKey(const Key('review-filter-missed')));
-      await tester.pumpAndSettle();
-      expect(find.text("You didn't miss any"), findsOneWidget);
-      expect(
-        find.textContaining('A perfect game! Try a longer game'),
-        findsOneWidget,
-      );
-      expect(find.byKey(const Key('review-play-again')), findsOneWidget);
-      final missed = tester.getSemantics(
-        find.byKey(const Key('review-filter-missed')),
-      );
-      expect(missed.label, 'Missed (0)');
-      expect(missed.flagsCollection.isButton, isTrue);
-      expect(missed.flagsCollection.isSelected, Tristate.isTrue);
-      final all = tester.getSemantics(
-        find.byKey(const Key('review-filter-all')),
-      );
-      expect(all.label, 'All (4)');
-      expect(all.flagsCollection.isSelected, isNot(Tristate.isTrue));
-    } finally {
-      handle.dispose();
-    }
-  });
+        await tester.tap(find.byKey(const Key('review-filter-missed')));
+        await tester.pumpAndSettle();
+        expect(find.text("You didn't miss any"), findsOneWidget);
+        expect(
+          find.textContaining('A perfect game! Try a longer game'),
+          findsOneWidget,
+        );
+        expect(find.byKey(const Key('review-play-again')), findsOneWidget);
+        final missed = tester.getSemantics(
+          find.byKey(const Key('review-filter-missed')),
+        );
+        expect(missed.label, 'Missed (0)');
+        expect(missed.flagsCollection.isButton, isTrue);
+        expect(missed.flagsCollection.isSelected, Tristate.isTrue);
+        final all = tester.getSemantics(
+          find.byKey(const Key('review-filter-all')),
+        );
+        expect(all.label, 'All (4)');
+        expect(all.flagsCollection.isSelected, isNot(Tristate.isTrue));
+      } finally {
+        handle.dispose();
+      }
+    },
+  );
 
   testWidgets('a mixed game filters to the misses and shows both answers', (
     tester,
@@ -281,25 +282,58 @@ void main() {
     expect(find.text('None correct this time'), findsNothing);
   });
 
-  testWidgets('review cards name missed or correct once for the reader', (
-    tester,
-  ) async {
+  testWidgets('review cards are one stop with the full answer', (tester) async {
     final handle = tester.ensureSemantics();
     try {
       await _openResults(tester, session: _mixed());
       await _tap(tester, const Key('results-review'));
 
-      _expectOneReviewStop(
-        tester,
-        const Key('review-answer-dc-0020'),
+      _expectOneReviewStop(tester, const Key('review-answer-dc-0020'), const [
         'Missed',
         'Where was the Church formally organized?',
-      );
+        'Your answer',
+        'Palmyra, New York',
+        'Correct answer',
+        'Fayette, New York',
+        'D&C 20 heading',
+      ]);
+      _expectOneReviewStop(tester, const Key('review-answer-dc-0004'), const [
+        'Missed',
+        'To whom was the revelation in section 4 given?',
+        'Your answer',
+        'Oliver Cowdery',
+        'Correct answer',
+        'Joseph Smith Sr.',
+        'D&C 4 heading',
+      ]);
       _expectOneReviewStop(
         tester,
         const Key('review-answer-bom-0003'),
-        'Correct',
-        'Who returned to Jerusalem to obtain the brass plates from Laban?',
+        const [
+          'Correct',
+          'Who returned to Jerusalem to obtain the brass plates from Laban?',
+          'Correct answer',
+          'Nephi',
+          '1 Nephi 3–4',
+        ],
+        absent: const ['Your answer'],
+      );
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('review-answer-bom-0011')),
+        400,
+      );
+      await tester.pumpAndSettle();
+      _expectOneReviewStop(
+        tester,
+        const Key('review-answer-bom-0011'),
+        const [
+          'Correct',
+          "Which king heard Abinadi's preaching?",
+          'Correct answer',
+          'King Noah',
+          'Mosiah 11–17',
+        ],
+        absent: const ['Your answer'],
       );
     } finally {
       handle.dispose();
@@ -338,6 +372,10 @@ void main() {
   testWidgets('a later perfect game sparkles, and the first one does not', (
     tester,
   ) async {
+    await _openResults(tester, session: _perfect());
+    expect(find.byKey(const Key('results-sparkle')), findsNothing);
+    expect(find.byKey(const Key('results-personal-best')), findsNothing);
+
     await _openResults(
       tester,
       session: _perfect(),
@@ -425,30 +463,45 @@ void main() {
     expect(find.byKey(const Key('results-sparkle')), findsNothing);
   });
 
-  testWidgets('the score counts up, and reduced motion shows the end', (
-    tester,
-  ) async {
-    await _pumpScreen(tester, session: _mixed());
-    await tester.pump();
-    expect(_numeral(tester), '0 / 4');
-    expect(find.text('You answered 2 of 4 correctly.'), findsOneWidget);
+  testWidgets(
+    'the score counts up, and reduced motion shows the sparkle already',
+    (tester) async {
+      await _pumpScreen(tester, session: _mixed());
+      await tester.pump();
+      expect(_numeral(tester), '0 / 4');
+      expect(find.text('You answered 2 of 4 correctly.'), findsOneWidget);
 
-    await tester.pump(const Duration(milliseconds: 800));
-    await tester.pump();
-    expect(_numeral(tester), '2 / 4');
-    expect(find.text('50%'), findsOneWidget);
+      await tester.pump(const Duration(milliseconds: 800));
+      await tester.pump();
+      expect(_numeral(tester), '2 / 4');
+      expect(find.text('50%'), findsOneWidget);
 
-    await tester.pumpWidget(const SizedBox.shrink());
-    tester.platformDispatcher.accessibilityFeaturesTestValue =
-        const FakeAccessibilityFeatures(disableAnimations: true);
-    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
-    await _pumpScreen(tester, session: _perfect());
-    await tester.pump();
-    expect(_numeral(tester), '4 / 4');
-    expect(find.text('100%'), findsOneWidget);
-    expect(find.byKey(const Key('results-sparkle')), findsNothing);
-    expect(find.text('0 / 4'), findsNothing);
-  });
+      await tester.pumpWidget(const SizedBox.shrink());
+      tester.platformDispatcher.accessibilityFeaturesTestValue =
+          const FakeAccessibilityFeatures(disableAnimations: true);
+      addTearDown(
+        tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+      );
+      // A later perfect game beats an earlier 80, so the sparkle is due.
+      // Reduce motion draws the finished ring on the first frame.
+      await _pumpScreen(
+        tester,
+        session: _perfect(),
+        snapshot: const HomeSnapshot(
+          gamesPlayed: 1,
+          accuracyPercent: 80,
+          bestStreak: 4,
+          bestScorePercent: 80,
+        ),
+      );
+      await tester.pump();
+      expect(_numeral(tester), '4 / 4');
+      expect(find.text('100%'), findsOneWidget);
+      expect(find.byKey(const Key('results-sparkle')), findsOneWidget);
+      expect(find.byKey(const Key('results-personal-best')), findsOneWidget);
+      expect(find.text('0 / 4'), findsNothing);
+    },
+  );
 
   testWidgets('play again deals a new session before opening the game', (
     tester,
@@ -1071,24 +1124,30 @@ TriviaQuestion _bankQuestion(ScriptureVolume volume, int n) {
   );
 }
 
-/// The card is one screen-reader stop: the status and the prompt share it.
+/// The card is one traversal stop, and that stop's label is the whole card.
 void _expectOneReviewStop(
   WidgetTester tester,
   Key key,
-  String status,
-  String prompt,
-) {
+  List<String> parts, {
+  List<String> absent = const [],
+}) {
   final node = tester.getSemantics(find.byKey(key));
-  expect(node.mergeAllDescendantsIntoThisNode, isTrue, reason: status);
+  expect(node.isMergedIntoParent, isFalse);
+  expect(node.mergeAllDescendantsIntoThisNode, isTrue);
   final label = node.getSemanticsData().label;
-  expect(label, contains(status));
-  expect(label, contains(prompt));
+  expect(find.bySemanticsLabel(label), findsOneWidget, reason: label);
+  for (final part in parts) {
+    expect(label, contains(part), reason: label);
+  }
+  for (final part in absent) {
+    expect(label, isNot(contains(part)), reason: label);
+  }
   final separate = <SemanticsNode>[];
   node.visitChildren((child) {
     if (!child.isMergedIntoParent) separate.add(child);
     return true;
   });
-  expect(separate, isEmpty, reason: status);
+  expect(separate, isEmpty, reason: label);
 }
 
 String _numeral(WidgetTester tester) {
@@ -1111,13 +1170,11 @@ Future<void> _tap(WidgetTester tester, Key key) async {
 Future<void> _pumpScreen(
   WidgetTester tester, {
   required GameSession session,
+  HomeSnapshot snapshot = const HomeSnapshot.firstRun(),
 }) async {
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [
-        _held(session),
-        fixedHomeSnapshot(const HomeSnapshot.firstRun()),
-      ],
+      overrides: [_held(session), fixedHomeSnapshot(snapshot)],
       child: MaterialApp(
         theme: buildTheme(Brightness.light),
         home: const ResultsScreen(),

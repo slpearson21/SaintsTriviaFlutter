@@ -20,7 +20,14 @@ const noQuestionsErrorBody =
     'Choose different scriptures and try again.';
 const noQuestionsErrorAction = 'Back to setup';
 
-/// ios-19 / ios-20 badge. The glyph stays this size when text scales.
+/// Spoken name while Try again is in flight. The spinner replaces the
+/// visible label, so this is what a screen reader hears.
+const errorStateBusyLabel = 'Trying again';
+
+/// ios-19 / ios-20 badge. The frames show an exclamation in a circle, drawn
+/// in [StColors.wrong] on the [StColors.wrongContainer] disc. The glyph stays
+/// this size when text scales, and it stays decorative: the title is the name.
+const errorStateIcon = Icons.error_outline;
 const _badgeSize = 88.0;
 const _badgeIconSize = 44.0;
 
@@ -61,7 +68,8 @@ class ErrorState extends StatefulWidget {
   /// Drawn inside the action. Omitted for a text-only button.
   final IconData? actionIcon;
 
-  /// Try again is in flight. The action shows progress and does not accept taps.
+  /// Try again is in flight. The action shows progress, does not accept taps,
+  /// and is named [errorStateBusyLabel] for a screen reader.
   final bool busy;
 
   /// Increments after each new failure of the same copy, so that failure is
@@ -290,13 +298,25 @@ class _ErrorAction extends StatelessWidget {
         ],
       );
     }
-    return FilledButton(
+    final button = FilledButton(
       key: const Key('error-state-action'),
       style: FilledButton.styleFrom(
         minimumSize: Size(expanded ? target : _actionMinWidth, minHeight),
       ),
       onPressed: onPressed,
       child: child,
+    );
+    if (!busy) return button;
+    // The spinner is the only child, so the button would otherwise be an
+    // unlabeled dimmed control. One stop, named for the action in flight.
+    return Semantics(
+      container: true,
+      button: true,
+      enabled: false,
+      focusable: true,
+      label: errorStateBusyLabel,
+      excludeSemantics: true,
+      child: button,
     );
   }
 }

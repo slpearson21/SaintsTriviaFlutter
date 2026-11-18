@@ -51,7 +51,7 @@ class _ContentLoadErrorViewState extends ConsumerState<ContentLoadErrorView> {
     return Scaffold(
       appBar: widget.showNewGameBar ? newGameAppBar(context) : null,
       body: ErrorState(
-        icon: Icons.info,
+        icon: errorStateIcon,
         actionIcon: Icons.refresh,
         title: contentLoadErrorTitle,
         body: contentLoadErrorBody,
