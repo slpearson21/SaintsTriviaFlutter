@@ -11,6 +11,8 @@ import '../layout/text_scale.dart';
 import '../progress/play_again.dart';
 import '../results/results_summary.dart';
 import '../routing/routes.dart';
+import '../scripture/scripture_link.dart';
+import '../scripture/scripture_reference_chip.dart';
 import '../theme/st_theme.dart';
 
 /// Which answers the review list is showing.
@@ -252,73 +254,102 @@ class _AnswerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final colors = theme.extension<StColors>()!;
     final correct = answer.correct;
     final mark = correct ? colors.correct : colors.wrong;
     final status = correct ? 'Correct' : 'Missed';
+    final reference = answer.question.reference;
+    final link = gospelLibraryUri(reference);
+    final linked = link != null;
+    final chip = ScriptureReferenceChip.fromLink(
+      reference: reference,
+      link: link,
+      background: scheme.primaryContainer,
+      foreground: scheme.onPrimaryContainer,
+      borderRadius: const BorderRadius.all(StRadius.full),
+      leading: StIcon(
+        Icons.menu_book_rounded,
+        size: 16,
+        color: scheme.onPrimaryContainer,
+      ),
+    );
     // The status label lives inside MergeSemantics. A label on a parent
-    // outside that boundary is a second screen-reader stop.
-    return MergeSemantics(
-      key: Key('review-answer-${answer.question.id}'),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(StSpace.md),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+    // outside that boundary is a second screen-reader stop. A Gospel
+    // Library link stays outside that merge so it is its own link stop.
+    final answers = Padding(
+      padding: const EdgeInsets.only(left: 22 + StSpace.sm),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: StSpace.xs),
+          if (correct)
+            _AnswerLine(
+              label: 'Correct answer',
+              value: answer.correctText,
+              color: colors.correct,
+            )
+          else ...[
+            _AnswerLine(
+              label: 'Your answer',
+              value: answer.selectedText,
+              color: colors.wrong,
+            ),
+            const SizedBox(height: StSpace.xxs),
+            _AnswerLine(
+              label: 'Correct answer',
+              value: answer.correctText,
+              color: colors.correct,
+            ),
+          ],
+          if (!linked) ...[const SizedBox(height: StSpace.sm), chip],
+        ],
+      ),
+    );
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(StSpace.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            MergeSemantics(
+              key: Key('review-answer-${answer.question.id}'),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Semantics(
-                    label: status,
-                    excludeSemantics: true,
-                    child: StIcon(
-                      correct ? Icons.check_circle : Icons.cancel,
-                      size: 22,
-                      color: mark,
-                    ),
-                  ),
-                  const SizedBox(width: StSpace.sm),
-                  Expanded(
-                    child: Text(
-                      answer.question.prompt,
-                      style: theme.textTheme.titleMedium,
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 22 + StSpace.sm),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: StSpace.xs),
-                    if (correct)
-                      _AnswerLine(
-                        label: 'Correct answer',
-                        value: answer.correctText,
-                        color: colors.correct,
-                      )
-                    else ...[
-                      _AnswerLine(
-                        label: 'Your answer',
-                        value: answer.selectedText,
-                        color: colors.wrong,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Semantics(
+                        label: status,
+                        excludeSemantics: true,
+                        child: StIcon(
+                          correct ? Icons.check_circle : Icons.cancel,
+                          size: 22,
+                          color: mark,
+                        ),
                       ),
-                      const SizedBox(height: StSpace.xxs),
-                      _AnswerLine(
-                        label: 'Correct answer',
-                        value: answer.correctText,
-                        color: colors.correct,
+                      const SizedBox(width: StSpace.sm),
+                      Expanded(
+                        child: Text(
+                          answer.question.prompt,
+                          style: theme.textTheme.titleMedium,
+                        ),
                       ),
                     ],
-                    const SizedBox(height: StSpace.sm),
-                    _ReferenceChip(reference: answer.question.reference),
-                  ],
-                ),
+                  ),
+                  answers,
+                ],
+              ),
+            ),
+            if (linked) ...[
+              const SizedBox(height: StSpace.sm),
+              Padding(
+                padding: const EdgeInsets.only(left: 22 + StSpace.sm),
+                child: chip,
               ),
             ],
-          ),
+          ],
         ),
       ),
     );
@@ -350,56 +381,6 @@ class _AnswerLine extends StatelessWidget {
           ),
           TextSpan(text: value),
         ],
-      ),
-    );
-  }
-}
-
-class _ReferenceChip extends StatelessWidget {
-  const _ReferenceChip({required this.reference});
-
-  final String reference;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: scheme.primaryContainer,
-        borderRadius: const BorderRadius.all(StRadius.full),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: StSpace.sm,
-          vertical: StSpace.xxs,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: ExcludeSemantics(
-                child: StIcon(
-                  Icons.menu_book_rounded,
-                  size: 16,
-                  color: scheme.onPrimaryContainer,
-                ),
-              ),
-            ),
-            const SizedBox(width: StSpace.xxs),
-            Flexible(
-              child: Text(
-                reference,
-                softWrap: true,
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: scheme.onPrimaryContainer,
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

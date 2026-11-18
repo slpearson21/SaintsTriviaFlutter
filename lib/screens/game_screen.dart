@@ -20,6 +20,7 @@ import '../layout/st_icon.dart';
 import '../layout/text_scale.dart';
 import '../progress/home_snapshot.dart';
 import '../routing/routes.dart';
+import '../scripture/scripture_reference_chip.dart';
 import '../theme/st_theme.dart';
 import 'content_load_error_screen.dart';
 import 'no_questions_screen.dart';
@@ -935,7 +936,12 @@ class _FeedbackSheet extends StatelessWidget {
                       ),
                     ],
                     const SizedBox(height: StSpace.sm),
-                    _ReferenceChip(reference: reference),
+                    ScriptureReferenceChip(
+                      key: const Key('reference-chip'),
+                      reference: reference,
+                      background: scheme.secondaryContainer,
+                      foreground: scheme.onSecondaryContainer,
+                    ),
                   ],
                 ),
               ),
@@ -953,35 +959,6 @@ class _FeedbackSheet extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ReferenceChip extends StatelessWidget {
-  const _ReferenceChip({required this.reference});
-
-  final String reference;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    return Container(
-      key: const Key('reference-chip'),
-      padding: const EdgeInsets.symmetric(
-        horizontal: StSpace.sm,
-        vertical: StSpace.xs,
-      ),
-      decoration: BoxDecoration(
-        color: scheme.secondaryContainer,
-        borderRadius: const BorderRadius.all(StRadius.sm),
-      ),
-      child: Text(
-        reference,
-        style: theme.textTheme.labelLarge?.copyWith(
-          color: scheme.onSecondaryContainer,
         ),
       ),
     );

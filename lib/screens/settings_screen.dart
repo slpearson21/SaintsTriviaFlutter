@@ -12,6 +12,7 @@ import '../layout/st_icon.dart';
 import '../layout/text_scale.dart';
 import '../persistence/persistence_providers.dart';
 import '../progress/home_providers.dart';
+import '../services/open_link.dart';
 import '../theme/st_theme.dart';
 
 /// Shown on the About row. Matches the pubspec version.
@@ -34,19 +35,6 @@ const feedbackRecipient = '';
 final feedbackUri = Uri.parse(
   'mailto:$feedbackRecipient?subject=${Uri.encodeComponent('Scripture Trivia feedback')}',
 );
-
-typedef OpenLink = Future<bool> Function(Uri uri);
-
-/// Sends [uri] to the platform. Tests override this.
-final openLinkProvider = Provider<OpenLink>((ref) => _openLink);
-
-Future<bool> _openLink(Uri uri) async {
-  try {
-    return await launchUrl(uri);
-  } on Object {
-    return false;
-  }
-}
 
 /// S12 / S13. Appearance, feedback, gameplay, and on-device data.
 class SettingsScreen extends ConsumerWidget {
@@ -165,11 +153,8 @@ Future<void> _confirmReset(BuildContext context, WidgetRef ref) async {
 }
 
 /// Opens the mail app. A `false` result means nothing handled the mailto.
-Future<void> sendAppFeedback(
-  BuildContext context,
-  Future<bool> Function(Uri uri) open,
-) async {
-  final opened = await open(feedbackUri);
+Future<void> sendAppFeedback(BuildContext context, OpenLink open) async {
+  final opened = await open(feedbackUri, mode: LaunchMode.platformDefault);
   if (opened || !context.mounted) return;
   ScaffoldMessenger.of(context)
       .showSnackBar(const SnackBar(content: Text('No mail app was found.')));
