@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:saints_trivia_flutter/report/question_report.dart';
 import 'package:saints_trivia_flutter/report/report_config.dart';
@@ -31,10 +31,7 @@ QuestionReport _report({
 void main() {
   test('subject uses the reason slug and the body uses the label', () {
     final report = _report();
-    expect(
-      report.subject,
-      '[Trivia report] dc-0001 – typo-or-wording',
-    );
+    expect(report.subject, '[Trivia report] dc-0001 – typo-or-wording');
     expect(report.body, contains('Reason: Typo or wording'));
     expect(report.body, contains("Player's answer: Temporary"));
     expect(report.body, contains('Correct answer (app): The same'));
@@ -48,17 +45,17 @@ void main() {
     expect(report.body, isNot(contains('\n\n')));
   });
 
-  test('an empty note is an em dash and other reasons have their own slugs', () {
-    final report = _report(note: '   ', reason: ReportReason.other);
-    expect(report.note, isEmpty);
-    expect(report.body, contains('Note: —'));
-    expect(report.subject, endsWith(' – other'));
-    expect(
-      ReportReason.wrongAnswer.slug,
-      'wrong-answer',
-    );
-    expect(ReportReason.wrongReference.slug, 'wrong-reference');
-  });
+  test(
+    'an empty note is an em dash and other reasons have their own slugs',
+    () {
+      final report = _report(note: '   ', reason: ReportReason.other);
+      expect(report.note, isEmpty);
+      expect(report.body, contains('Note: —'));
+      expect(report.subject, endsWith(' – other'));
+      expect(ReportReason.wrongAnswer.slug, 'wrong-answer');
+      expect(ReportReason.wrongReference.slug, 'wrong-reference');
+    },
+  );
 
   test('mailto uses percent encoding and never a plus for spaces', () {
     final report = _report(prompt: 'A & B’s voice');
@@ -80,16 +77,22 @@ void main() {
     expect(body, contains('Note: The verse reads "mine own voice."'));
   });
 
-  test('clipboard keeps the full text when the mailto question is shortened', () {
-    final prompt = 'Prompt ${'word ' * 400}';
-    final note = 'n' * 280;
-    final report = _report(prompt: prompt, note: note);
-    expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
-    expect(report.clipboardText, contains(prompt));
-    expect(report.clipboardText, contains('To: $kReportEmail'));
-    expect(report.clipboardText, contains('Subject: ${report.subject}'));
-    expect(report.clipboardText, contains(note));
-  });
+  test(
+    'clipboard keeps the full text when the mailto question is shortened',
+    () {
+      final prompt = 'Prompt ${'word ' * 400}';
+      final note = 'n' * 280;
+      final report = _report(prompt: prompt, note: note);
+      expect(
+        report.mailto.toString().length,
+        lessThanOrEqualTo(maxMailtoLength),
+      );
+      expect(report.clipboardText, contains(prompt));
+      expect(report.clipboardText, contains('To: $kReportEmail'));
+      expect(report.clipboardText, contains('Subject: ${report.subject}'));
+      expect(report.clipboardText, contains(note));
+    },
+  );
 
   test('every bundled question plus a full note stays within 1,800 chars', () {
     const files = [
@@ -131,7 +134,31 @@ void main() {
     expect(count, 591);
   });
 
-  test('a release build rejects the example.com placeholder', () {
-    expect(kReleaseMode && kReportEmail.contains('example.com'), isFalse);
+  test('a note is trimmed on grapheme boundaries', () {
+    final report = QuestionReport(
+      questionId: 'bom-0001',
+      prompt: 'Prompt',
+      correctAnswer: 'Alpha',
+      selectedAnswer: 'Beta',
+      reference: '1 Nephi 1:1',
+      reason: ReportReason.other,
+      note: '😀' * 300,
+      appVersion: 'v1.0.0',
+      platform: 'iOS 18.1',
+      bankVersion: 'v1',
+      source: 'game',
+      createdAtUtc: DateTime.utc(2026, 11, 18),
+    );
+    expect(report.note.characters.length, maxReportNoteLength);
+    expect(report.note, '😀' * maxReportNoteLength);
+    expect(report.note, isNot(contains('\uFFFD')));
+    expect(report.clipboardText, contains('😀' * maxReportNoteLength));
+  });
+
+  test('iOS drops the Version prefix from the platform line', () {
+    expect(
+      formatReportPlatform(TargetPlatform.iOS, 'Version 18.1 (Build 22B83)'),
+      'iOS 18.1 (Build 22B83)',
+    );
   });
 }

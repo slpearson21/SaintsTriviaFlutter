@@ -11,7 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../layout/section_label.dart';
 import '../layout/st_icon.dart';
 import '../layout/text_scale.dart';
-import '../screens/settings_screen.dart';
+import '../app_info.dart';
 import '../services/open_link.dart';
 import '../theme/st_theme.dart';
 import 'question_report.dart';
@@ -40,8 +40,7 @@ final class ReportTarget {
 }
 
 const reportFlagTooltip = 'Report a problem with this question';
-const reportThanksLine =
-    'Thanks. If you sent the email, we’ll take a look.';
+const reportThanksLine = 'Thanks. If you sent the email, we’ll take a look.';
 const reportAnnouncement =
     'Marked as reported. If you sent the email, we’ll take a look.';
 const reportSheetTitle = 'Report a problem';
@@ -131,9 +130,7 @@ class _ReportFlagState extends ConsumerState<ReportFlag> {
     );
     final reduced = _reducedMotion(context);
     final scheme = Theme.of(context).colorScheme;
-    return Focus(
-      focusNode: _focusNode,
-      child: AnimatedSwitcher(
+    return AnimatedSwitcher(
       duration: reduced ? Duration.zero : StMotion.fast,
       child: reported
           ? Semantics(
@@ -142,7 +139,9 @@ class _ReportFlagState extends ConsumerState<ReportFlag> {
               label: 'Reported',
               hint: reportReportedHint,
               excludeSemantics: true,
+              onTap: _open,
               child: TextButton.icon(
+                focusNode: _focusNode,
                 onPressed: _open,
                 style: TextButton.styleFrom(
                   foregroundColor: scheme.primary,
@@ -156,6 +155,7 @@ class _ReportFlagState extends ConsumerState<ReportFlag> {
             )
           : IconButton(
               key: const ValueKey('idle'),
+              focusNode: _focusNode,
               tooltip: reportFlagTooltip,
               onPressed: _open,
               style: IconButton.styleFrom(
@@ -168,7 +168,6 @@ class _ReportFlagState extends ConsumerState<ReportFlag> {
                 color: scheme.onSurfaceVariant,
               ),
             ),
-      ),
     );
   }
 }
@@ -246,12 +245,14 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
   }
 
   void _saveDraft() {
-    ref.read(reportedQuestionIdsProvider.notifier).saveDraft(
-      widget.target.questionId,
-      reason: _reason,
-      note: _note.text,
-      clearReason: _reason == null,
-    );
+    ref
+        .read(reportedQuestionIdsProvider.notifier)
+        .saveDraft(
+          widget.target.questionId,
+          reason: _reason,
+          note: _note.text,
+          clearReason: _reason == null,
+        );
   }
 
   void _select(ReportReason reason) {
@@ -295,9 +296,9 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
       await Clipboard.setData(ClipboardData(text: report.clipboardText));
     }
     if (!mounted) return;
-    ref.read(reportedQuestionIdsProvider.notifier).markReported(
-      widget.target.questionId,
-    );
+    ref
+        .read(reportedQuestionIdsProvider.notifier)
+        .markReported(widget.target.questionId);
     Navigator.of(context).pop(opened);
   }
 
@@ -329,81 +330,78 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                  Focus(
-                    autofocus: true,
-                    child: Semantics(
-                      header: true,
-                      child: Text(
-                        reportSheetTitle,
-                        style: theme.textTheme.titleLarge,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: StSpace.xxs),
-                  Text(
-                    widget.target.prompt,
-                    maxLines: large ? 3 : 2,
-                    overflow: TextOverflow.ellipsis,
-                    semanticsLabel: widget.target.prompt,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: StSpace.md),
-                  const SectionLabel("What’s wrong?"),
-                  const SizedBox(height: StSpace.sm),
-                  if (cupertino)
-                    _IosReasons(selected: _reason, onSelected: _select)
-                  else
-                    _AndroidReasons(selected: _reason, onSelected: _select),
-                  const SizedBox(height: StSpace.md),
-                  TextField(
-                    key: const Key('report-note'),
-                    controller: _note,
-                    minLines: 3,
-                    maxLines: 5,
-                    maxLength: maxReportNoteLength,
-                    textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(
-                      labelText: 'Note (optional)',
-                      hintText: hint,
-                      border: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(StRadius.md),
-                      ),
-                    ),
-                    onChanged: (value) {
-                      ref
-                          .read(reportedQuestionIdsProvider.notifier)
-                          .saveDraft(
-                            widget.target.questionId,
-                            note: value,
-                          );
-                    },
-                  ),
-                  const SizedBox(height: StSpace.sm),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.mail_outline,
-                        size: 18,
-                        color: scheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: StSpace.xs),
-                      Expanded(
+                    Focus(
+                      autofocus: true,
+                      child: Semantics(
+                        header: true,
                         child: Text(
-                          reportExpectation,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontSize: 13,
-                            color: scheme.onSurfaceVariant,
-                          ),
+                          reportSheetTitle,
+                          style: theme.textTheme.titleLarge,
                         ),
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: StSpace.xxs),
+                    Text(
+                      widget.target.prompt,
+                      maxLines: large ? 3 : 2,
+                      overflow: TextOverflow.ellipsis,
+                      semanticsLabel: widget.target.prompt,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: StSpace.md),
+                    const SectionLabel("What’s wrong?"),
+                    const SizedBox(height: StSpace.sm),
+                    if (cupertino)
+                      _IosReasons(selected: _reason, onSelected: _select)
+                    else
+                      _AndroidReasons(selected: _reason, onSelected: _select),
+                    const SizedBox(height: StSpace.md),
+                    TextField(
+                      key: const Key('report-note'),
+                      controller: _note,
+                      minLines: 3,
+                      maxLines: 5,
+                      maxLength: maxReportNoteLength,
+                      textCapitalization: TextCapitalization.sentences,
+                      decoration: InputDecoration(
+                        labelText: 'Note (optional)',
+                        hintText: hint,
+                        border: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(StRadius.md),
+                        ),
+                      ),
+                      onChanged: (value) {
+                        ref
+                            .read(reportedQuestionIdsProvider.notifier)
+                            .saveDraft(widget.target.questionId, note: value);
+                      },
+                    ),
+                    const SizedBox(height: StSpace.sm),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.mail_outline,
+                          size: 18,
+                          color: scheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: StSpace.xs),
+                        Expanded(
+                          child: Text(
+                            reportExpectation,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontSize: 13,
+                              color: scheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
             ),
             if (_scrolled) Divider(height: 1, color: scheme.outlineVariant),
             Padding(
@@ -417,9 +415,14 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Semantics(
+                    key: const Key('report-continue'),
+                    button: true,
+                    enabled: _reason != null && !_busy,
+                    label: reportContinueLabel,
                     hint: _reason == null ? reportChooseReasonHint : null,
+                    excludeSemantics: true,
+                    onTap: _reason == null || _busy ? null : _continue,
                     child: FilledButton.icon(
-                      key: const Key('report-continue'),
                       onPressed: _reason == null || _busy ? null : _continue,
                       style: FilledButton.styleFrom(
                         minimumSize: Size.fromHeight(
@@ -538,6 +541,7 @@ class _ReasonRow extends StatelessWidget {
       checked: selected,
       label: reason.label,
       excludeSemantics: true,
+      onTap: () => onSelected(reason),
       child: InkWell(
         key: Key('report-reason-${reason.name}'),
         onTap: () => onSelected(reason),
@@ -551,9 +555,7 @@ class _ReasonRow extends StatelessWidget {
                   child: Text(
                     reason.label,
                     style: theme.textTheme.bodyLarge?.copyWith(
-                      fontWeight: selected
-                          ? FontWeight.w600
-                          : FontWeight.w400,
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                     ),
                   ),
                 ),

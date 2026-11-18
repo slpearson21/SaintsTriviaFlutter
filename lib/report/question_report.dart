@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 import 'report_config.dart';
 
@@ -81,11 +82,12 @@ final class QuestionReport {
       uri = _mailto(question, fullNote);
       if (uri.toString().length <= maxMailtoLength) return uri;
     }
+    final noteChars = fullNote.characters;
     var low = 0;
-    var high = fullNote.length;
+    var high = noteChars.length;
     while (low <= high) {
       final mid = (low + high) ~/ 2;
-      final candidate = fullNote.substring(0, mid);
+      final candidate = noteChars.take(mid).string;
       final next = _mailto(question, candidate);
       if (next.toString().length <= maxMailtoLength) {
         uri = next;
@@ -133,8 +135,9 @@ final class QuestionReport {
 
   static String _trimNote(String value) {
     final trimmed = value.trim();
-    if (trimmed.length <= maxReportNoteLength) return trimmed;
-    return trimmed.substring(0, maxReportNoteLength);
+    final chars = trimmed.characters;
+    if (chars.length <= maxReportNoteLength) return trimmed;
+    return chars.take(maxReportNoteLength).string;
   }
 }
 
@@ -155,7 +158,19 @@ String formatReportUtc(DateTime time) {
 
 /// `iOS 18.1` style label from the current platform.
 String reportPlatformLabel() {
-  final name = switch (defaultTargetPlatform) {
+  return formatReportPlatform(
+    defaultTargetPlatform,
+    Platform.operatingSystemVersion,
+  );
+}
+
+/// Builds the platform line. iOS reports `Version 18.1 (Build …)`, so the
+/// leading "Version " is dropped.
+String formatReportPlatform(
+  TargetPlatform platform,
+  String operatingSystemVersion,
+) {
+  final name = switch (platform) {
     TargetPlatform.iOS => 'iOS',
     TargetPlatform.android => 'Android',
     TargetPlatform.macOS => 'macOS',
@@ -163,7 +178,10 @@ String reportPlatformLabel() {
     TargetPlatform.linux => 'Linux',
     TargetPlatform.fuchsia => 'Fuchsia',
   };
-  final version = Platform.operatingSystemVersion.trim();
+  final version = operatingSystemVersion.trim().replaceFirst(
+    RegExp(r'^Version\s+', caseSensitive: false),
+    '',
+  );
   if (version.toLowerCase().startsWith(name.toLowerCase())) return version;
   return '$name $version';
 }

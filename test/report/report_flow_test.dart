@@ -1,5 +1,9 @@
 import 'dart:math';
 
+import 'dart:ui' show CheckedState;
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -33,6 +37,15 @@ void main() {
 
     expect(find.byTooltip(reportFlagTooltip), findsOneWidget);
     expect(find.text('Next question'), findsOneWidget);
+    final semantics = tester.ensureSemantics();
+    expect(
+      tester
+          .getSemantics(find.byTooltip(reportFlagTooltip))
+          .getSemanticsData()
+          .hasAction(SemanticsAction.tap),
+      isTrue,
+    );
+    semantics.dispose();
     final flag = tester.getSize(find.byTooltip(reportFlagTooltip));
     expect(flag.width, greaterThanOrEqualTo(48));
     expect(flag.height, greaterThanOrEqualTo(48));
@@ -59,8 +72,17 @@ void main() {
     expect(find.text('Note (optional)'), findsOneWidget);
     expect(find.text(reportExpectation), findsOneWidget);
     expect(find.text('0/280'), findsOneWidget);
+    final semantics = tester.ensureSemantics();
+    expect(
+      tester.getSemantics(find.byKey(const Key('report-continue'))).hint,
+      reportChooseReasonHint,
+    );
+    semantics.dispose();
     final continueButton = tester.widget<FilledButton>(
-      find.byKey(const Key('report-continue')),
+      find.descendant(
+        of: find.byKey(const Key('report-continue')),
+        matching: find.byType(FilledButton),
+      ),
     );
     expect(continueButton.onPressed, isNull);
 
@@ -68,16 +90,38 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('report-sheet')), findsNothing);
     expect(find.text('Reported'), findsNothing);
+    expect(
+      tester
+          .widget<IconButton>(
+            find.ancestor(
+              of: find.byTooltip(reportFlagTooltip),
+              matching: find.byType(IconButton),
+            ),
+          )
+          .focusNode
+          ?.hasFocus,
+      isTrue,
+    );
 
     await tester.tap(find.byTooltip(reportFlagTooltip));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Typo or wording'));
     await tester.pumpAndSettle();
     expect(
-      tester.widget<FilledButton>(find.byKey(const Key('report-continue'))).onPressed,
+      tester
+          .widget<FilledButton>(
+            find.descendant(
+              of: find.byKey(const Key('report-continue')),
+              matching: find.byType(FilledButton),
+            ),
+          )
+          .onPressed,
       isNotNull,
     );
-    await tester.enterText(find.byKey(const Key('report-note')), 'Fix the wording');
+    await tester.enterText(
+      find.byKey(const Key('report-note')),
+      'Fix the wording',
+    );
     await tester.pump();
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
@@ -89,7 +133,9 @@ void main() {
     expect(note.controller?.text, 'Fix the wording');
   });
 
-  testWidgets('a successful launch marks the question reported', (tester) async {
+  testWidgets('a successful launch marks the question reported', (
+    tester,
+  ) async {
     final opened = <({Uri uri, LaunchMode mode})>[];
     final messages = await _announcements(tester);
     await _pumpGame(
@@ -119,17 +165,20 @@ void main() {
     expect(opened.single.uri.toString(), isNot(contains('+')));
     expect(opened.single.uri.toString(), contains('wrong-reference'));
     final body = Uri.decodeComponent(
-      opened.single.uri.query.split('&').skip(1).join('&').replaceFirst('body=', ''),
+      opened.single.uri.query
+          .split('&')
+          .skip(1)
+          .join('&')
+          .replaceFirst('body=', ''),
     );
     expect(body, contains('Correct answer (app): Alpha'));
     expect(body, contains("Player's answer: Alpha"));
     expect(body, contains('Source: game'));
 
     await tester.pump(const Duration(seconds: 2));
-    expect(
-      messages.where((message) => message == reportAnnouncement),
-      [reportAnnouncement],
-    );
+    expect(messages.where((message) => message == reportAnnouncement), [
+      reportAnnouncement,
+    ]);
 
     await tester.tap(find.text('Reported'));
     await tester.pumpAndSettle();
@@ -172,10 +221,20 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Typo or wording'));
     await tester.pumpAndSettle();
-    await tester.enterText(find.byKey(const Key('report-note')), 'Needs a look');
+    await tester.enterText(
+      find.byKey(const Key('report-note')),
+      'Needs a look',
+    );
     await tester.pumpAndSettle();
     expect(
-      tester.widget<FilledButton>(find.byKey(const Key('report-continue'))).onPressed,
+      tester
+          .widget<FilledButton>(
+            find.descendant(
+              of: find.byKey(const Key('report-continue')),
+              matching: find.byType(FilledButton),
+            ),
+          )
+          .onPressed,
       isNotNull,
     );
     await tester.tap(find.byKey(const Key('report-continue')));
@@ -212,7 +271,8 @@ void main() {
         tester,
         count: 1,
         canOpen: (_) async => true,
-        open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async => true,
+        open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async =>
+            true,
       );
       await tester.tap(find.text('Alpha'));
       await tester.pumpAndSettle();
@@ -232,23 +292,174 @@ void main() {
       );
       expect(card.label, isNot(contains('Report a problem')));
       expect(card.label, isNot(contains('Reported')));
-      final flag = tester.getSemantics(find.byKey(const Key('report-flag-bom-0001')));
+      final flag = tester.getSemantics(
+        find.byKey(const Key('report-flag-bom-0001')),
+      );
       expect(flag.label, contains('Reported'));
       expect(flag.flagsCollection.isButton, isTrue);
+      expect(flag.getSemanticsData().hasAction(SemanticsAction.tap), isTrue);
     } finally {
       semantics.dispose();
     }
   });
 
+  testWidgets('a semantics tap on Reported reopens the draft', (tester) async {
+    final semantics = tester.ensureSemantics();
+    try {
+      await _pumpGame(
+        tester,
+        canOpen: (_) async => true,
+        open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async =>
+            true,
+      );
+      await tester.tap(find.text('Alpha'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip(reportFlagTooltip));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Typo or wording'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('report-continue')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Reported'), findsOneWidget);
+      final reported = tester.getSemantics(find.text('Reported'));
+      expect(
+        reported.getSemanticsData().hasAction(SemanticsAction.tap),
+        isTrue,
+      );
+      tester.semantics.performAction(
+        find.semantics.byLabel('Reported'),
+        SemanticsAction.tap,
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('report-sheet')), findsOneWidget);
+      expect(find.text('Typo or wording'), findsOneWidget);
+    } finally {
+      semantics.dispose();
+    }
+  });
+
+  testWidgets('iOS reason rows are an exclusive group with a tap action', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    try {
+      await _pumpGame(tester);
+      await tester.tap(find.text('Alpha'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip(reportFlagTooltip));
+      await tester.pumpAndSettle();
+      for (final reason in ReportReason.values) {
+        final node = tester.getSemantics(
+          find.byKey(Key('report-reason-${reason.name}')),
+        );
+        expect(
+          node.flagsCollection.isInMutuallyExclusiveGroup,
+          isTrue,
+          reason: reason.name,
+        );
+        expect(
+          node.getSemanticsData().hasAction(SemanticsAction.tap),
+          isTrue,
+          reason: reason.name,
+        );
+        expect(
+          node.flagsCollection.isChecked,
+          isNot(CheckedState.isTrue),
+          reason: reason.name,
+        );
+      }
+      tester.semantics.performAction(
+        find.semantics.byLabel('Typo or wording'),
+        SemanticsAction.tap,
+      );
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .getSemantics(find.byKey(const Key('report-reason-typoOrWording')))
+            .flagsCollection
+            .isChecked,
+        CheckedState.isTrue,
+      );
+    } finally {
+      semantics.dispose();
+    }
+  });
+
+  testWidgets('reduce motion removes the flag animation', (tester) async {
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    await _pumpGame(tester);
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+    final switcher = tester.widget<AnimatedSwitcher>(
+      find.descendant(
+        of: find.byKey(const Key('report-flag-bom-0001')),
+        matching: find.byType(AnimatedSwitcher),
+      ),
+    );
+    expect(switcher.duration, Duration.zero);
+
+    await tester.tap(find.byTooltip(reportFlagTooltip));
+    await tester.pump();
+    expect(find.text(reportSheetTitle), findsOneWidget);
+  });
+
+  testWidgets('the report sheet fits at large text', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await _pumpGame(tester);
+    await tester.binding.setSurfaceSize(const Size(320, 640));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byTooltip(reportFlagTooltip));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip(reportFlagTooltip));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.text(reportSheetTitle), findsOneWidget);
+    expect(find.byKey(const Key('report-continue')), findsOneWidget);
+    expect(find.text('Cancel'), findsOneWidget);
+  });
+
+  testWidgets('a report from review records Source: review', (tester) async {
+    final opened = <Uri>[];
+    final container = await _pumpGame(
+      tester,
+      count: 1,
+      canOpen: (_) async => true,
+      open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async {
+        opened.add(uri);
+        return true;
+      },
+    );
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+    container.read(appRouterProvider).go(AppRoutes.review);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip(reportFlagTooltip));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Wrong reference'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('report-continue')));
+    await tester.pumpAndSettle();
+    expect(opened, hasLength(1));
+    expect(opened.single.toString(), contains('Source%3A%20review'));
+  });
+
   test('a new deal clears reported questions', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);
-    container.read(reportedQuestionIdsProvider.notifier).markReported('bom-0001');
-    container.read(reportedQuestionIdsProvider.notifier).saveDraft(
-      'bom-0001',
-      reason: ReportReason.other,
-      note: 'hi',
-    );
+    container
+        .read(reportedQuestionIdsProvider.notifier)
+        .markReported('bom-0001');
+    container
+        .read(reportedQuestionIdsProvider.notifier)
+        .saveDraft('bom-0001', reason: ReportReason.other, note: 'hi');
     final bank = QuestionBank(
       schemaVersion: 1,
       questions: [
@@ -264,11 +475,13 @@ void main() {
         ),
       ],
     );
-    container.read(gameControllerProvider.notifier).start(
-      bank: bank,
-      volumes: const [ScriptureVolume.bom],
-      requestedCount: 1,
-    );
+    container
+        .read(gameControllerProvider.notifier)
+        .start(
+          bank: bank,
+          volumes: const [ScriptureVolume.bom],
+          requestedCount: 1,
+        );
     final memory = container.read(reportedQuestionIdsProvider);
     expect(memory.reportedIds, isEmpty);
     expect(memory.drafts, isEmpty);
@@ -327,7 +540,10 @@ Future<ProviderContainer> _pumpGame(
   addTearDown(() => tester.binding.setSurfaceSize(null));
   final container = ProviderContainer(
     overrides: [
-      questionBankLoaderProvider.overrideWith((ref) => () async => _bank(count: count)),
+      questionBankLoaderProvider.overrideWith(
+        (ref) =>
+            () async => _bank(count: count),
+      ),
       gameRandomProvider.overrideWith((ref) => Random(1)),
       if (canOpen != null) canOpenLinkProvider.overrideWith((ref) => canOpen),
       if (open != null) openLinkProvider.overrideWith((ref) => open),
@@ -342,13 +558,15 @@ Future<ProviderContainer> _pumpGame(
     ),
   );
   await tester.pump();
-  container.read(appRouterProvider).go(
-    AppRoutes.game,
-    extra: LastGameSettings(
-      volumes: const [ScriptureVolume.bom],
-      questionCount: count,
-    ),
-  );
+  container
+      .read(appRouterProvider)
+      .go(
+        AppRoutes.game,
+        extra: LastGameSettings(
+          volumes: const [ScriptureVolume.bom],
+          questionCount: count,
+        ),
+      );
   await tester.pump();
   await tester.pump();
   return container;

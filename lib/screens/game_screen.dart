@@ -860,8 +860,7 @@ class _FeedbackSheet extends ConsumerWidget {
     final reference = question.reference;
     final explanation = question.explanation;
     final selected = answer.selectedIndex;
-    final selectedAnswer =
-        selected >= 0 && selected < question.options.length
+    final selectedAnswer = selected >= 0 && selected < question.options.length
         ? question.options[selected]
         : '';
     final showStreak = _streakMarks.contains(streak);
@@ -948,15 +947,17 @@ class _FeedbackSheet extends ConsumerWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Flexible(
-                          child: ScriptureReferenceChip(
-                            key: const Key('reference-chip'),
-                            reference: reference,
-                            background: scheme.secondaryContainer,
-                            foreground: scheme.onSecondaryContainer,
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: ScriptureReferenceChip(
+                              key: const Key('reference-chip'),
+                              reference: reference,
+                              background: scheme.secondaryContainer,
+                              foreground: scheme.onSecondaryContainer,
+                            ),
                           ),
                         ),
-                        const Spacer(),
                         ReportFlag(
                           key: Key('report-flag-${question.id}'),
                           target: ReportTarget(

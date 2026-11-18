@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../app_info.dart';
 import '../layout/home_back_button.dart';
 import '../layout/section_label.dart';
 import '../layout/st_icon.dart';
@@ -15,9 +16,6 @@ import '../progress/home_providers.dart';
 import '../report/report_config.dart';
 import '../services/open_link.dart';
 import '../theme/st_theme.dart';
-
-/// Shown on the About row. Matches the pubspec version.
-const scriptureTriviaVersionLabel = 'v1.0.0';
 
 const scriptureTriviaDisclaimer =
     'Scripture Trivia is a free, unofficial app. It is not an official '
