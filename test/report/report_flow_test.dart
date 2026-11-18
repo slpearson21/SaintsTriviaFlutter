@@ -160,6 +160,14 @@ void main() {
 
     expect(find.byKey(const Key('report-sheet')), findsNothing);
     expect(find.text('Reported'), findsOneWidget);
+    await tester.pump();
+    expect(
+      tester
+          .widget<TextButton>(find.widgetWithText(TextButton, 'Reported'))
+          .focusNode
+          ?.hasFocus,
+      isTrue,
+    );
     expect(find.text(reportThanksLine), findsOneWidget);
     expect(find.text('Next question'), findsOneWidget);
     expect(opened, hasLength(1));
@@ -434,8 +442,23 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
     expect(find.text(reportSheetTitle), findsOneWidget);
-    expect(find.byKey(const Key('report-continue')), findsOneWidget);
-    expect(find.text('Cancel'), findsOneWidget);
+    await tester.showKeyboard(find.byKey(const Key('report-note')));
+    const keyboard = 280.0;
+    tester.view.viewInsets = FakeViewPadding(
+      bottom: keyboard * tester.view.devicePixelRatio,
+    );
+    addTearDown(tester.view.resetViewInsets);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    final keyboardTop = 640.0 - keyboard;
+    expect(
+      tester.getRect(find.byKey(const Key('report-continue'))).bottom,
+      lessThanOrEqualTo(keyboardTop),
+    );
+    expect(
+      tester.getRect(find.text('Cancel')).bottom,
+      lessThanOrEqualTo(keyboardTop),
+    );
   });
 
   testWidgets('a report from review records Source: review', (tester) async {
@@ -461,6 +484,38 @@ void main() {
     await tester.pumpAndSettle();
     expect(opened, hasLength(1));
     expect(opened.single.toString(), contains('Source%3A%20review'));
+  });
+
+  testWidgets('a pause that resumes before the mail app returns still announces', (
+    tester,
+  ) async {
+    final messages = await _announcements(tester);
+    await _pumpGame(
+      tester,
+      canOpen: (_) async => true,
+      open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async {
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.inactive,
+        );
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+        return true;
+      },
+    );
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip(reportFlagTooltip));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Wrong answer'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('report-continue')));
+    await tester.pumpAndSettle();
+    expect(messages, isNot(contains(reportAnnouncement)));
+    await tester.pump(const Duration(seconds: 2));
+    expect(messages.where((message) => message == reportAnnouncement), [
+      reportAnnouncement,
+    ]);
   });
 
   testWidgets('a pause then resume announces once', (tester) async {
@@ -652,6 +707,8 @@ void main() {
       await tester.tap(find.byTooltip(reportFlagTooltip));
       await tester.pumpAndSettle();
       for (final guideline in guidelines) {
+        // Disabled Continue's hint is drawn in the disabled button colors,
+        // about 2.27:1, so the contrast check does not apply to this sheet.
         if (guideline == textContrastGuideline) continue;
         await expectLater(tester, meetsGuideline(guideline));
       }

@@ -90,14 +90,19 @@ class _ReportFlagState extends ConsumerState<ReportFlag> {
       _stopWatching();
       return;
     }
-    _focusNode.requestFocus();
     if (opened == null) {
+      _focusNode.requestFocus();
       _stopWatching();
       return;
     }
     ref
         .read(reportedQuestionIdsProvider.notifier)
         .markReported(widget.target.questionId);
+    // The idle flag is replaced by Reported in the next frame. Focus after
+    // that swap so the node is attached to the Reported button.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _focusNode.requestFocus();
+    });
     if (opened) {
       _announceWhenBack();
       return;
@@ -116,7 +121,11 @@ class _ReportFlagState extends ConsumerState<ReportFlag> {
       onInactive: () => _away = true,
       onHide: () => _away = true,
       onResume: () {
-        if (_wantAnnouncement && _away) _sendAnnouncement();
+        if (_wantAnnouncement && _away) {
+          _sendAnnouncement();
+        } else {
+          _away = false;
+        }
       },
     );
   }
@@ -341,15 +350,14 @@ class _ReportSheetState extends ConsumerState<_ReportSheet> {
       createdAtUtc: DateTime.now().toUtc(),
     );
     final uri = report.mailto;
+    final canOpenLink = ref.read(canOpenLinkProvider);
+    final openLink = ref.read(openLinkProvider);
     var opened = false;
     try {
-      final canOpen = await ref.read(canOpenLinkProvider)(uri);
+      final canOpen = await canOpenLink(uri);
       opened =
           canOpen &&
-          await ref.read(openLinkProvider)(
-            uri,
-            mode: LaunchMode.externalApplication,
-          );
+          await openLink(uri, mode: LaunchMode.externalApplication);
     } on Object {
       opened = false;
     }
