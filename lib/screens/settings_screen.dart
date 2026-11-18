@@ -4,6 +4,8 @@ import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../layout/home_back_button.dart';
 import '../layout/section_label.dart';
 import '../layout/st_icon.dart';
@@ -151,11 +153,8 @@ Future<void> _confirmReset(BuildContext context, WidgetRef ref) async {
 }
 
 /// Opens the mail app. A `false` result means nothing handled the mailto.
-Future<void> sendAppFeedback(
-  BuildContext context,
-  Future<bool> Function(Uri uri) open,
-) async {
-  final opened = await open(feedbackUri);
+Future<void> sendAppFeedback(BuildContext context, OpenLink open) async {
+  final opened = await open(feedbackUri, mode: LaunchMode.platformDefault);
   if (opened || !context.mounted) return;
   ScaffoldMessenger.of(context)
       .showSnackBar(const SnackBar(content: Text('No mail app was found.')));

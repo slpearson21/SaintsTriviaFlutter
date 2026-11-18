@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/semantics.dart';
@@ -18,6 +19,13 @@ import 'package:saints_trivia_flutter/services/open_link.dart';
 import 'package:saints_trivia_flutter/theme/st_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+const _guidelines = <AccessibilityGuideline>[
+  androidTapTargetGuideline,
+  iOSTapTargetGuideline,
+  labeledTapTargetGuideline,
+  textContrastGuideline,
+];
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -27,10 +35,10 @@ void main() {
       final semantics = tester.ensureSemantics();
       final opened = <({Uri uri, LaunchMode mode})>[];
       try {
-      await _pumpGame(
-        tester,
-        reference: 'Acts 3:2, 6-7',
-        count: 2,
+        await _pumpGame(
+          tester,
+          reference: 'Acts 3:2, 6-7',
+          count: 2,
           open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async {
             opened.add((uri: uri, mode: mode));
             return true;
@@ -59,9 +67,13 @@ void main() {
           find.widgetWithText(FilledButton, 'Next question'),
         );
         expect(chip.bottom, lessThanOrEqualTo(next.top));
+        for (final guideline in _guidelines) {
+          await expectLater(tester, meetsGuideline(guideline));
+        }
 
-        tester.semantics.tap(
+        tester.semantics.performAction(
           find.semantics.byLabel('Open Acts 3:2, 6-7 in Gospel Library'),
+          SemanticsAction.tap,
         );
         await tester.pumpAndSettle();
         expect(opened, hasLength(1));
@@ -98,7 +110,9 @@ void main() {
       await tester.ensureVisible(find.byKey(const Key('reference-chip')));
       await tester.pumpAndSettle();
       final chip = tester.getRect(find.byKey(const Key('reference-chip')));
-      final next = tester.getRect(find.widgetWithText(FilledButton, 'Next question'));
+      final next = tester.getRect(
+        find.widgetWithText(FilledButton, 'Next question'),
+      );
       expect(chip.bottom, lessThanOrEqualTo(next.top));
       expect(tester.takeException(), isNull);
 
@@ -107,6 +121,32 @@ void main() {
       expect(opened, [gospelLibraryUri('1 Nephi 1:1')]);
     },
   );
+
+  testWidgets('a second tap while a launch is in flight opens once', (
+    tester,
+  ) async {
+    final release = Completer<bool>();
+    var calls = 0;
+    await _pumpGame(
+      tester,
+      reference: 'Acts 3:2, 6-7',
+      open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) {
+        calls += 1;
+        expect(mode, LaunchMode.externalApplication);
+        return release.future;
+      },
+    );
+    await tester.tap(find.text('Alpha'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('reference-chip')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('reference-chip')));
+    await tester.pump();
+    expect(calls, 1);
+    release.complete(true);
+    await tester.pumpAndSettle();
+    expect(calls, 1);
+  });
 
   testWidgets('a failed launch on the feedback sheet shows a SnackBar', (
     tester,
@@ -157,6 +197,9 @@ void main() {
       final chip = tester.getRect(chipFinder);
       expect(chip.width, greaterThanOrEqualTo(StSpace.minTap));
       expect(chip.height, greaterThanOrEqualTo(StSpace.minTap));
+      for (final guideline in _guidelines) {
+        await expectLater(tester, meetsGuideline(guideline));
+      }
 
       await tester.tap(find.text('D&C 1:38'));
       await tester.pumpAndSettle();
@@ -278,7 +321,8 @@ Future<void> _pumpGame(
   final container = ProviderContainer(
     overrides: [
       questionBankLoaderProvider.overrideWith(
-        (ref) => () async => _bank(reference, count: count),
+        (ref) =>
+            () async => _bank(reference, count: count),
       ),
       gameRandomProvider.overrideWith((ref) => Random(1)),
       if (!showExplanations)
@@ -295,13 +339,15 @@ Future<void> _pumpGame(
     ),
   );
   await tester.pump();
-  container.read(appRouterProvider).go(
-    AppRoutes.game,
-    extra: LastGameSettings(
-      volumes: const [ScriptureVolume.bom],
-      questionCount: count,
-    ),
-  );
+  container
+      .read(appRouterProvider)
+      .go(
+        AppRoutes.game,
+        extra: LastGameSettings(
+          volumes: const [ScriptureVolume.bom],
+          questionCount: count,
+        ),
+      );
   await tester.pump();
   await tester.pump();
 }
@@ -346,7 +392,8 @@ Future<void> _pumpReview(
   final container = ProviderContainer(
     overrides: [
       questionBankLoaderProvider.overrideWith(
-        (ref) => () async => _bank(reference),
+        (ref) =>
+            () async => _bank(reference),
       ),
       gameControllerProvider.overrideWith(() => _HeldGame(session)),
       openLinkProvider.overrideWith((ref) => open),

@@ -5,8 +5,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import 'package:saints_trivia_flutter/app.dart';
 import 'package:saints_trivia_flutter/data/questions/scripture_volume.dart';
 import 'package:saints_trivia_flutter/persistence/app_settings.dart';
@@ -242,8 +243,14 @@ void main() {
           body: Builder(
             builder: (context) {
               return FilledButton(
-                onPressed: () =>
-                    unawaited(sendAppFeedback(context, (_) async => false)),
+                onPressed: () => unawaited(
+                  sendAppFeedback(context, (
+                    uri, {
+                    LaunchMode mode = LaunchMode.platformDefault,
+                  }) async {
+                    return false;
+                  }),
+                ),
                 child: const Text('Send'),
               );
             },
@@ -256,14 +263,45 @@ void main() {
     expect(find.text('No mail app was found.'), findsOneWidget);
   });
 
+  testWidgets('settings feedback uses the platform default launch mode', (
+    tester,
+  ) async {
+    LaunchMode? seen;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) {
+              return FilledButton(
+                onPressed: () => unawaited(
+                  sendAppFeedback(context, (
+                    uri, {
+                    LaunchMode mode = LaunchMode.platformDefault,
+                  }) async {
+                    seen = mode;
+                    return true;
+                  }),
+                ),
+                child: const Text('Send'),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Send'));
+    await tester.pump();
+    expect(seen, LaunchMode.platformDefault);
+  });
+
   testWidgets('feedback is hidden and about shows the disclaimer', (
     tester,
   ) async {
-    final opened = <Uri>[];
+    final opened = <({Uri uri, LaunchMode mode})>[];
     await _pump(
       tester,
       openLink: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async {
-        opened.add(uri);
+        opened.add((uri: uri, mode: mode));
         return true;
       },
     );

@@ -260,9 +260,11 @@ class _AnswerCard extends StatelessWidget {
     final mark = correct ? colors.correct : colors.wrong;
     final status = correct ? 'Correct' : 'Missed';
     final reference = answer.question.reference;
-    final linked = gospelLibraryUri(reference) != null;
-    final chip = ScriptureReferenceChip(
+    final link = gospelLibraryUri(reference);
+    final linked = link != null;
+    final chip = ScriptureReferenceChip.fromLink(
       reference: reference,
+      link: link,
       background: scheme.primaryContainer,
       foreground: scheme.onPrimaryContainer,
       borderRadius: const BorderRadius.all(StRadius.full),
@@ -300,10 +302,7 @@ class _AnswerCard extends StatelessWidget {
               color: colors.correct,
             ),
           ],
-          if (!linked) ...[
-            const SizedBox(height: StSpace.sm),
-            chip,
-          ],
+          if (!linked) ...[const SizedBox(height: StSpace.sm), chip],
         ],
       ),
     );

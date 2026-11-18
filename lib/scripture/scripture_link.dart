@@ -57,11 +57,7 @@ const gospelLibraryBooks = <GospelLibraryBook>[
   GospelLibraryBook(volume: 'ot', slug: 'ps', names: ['Psalms', 'Psalm']),
   GospelLibraryBook(volume: 'ot', slug: 'prov', names: ['Proverbs']),
   GospelLibraryBook(volume: 'ot', slug: 'eccl', names: ['Ecclesiastes']),
-  GospelLibraryBook(
-    volume: 'ot',
-    slug: 'song',
-    names: ['Song of Solomon'],
-  ),
+  GospelLibraryBook(volume: 'ot', slug: 'song', names: ['Song of Solomon']),
   GospelLibraryBook(volume: 'ot', slug: 'isa', names: ['Isaiah']),
   GospelLibraryBook(volume: 'ot', slug: 'jer', names: ['Jeremiah']),
   GospelLibraryBook(volume: 'ot', slug: 'lam', names: ['Lamentations']),
@@ -91,16 +87,8 @@ const gospelLibraryBooks = <GospelLibraryBook>[
   GospelLibraryBook(volume: 'nt', slug: 'eph', names: ['Ephesians']),
   GospelLibraryBook(volume: 'nt', slug: 'philip', names: ['Philippians']),
   GospelLibraryBook(volume: 'nt', slug: 'col', names: ['Colossians']),
-  GospelLibraryBook(
-    volume: 'nt',
-    slug: '1-thes',
-    names: ['1 Thessalonians'],
-  ),
-  GospelLibraryBook(
-    volume: 'nt',
-    slug: '2-thes',
-    names: ['2 Thessalonians'],
-  ),
+  GospelLibraryBook(volume: 'nt', slug: '1-thes', names: ['1 Thessalonians']),
+  GospelLibraryBook(volume: 'nt', slug: '2-thes', names: ['2 Thessalonians']),
   GospelLibraryBook(volume: 'nt', slug: '1-tim', names: ['1 Timothy']),
   GospelLibraryBook(volume: 'nt', slug: '2-tim', names: ['2 Timothy']),
   GospelLibraryBook(volume: 'nt', slug: 'titus', names: ['Titus']),
@@ -120,11 +108,7 @@ const gospelLibraryBooks = <GospelLibraryBook>[
   GospelLibraryBook(volume: 'bofm', slug: 'enos', names: ['Enos']),
   GospelLibraryBook(volume: 'bofm', slug: 'jarom', names: ['Jarom']),
   GospelLibraryBook(volume: 'bofm', slug: 'omni', names: ['Omni']),
-  GospelLibraryBook(
-    volume: 'bofm',
-    slug: 'w-of-m',
-    names: ['Words of Mormon'],
-  ),
+  GospelLibraryBook(volume: 'bofm', slug: 'w-of-m', names: ['Words of Mormon']),
   GospelLibraryBook(volume: 'bofm', slug: 'mosiah', names: ['Mosiah']),
   GospelLibraryBook(volume: 'bofm', slug: 'alma', names: ['Alma']),
   GospelLibraryBook(volume: 'bofm', slug: 'hel', names: ['Helaman']),
@@ -184,8 +168,7 @@ ScriptureReferenceLink? parseScriptureReference(String reference) {
   for (final entry in gospelLibraryBooks) {
     for (final name in entry.names) {
       final key = normalizeScriptureName(name);
-      final matches =
-          normalized == key || normalized.startsWith('$key ');
+      final matches = normalized == key || normalized.startsWith('$key ');
       if (matches && key.length > matchedName.length) {
         book = entry;
         matchedName = key;
@@ -197,8 +180,8 @@ ScriptureReferenceLink? parseScriptureReference(String reference) {
   final rest = normalized.substring(matchedName.length).trim();
   final chapterMatch = RegExp(r'^(\d+)(?::(.*))?$').firstMatch(rest);
   if (chapterMatch == null) return null;
-  final chapter = int.parse(chapterMatch.group(1)!);
-  if (chapter <= 0) return null;
+  final chapter = int.tryParse(chapterMatch.group(1)!);
+  if (chapter == null || chapter <= 0) return null;
 
   final hasVerseMark = rest.contains(':');
   final verseSpec = chapterMatch.group(2)?.trim();
@@ -242,19 +225,21 @@ _VerseId? _verseId(String spec) {
   for (final raw in parts) {
     final part = raw.trim();
     if (part.isEmpty) return null;
-    final range = RegExp(r'^(\d+)\s*[-–]\s*(\d+)$').firstMatch(part);
+    final range = RegExp(r'^(\d+)\s*-\s*(\d+)$').firstMatch(part);
     if (range != null) {
-      final start = int.parse(range.group(1)!);
-      final end = int.parse(range.group(2)!);
-      if (start <= 0 || end < start) return null;
+      final start = int.tryParse(range.group(1)!);
+      final end = int.tryParse(range.group(2)!);
+      if (start == null || end == null || start <= 0 || end < start) {
+        return null;
+      }
       first ??= start;
       pieces.add('p$start-p$end');
       continue;
     }
     final single = RegExp(r'^(\d+)$').firstMatch(part);
     if (single == null) return null;
-    final verse = int.parse(single.group(1)!);
-    if (verse <= 0) return null;
+    final verse = int.tryParse(single.group(1)!);
+    if (verse == null || verse <= 0) return null;
     first ??= verse;
     pieces.add('p$verse');
   }

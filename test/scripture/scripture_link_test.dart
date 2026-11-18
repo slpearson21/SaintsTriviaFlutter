@@ -251,22 +251,41 @@ void main() {
         final normalized = normalizeScriptureName(reference);
         expect(
           parsed.book.names.any(
-            (name) => normalized.startsWith(
-              '${normalizeScriptureName(name)} ',
-            ),
+            (name) => normalized.startsWith('${normalizeScriptureName(name)} '),
           ),
           isTrue,
           reason: reference,
         );
         expect(
-          parsed.uri.path,
-          '/study/scriptures/${parsed.book.volume}/${parsed.book.slug}/'
-          '${parsed.uri.pathSegments.last}',
+          parsed.uri.toString(),
+          matches(_gospelLibraryUrl),
+          reason: reference,
         );
         expect(parsed.uri.toString(), isNot(contains('lang=')));
+        final chapter = _chapterIn(normalized, parsed.book);
+        expect(parsed.uri.pathSegments.last, chapter, reason: reference);
         count += 1;
       }
     }
     expect(count, 591);
   });
+}
+
+/// Gospel Library chapter URLs this app builds. The query is omitted for a
+/// chapter with no verses.
+final _gospelLibraryUrl = RegExp(
+  r'^https://www\.churchofjesuschrist\.org/study/scriptures/'
+  r'(ot|nt|bofm|dc-testament|pgp)/[a-z0-9-]+/[1-9]\d*'
+  r'(\?id=p\d+(-p\d+)?(,p\d+(-p\d+)?)*#p\d+)?$',
+);
+
+String _chapterIn(String normalized, GospelLibraryBook book) {
+  var matchedName = '';
+  for (final name in book.names) {
+    final key = normalizeScriptureName(name);
+    final matches = normalized == key || normalized.startsWith('$key ');
+    if (matches && key.length > matchedName.length) matchedName = key;
+  }
+  final rest = normalized.substring(matchedName.length).trim();
+  return RegExp(r'^(\d+)').firstMatch(rest)!.group(1)!;
 }
