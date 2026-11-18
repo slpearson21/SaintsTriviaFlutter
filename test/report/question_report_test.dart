@@ -168,7 +168,8 @@ void main() {
       'assets/questions/v1/doctrine_and_covenants.json',
       'assets/questions/v1/pearl_of_great_price.json',
     ];
-    const note = 'The reference looks wrong.';
+    final note = 'n' * 280;
+    var count = 0;
     for (final path in files) {
       final questions = jsonDecode(File(path).readAsStringSync()) as List;
       for (final raw in questions) {
@@ -197,7 +198,9 @@ void main() {
         );
         expect(body, report.body, reason: question['id']);
         expect(body, contains('Note: $note'));
+        count += 1;
       }
     }
+    expect(count, 591);
   });
 }

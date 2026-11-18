@@ -160,6 +160,14 @@ void main() {
 
     expect(find.byKey(const Key('report-sheet')), findsNothing);
     expect(find.text('Reported'), findsOneWidget);
+    await tester.pump();
+    expect(
+      tester
+          .widget<TextButton>(find.widgetWithText(TextButton, 'Reported'))
+          .focusNode
+          ?.hasFocus,
+      isTrue,
+    );
     expect(find.text(reportThanksLine), findsOneWidget);
     expect(find.text('Next question'), findsOneWidget);
     expect(opened, hasLength(1));
@@ -247,6 +255,19 @@ void main() {
     expect(find.text(reportNoMailTitle), findsWidgets);
     expect(find.text('Reported'), findsOneWidget);
     expect(find.byKey(const Key('report-no-mail-dialog')), findsOneWidget);
+    final reportedNode = tester
+        .widget<TextButton>(find.widgetWithText(TextButton, 'Reported'))
+        .focusNode;
+    expect(reportedNode?.hasFocus, isFalse);
+    final primary = FocusManager.instance.primaryFocus;
+    expect(primary, isNot(reportedNode));
+    final dialogScope = FocusScope.of(
+      tester.element(find.byKey(const Key('report-no-mail-dialog'))),
+    );
+    expect(
+      primary == dialogScope || primary!.ancestors.contains(dialogScope),
+      isTrue,
+    );
     expect(find.text(reportNoMailTitle), findsOneWidget);
     expect(find.text(kReportEmail), findsOneWidget);
     expect(clipboard, contains('To: $kReportEmail'));
@@ -263,6 +284,13 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Reported'), findsOneWidget);
     expect(find.text('Next question'), findsOneWidget);
+    expect(
+      tester
+          .widget<TextButton>(find.widgetWithText(TextButton, 'Reported'))
+          .focusNode
+          ?.hasFocus,
+      isTrue,
+    );
   });
 
   testWidgets('review flags sit outside the card and keep an in-game report', (
@@ -434,8 +462,26 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
     expect(find.text(reportSheetTitle), findsOneWidget);
-    expect(find.byKey(const Key('report-continue')), findsOneWidget);
-    expect(find.text('Cancel'), findsOneWidget);
+    await tester.showKeyboard(find.byKey(const Key('report-note')));
+    const keyboard = 280.0;
+    tester.view.viewInsets = FakeViewPadding(
+      bottom: keyboard * tester.view.devicePixelRatio,
+    );
+    addTearDown(tester.view.resetViewInsets);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    // setSurfaceSize sizes the render view. tester.view.physicalSize stays
+    // on the default 800×600 viewport, so it is not the surface under test.
+    final surfaceHeight = tester.binding.renderViews.single.size.height;
+    final keyboardTop = surfaceHeight - keyboard;
+    expect(
+      tester.getRect(find.byKey(const Key('report-continue'))).bottom,
+      lessThanOrEqualTo(keyboardTop),
+    );
+    expect(
+      tester.getRect(find.text('Cancel')).bottom,
+      lessThanOrEqualTo(keyboardTop),
+    );
   });
 
   testWidgets('a report from review records Source: review', (tester) async {
@@ -462,6 +508,45 @@ void main() {
     expect(opened, hasLength(1));
     expect(opened.single.toString(), contains('Source%3A%20review'));
   });
+
+  testWidgets(
+    'a pause that resumes before the mail app returns still announces',
+    (tester) async {
+      final messages = await _announcements(tester);
+      await _pumpGame(
+        tester,
+        canOpen: (_) async => true,
+        open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async {
+          tester.binding.handleAppLifecycleStateChanged(
+            AppLifecycleState.paused,
+          );
+          tester.binding.handleAppLifecycleStateChanged(
+            AppLifecycleState.hidden,
+          );
+          tester.binding.handleAppLifecycleStateChanged(
+            AppLifecycleState.inactive,
+          );
+          tester.binding.handleAppLifecycleStateChanged(
+            AppLifecycleState.resumed,
+          );
+          return true;
+        },
+      );
+      await tester.tap(find.text('Alpha'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip(reportFlagTooltip));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Wrong answer'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('report-continue')));
+      await tester.pumpAndSettle();
+      expect(messages, isNot(contains(reportAnnouncement)));
+      await tester.pump(const Duration(seconds: 2));
+      expect(messages.where((message) => message == reportAnnouncement), [
+        reportAnnouncement,
+      ]);
+    },
+  );
 
   testWidgets('a pause then resume announces once', (tester) async {
     final messages = await _announcements(tester);
@@ -651,8 +736,9 @@ void main() {
       }
       await tester.tap(find.byTooltip(reportFlagTooltip));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('Other'));
+      await tester.pumpAndSettle();
       for (final guideline in guidelines) {
-        if (guideline == textContrastGuideline) continue;
         await expectLater(tester, meetsGuideline(guideline));
       }
       await tester.tap(find.text('Cancel'));
