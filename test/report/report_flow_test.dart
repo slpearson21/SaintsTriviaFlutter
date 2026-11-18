@@ -258,6 +258,7 @@ void main() {
     final reportedNode = tester
         .widget<TextButton>(find.widgetWithText(TextButton, 'Reported'))
         .focusNode;
+    expect(reportedNode?.hasFocus, isFalse);
     final primary = FocusManager.instance.primaryFocus;
     expect(primary, isNot(reportedNode));
     final dialogScope = FocusScope.of(
@@ -469,7 +470,10 @@ void main() {
     addTearDown(tester.view.resetViewInsets);
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
-    final keyboardTop = 640.0 - keyboard;
+    // setSurfaceSize sizes the render view. tester.view.physicalSize stays
+    // on the default 800×600 viewport, so it is not the surface under test.
+    final surfaceHeight = tester.binding.renderViews.single.size.height;
+    final keyboardTop = surfaceHeight - keyboard;
     expect(
       tester.getRect(find.byKey(const Key('report-continue'))).bottom,
       lessThanOrEqualTo(keyboardTop),
@@ -505,37 +509,44 @@ void main() {
     expect(opened.single.toString(), contains('Source%3A%20review'));
   });
 
-  testWidgets('a pause that resumes before the mail app returns still announces', (
-    tester,
-  ) async {
-    final messages = await _announcements(tester);
-    await _pumpGame(
-      tester,
-      canOpen: (_) async => true,
-      open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async {
-        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
-        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
-        tester.binding.handleAppLifecycleStateChanged(
-          AppLifecycleState.inactive,
-        );
-        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
-        return true;
-      },
-    );
-    await tester.tap(find.text('Alpha'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip(reportFlagTooltip));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Wrong answer'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('report-continue')));
-    await tester.pumpAndSettle();
-    expect(messages, isNot(contains(reportAnnouncement)));
-    await tester.pump(const Duration(seconds: 2));
-    expect(messages.where((message) => message == reportAnnouncement), [
-      reportAnnouncement,
-    ]);
-  });
+  testWidgets(
+    'a pause that resumes before the mail app returns still announces',
+    (tester) async {
+      final messages = await _announcements(tester);
+      await _pumpGame(
+        tester,
+        canOpen: (_) async => true,
+        open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async {
+          tester.binding.handleAppLifecycleStateChanged(
+            AppLifecycleState.paused,
+          );
+          tester.binding.handleAppLifecycleStateChanged(
+            AppLifecycleState.hidden,
+          );
+          tester.binding.handleAppLifecycleStateChanged(
+            AppLifecycleState.inactive,
+          );
+          tester.binding.handleAppLifecycleStateChanged(
+            AppLifecycleState.resumed,
+          );
+          return true;
+        },
+      );
+      await tester.tap(find.text('Alpha'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip(reportFlagTooltip));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Wrong answer'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('report-continue')));
+      await tester.pumpAndSettle();
+      expect(messages, isNot(contains(reportAnnouncement)));
+      await tester.pump(const Duration(seconds: 2));
+      expect(messages.where((message) => message == reportAnnouncement), [
+        reportAnnouncement,
+      ]);
+    },
+  );
 
   testWidgets('a pause then resume announces once', (tester) async {
     final messages = await _announcements(tester);
@@ -725,10 +736,9 @@ void main() {
       }
       await tester.tap(find.byTooltip(reportFlagTooltip));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('Other'));
+      await tester.pumpAndSettle();
       for (final guideline in guidelines) {
-        // Disabled Continue's hint is drawn in the disabled button colors,
-        // about 2.27:1, so the contrast check does not apply to this sheet.
-        if (guideline == textContrastGuideline) continue;
         await expectLater(tester, meetsGuideline(guideline));
       }
       await tester.tap(find.text('Cancel'));

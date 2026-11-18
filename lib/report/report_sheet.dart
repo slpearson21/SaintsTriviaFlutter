@@ -243,7 +243,6 @@ bool _reportUsesCupertino() {
   };
 }
 
-/// Opens the report sheet. Returns when it closes.
 /// Tracks a launch that can outlive the sheet. A swipe while the mail
 /// app is opening dismisses the route before [openLink] returns.
 final class _SheetLaunch {
@@ -255,6 +254,7 @@ final class _SheetLaunch {
   }
 }
 
+/// Opens the report sheet. Returns when it closes.
 Future<bool?> showReportSheet(
   BuildContext context,
   WidgetRef ref, {
@@ -359,8 +359,7 @@ class _ReportSheetState extends ConsumerState<_ReportSheet> {
     try {
       final canOpen = await canOpenLink(uri);
       opened =
-          canOpen &&
-          await openLink(uri, mode: LaunchMode.externalApplication);
+          canOpen && await openLink(uri, mode: LaunchMode.externalApplication);
     } on Object {
       opened = false;
     }
@@ -667,11 +666,11 @@ class _IosNoMailDialog extends StatelessWidget {
               color: scheme.surfaceContainerHigh,
               borderRadius: const BorderRadius.all(StRadius.sm),
             ),
-            child: const Padding(
-              padding: EdgeInsets.all(StSpace.sm),
-              child: SizedBox(
-                height: StSpace.minTap,
-                child: SelectableText(kReportEmail),
+            child: Padding(
+              padding: const EdgeInsets.all(StSpace.sm),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: StSpace.minTap),
+                child: const SelectableText(kReportEmail),
               ),
             ),
           ),
@@ -715,12 +714,14 @@ class _AndroidNoMailDialog extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Padding(
-                    padding: EdgeInsets.all(StSpace.sm),
-                    child: SizedBox(
-                      height: StSpace.minTap,
-                      child: SelectableText(kReportEmail),
+                    padding: const EdgeInsets.all(StSpace.sm),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        minHeight: StSpace.minTap,
+                      ),
+                      child: const SelectableText(kReportEmail),
                     ),
                   ),
                 ),
