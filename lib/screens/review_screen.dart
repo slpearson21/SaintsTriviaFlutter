@@ -9,6 +9,7 @@ import '../layout/section_label.dart';
 import '../layout/st_icon.dart';
 import '../layout/text_scale.dart';
 import '../progress/play_again.dart';
+import '../report/report_sheet.dart';
 import '../results/results_summary.dart';
 import '../routing/routes.dart';
 import '../scripture/scripture_link.dart';
@@ -308,10 +309,19 @@ class _AnswerCard extends StatelessWidget {
     );
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(StSpace.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.fromLTRB(
+          StSpace.md,
+          StSpace.md,
+          StSpace.xxs,
+          StSpace.xxs,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
             MergeSemantics(
               key: Key('review-answer-${answer.question.id}'),
               child: Column(
@@ -349,6 +359,20 @@ class _AnswerCard extends StatelessWidget {
                 child: chip,
               ),
             ],
+                ],
+              ),
+            ),
+            ReportFlag(
+              key: Key('report-flag-${answer.question.id}'),
+              target: ReportTarget(
+                questionId: answer.question.id,
+                prompt: answer.question.prompt,
+                correctAnswer: answer.correctText,
+                selectedAnswer: answer.selectedText,
+                reference: reference,
+                source: 'review',
+              ),
+            ),
           ],
         ),
       ),

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/questions/question_bank.dart';
 import '../data/questions/scripture_volume.dart';
 import '../persistence/persistence_providers.dart';
+import '../report/reported_questions_provider.dart';
 import 'game_engine.dart';
 
 /// Source of randomness for a deal.
@@ -31,6 +32,7 @@ class GameController extends Notifier<GameSession?> {
     required List<ScriptureVolume> volumes,
     required int requestedCount,
   }) {
+    ref.read(reportedQuestionIdsProvider.notifier).clear();
     state = startGame(
       bank: bank,
       volumes: volumes,
