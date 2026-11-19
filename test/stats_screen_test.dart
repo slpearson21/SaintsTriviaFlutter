@@ -11,8 +11,6 @@ import 'package:saints_trivia_flutter/progress/home_providers.dart';
 import 'package:saints_trivia_flutter/routing/app_router.dart';
 import 'package:saints_trivia_flutter/routing/routes.dart';
 
-import 'pump_app.dart';
-
 const _guidelines = <AccessibilityGuideline>[
   androidTapTargetGuideline,
   iOSTapTargetGuideline,
@@ -136,7 +134,6 @@ void main() {
     addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
     try {
       for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
-        captureAppThemes();
         debugDefaultTargetPlatformOverride = platform;
         for (final brightness in Brightness.values) {
           tester.platformDispatcher.platformBrightnessTestValue = brightness;

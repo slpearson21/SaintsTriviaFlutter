@@ -682,7 +682,6 @@ Future<ProviderContainer> _pumpHome(
 }) async {
   await tester.binding.setSurfaceSize(surface);
   addTearDown(() => tester.binding.setSurfaceSize(null));
-  captureAppThemes();
   debugDefaultTargetPlatformOverride = platform;
   addTearDown(() => debugDefaultTargetPlatformOverride = null);
   final container = ProviderContainer(

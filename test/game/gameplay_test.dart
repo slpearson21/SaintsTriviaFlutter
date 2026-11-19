@@ -16,8 +16,6 @@ import 'package:saints_trivia_flutter/routing/app_router.dart';
 import 'package:saints_trivia_flutter/routing/routes.dart';
 import 'package:saints_trivia_flutter/theme/st_theme.dart';
 
-import '../pump_app.dart';
-
 QuestionBank _bank(
   int count, {
   String reference = '1 Nephi 1:1',
@@ -74,7 +72,6 @@ Future<ProviderContainer> _pumpGame(
     addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
   }
   if (platform != null) {
-    captureAppThemes();
     debugDefaultTargetPlatformOverride = platform;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
   }
