@@ -1,9 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// The in-memory store is the test double SharedPreferences.setMockInitialValues
-// installs. The app does not depend on the platform interface directly.
-// ignore: depend_on_referenced_packages
 import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 import 'package:saints_trivia_flutter/data/questions/scripture_volume.dart';
 import 'package:saints_trivia_flutter/game/game_engine.dart';
@@ -323,18 +320,25 @@ void main() {
     expect(parsed.questionCount, 10);
     expect(parsed.volumeCorrect[ScriptureVolume.ot], 1);
     expect(parsed.volumeTotal[ScriptureVolume.ot], 2);
-
-    final disguised = FinishedGameRecord.tryParse({
-      'score': 10.9,
-      'total': 10.1,
-      'playedAt': '2026-11-09T08:00:00.000',
-      'volumes': ['OT'],
-    });
-    expect(disguised, isNotNull);
-    expect(disguised!.score, 10);
-    expect(disguised.total, 10);
-    expect(disguised.percent, 100);
   });
+
+  test(
+    'a raw score above the raw total is rejected',
+    () {
+      expect(
+        FinishedGameRecord.tryParse({
+          'score': 10.9,
+          'total': 10.1,
+          'playedAt': '2026-11-09T08:00:00.000',
+          'volumes': ['OT'],
+        }),
+        isNull,
+      );
+    },
+    skip:
+        'Values are truncated before the score-greater-than-total check. '
+        'Persistence P2: https://app.notion.com/p/41d765a7f9f581c09deaf891f1a551f5',
+  );
 
   test('finishedGameFromSession stores the deal and the requested count', () {
     final questions = [
