@@ -15,9 +15,17 @@ ThemeData _theme(Brightness brightness) {
   );
 }
 
-/// Built once. [SaintsTriviaApp] must not call [buildTheme] on every rebuild.
-final ThemeData lightTheme = _theme(Brightness.light);
-final ThemeData darkTheme = _theme(Brightness.dark);
+/// Light theme for the platform at the moment it is built.
+ThemeData buildLightTheme() => _theme(Brightness.light);
+
+/// Dark theme for the platform at the moment it is built.
+ThemeData buildDarkTheme() => _theme(Brightness.dark);
+
+/// Fresh light theme. Same result as [buildLightTheme].
+ThemeData get lightTheme => buildLightTheme();
+
+/// Fresh dark theme. Same result as [buildDarkTheme].
+ThemeData get darkTheme => buildDarkTheme();
 
 class SaintsTriviaApp extends ConsumerWidget {
   const SaintsTriviaApp({super.key});
@@ -28,8 +36,8 @@ class SaintsTriviaApp extends ConsumerWidget {
     final themeMode = ref.watch(settingsProvider).themeMode;
     return MaterialApp.router(
       title: 'Scripture Trivia',
-      theme: lightTheme,
-      darkTheme: darkTheme,
+      theme: buildLightTheme(),
+      darkTheme: buildDarkTheme(),
       themeMode: themeMode,
       routerConfig: router,
       builder: (context, child) {
