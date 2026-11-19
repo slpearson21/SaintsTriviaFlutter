@@ -1,7 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 import 'package:saints_trivia_flutter/data/questions/scripture_volume.dart';
+import 'package:saints_trivia_flutter/game/game_engine.dart';
 import 'package:saints_trivia_flutter/main.dart';
 import 'package:saints_trivia_flutter/persistence/app_settings.dart';
 import 'package:saints_trivia_flutter/persistence/finished_game_record.dart';
@@ -171,6 +173,269 @@ void main() {
     );
   });
 
+  test('broken game JSON and a non-list are dropped', () async {
+    SharedPreferences.setMockInitialValues({
+      SharedPreferencesProgressRepository.gamesKey: '{not json',
+    });
+    final broken = await SharedPreferences.getInstance();
+    expect(SharedPreferencesProgressRepository(broken).readGames(), isEmpty);
+
+    for (final raw in ['{"score": 1}', '"games"', '12', 'null']) {
+      SharedPreferences.setMockInitialValues({
+        SharedPreferencesProgressRepository.gamesKey: raw,
+      });
+      final prefs = await SharedPreferences.getInstance();
+      expect(
+        SharedPreferencesProgressRepository(prefs).readGames(),
+        isEmpty,
+        reason: raw,
+      );
+    }
+  });
+
+  test('a failed save is logged and does not throw', () async {
+    final printed = <String>[];
+    final previous = debugPrint;
+    debugPrint = (String? message, {int? wrapWidth}) {
+      printed.add(message ?? '');
+    };
+    addTearDown(() => debugPrint = previous);
+    addTearDown(() {
+      SharedPreferences.resetStatic();
+      SharedPreferences.setMockInitialValues({});
+    });
+
+    SharedPreferences.resetStatic();
+    SharedPreferencesStorePlatform.instance = _FailingPrefsStore();
+    final prefs = await SharedPreferences.getInstance();
+    final repo = SharedPreferencesProgressRepository(prefs);
+
+    repo.writeGames([game]);
+    repo.writeSettings(settings);
+    await pumpEventQueue();
+
+    final log = printed.join('\n');
+    expect(
+      log,
+      contains(
+        'Could not save ${SharedPreferencesProgressRepository.gamesKey}',
+      ),
+    );
+    expect(
+      log,
+      contains(
+        'Could not save ${SharedPreferencesProgressRepository.settingsKey}',
+      ),
+    );
+    expect(log, contains('disk full'));
+    // SharedPreferences updates its cache before the platform write, so a
+    // failed save is still what the next read in this process returns.
+    expect(repo.readGames(), hasLength(1));
+    expect(repo.readSettings(), settings);
+  });
+
+  test('an unreadable playedAt is dropped', () {
+    for (final playedAt in ['not-a-date', '', 20261109]) {
+      expect(
+        FinishedGameRecord.tryParse({
+          'score': 1,
+          'total': 1,
+          'playedAt': playedAt,
+          'volumes': ['OT'],
+        }),
+        isNull,
+        reason: '$playedAt',
+      );
+    }
+  });
+
+  test('a score above the total or below zero is dropped', () {
+    expect(_parse(score: 11, total: 10), isNull);
+    expect(_parse(score: -1, total: 10), isNull);
+    expect(_parse(score: 0, total: 0), isNull);
+  });
+
+  test('best streak is clamped into 0 through total', () {
+    expect(_parse(bestStreak: 20)!.bestStreak, 10);
+    expect(_parse(bestStreak: -4)!.bestStreak, 0);
+    expect(_parse()!.bestStreak, 0);
+  });
+
+  test('a missing or zero questionCount falls back to the total', () {
+    expect(_parse()!.questionCount, 10);
+    expect(_parse(questionCount: 0)!.questionCount, 10);
+    expect(_parse(questionCount: 12)!.questionCount, 12);
+  });
+
+  test('repeated and unknown volume codes are skipped', () {
+    final parsed = FinishedGameRecord.tryParse({
+      'score': 8,
+      'total': 10,
+      'playedAt': '2026-11-09T08:00:00.000',
+      'volumes': ['OT', 'OT', 'NOPE', 3, 'NT'],
+    });
+
+    expect(parsed, isNotNull);
+    expect(parsed!.volumes, [ScriptureVolume.ot, ScriptureVolume.nt]);
+  });
+
+  test('a volume row with more correct than dealt is skipped', () {
+    final parsed = FinishedGameRecord.tryParse({
+      'score': 1,
+      'total': 3,
+      'playedAt': '2026-11-09T08:00:00.000',
+      'volumes': ['OT', 'NT'],
+      'byVolume': {
+        'OT': {'correct': 6, 'total': 4},
+        'NT': {'correct': 1, 'total': 2},
+      },
+    });
+
+    expect(parsed, isNotNull);
+    expect(parsed!.volumeTotal.containsKey(ScriptureVolume.ot), isFalse);
+    expect(parsed.volumeCorrect.containsKey(ScriptureVolume.ot), isFalse);
+    expect(parsed.volumeTotal[ScriptureVolume.nt], 2);
+    expect(parsed.volumeCorrect[ScriptureVolume.nt], 1);
+  });
+
+  test('decimal numbers are truncated toward zero', () {
+    final parsed = FinishedGameRecord.tryParse({
+      'score': 8.9,
+      'total': 10.2,
+      'bestStreak': 4.8,
+      'playedAt': '2026-11-09T08:00:00.000',
+      'volumes': ['OT'],
+      'questionCount': 10.7,
+      'percent': 1,
+      'byVolume': {
+        'OT': {'correct': 1.9, 'total': 2.2},
+      },
+    });
+
+    expect(parsed, isNotNull);
+    expect(parsed!.score, 8);
+    expect(parsed.total, 10);
+    expect(parsed.percent, 80);
+    expect(parsed.bestStreak, 4);
+    expect(parsed.questionCount, 10);
+    expect(parsed.volumeCorrect[ScriptureVolume.ot], 1);
+    expect(parsed.volumeTotal[ScriptureVolume.ot], 2);
+  });
+
+  test(
+    'a raw score above the raw total is rejected',
+    () {
+      expect(
+        FinishedGameRecord.tryParse({
+          'score': 10.9,
+          'total': 10.1,
+          'playedAt': '2026-11-09T08:00:00.000',
+          'volumes': ['OT'],
+        }),
+        isNull,
+      );
+    },
+    skip:
+        'Values are truncated before the score-greater-than-total check. '
+        'Persistence P2: https://app.notion.com/p/41d765a7f9f581c09deaf891f1a551f5',
+  );
+
+  test('finishedGameFromSession stores the deal and the requested count', () {
+    final questions = [
+      GameQuestion(
+        id: 'ot-0001',
+        volume: ScriptureVolume.ot,
+        reference: 'Genesis 1:1',
+        prompt: 'One',
+        options: const ['A', 'B', 'C', 'D'],
+        answerIndex: 0,
+        explanation: 'Because.',
+      ),
+      GameQuestion(
+        id: 'nt-0001',
+        volume: ScriptureVolume.nt,
+        reference: 'John 1:1',
+        prompt: 'Two',
+        options: const ['A', 'B', 'C', 'D'],
+        answerIndex: 1,
+        explanation: 'Because.',
+      ),
+    ];
+    final when = DateTime.utc(2026, 11, 9, 8);
+    final record = finishedGameFromSession(
+      GameSession(
+        volumes: const [ScriptureVolume.nt, ScriptureVolume.ot],
+        requestedCount: 12,
+        questions: questions,
+        currentIndex: 2,
+        answers: const [
+          GameAnswer(questionId: 'ot-0001', selectedIndex: 0, correct: true),
+          GameAnswer(questionId: 'nt-0001', selectedIndex: 0, correct: false),
+        ],
+        score: 1,
+        currentStreak: 0,
+        bestStreak: 1,
+      ),
+      playedAt: when,
+    );
+
+    expect(record.score, 1);
+    expect(record.total, 2);
+    expect(record.percent, 50);
+    expect(record.bestStreak, 1);
+    expect(record.playedAt, when);
+    expect(record.volumes, [ScriptureVolume.nt, ScriptureVolume.ot]);
+    expect(record.questionCount, 12);
+    expect(record.volumeCorrect[ScriptureVolume.ot], 1);
+    expect(record.volumeTotal[ScriptureVolume.ot], 1);
+    expect(record.volumeCorrect[ScriptureVolume.nt], 0);
+    expect(record.volumeTotal[ScriptureVolume.nt], 1);
+
+    final fallback = finishedGameFromSession(
+      GameSession(
+        volumes: const [ScriptureVolume.ot],
+        requestedCount: 0,
+        questions: [questions.first],
+        currentIndex: 1,
+        answers: const [
+          GameAnswer(questionId: 'ot-0001', selectedIndex: 0, correct: true),
+        ],
+        score: 1,
+        currentStreak: 1,
+        bestStreak: 1,
+      ),
+      playedAt: when,
+    );
+    expect(fallback.questionCount, 1);
+  });
+
+  test('settings that are not a map fall back to defaults', () async {
+    for (final raw in ['[]', '"dark"', '1', 'null']) {
+      SharedPreferences.setMockInitialValues({
+        SharedPreferencesProgressRepository.settingsKey: raw,
+      });
+      final prefs = await SharedPreferences.getInstance();
+      expect(
+        SharedPreferencesProgressRepository(prefs).readSettings(),
+        AppSettings.defaults,
+        reason: raw,
+      );
+    }
+  });
+
+  test('wrong-typed settings fields keep that field default', () async {
+    SharedPreferences.setMockInitialValues({
+      SharedPreferencesProgressRepository.settingsKey: '{"themeMode": 1, "soundEffects": "true", "haptics": 0, "showExplanations": null}',
+    });
+    final prefs = await SharedPreferences.getInstance();
+    final stored = SharedPreferencesProgressRepository(prefs).readSettings();
+
+    expect(stored.themeMode, ThemeMode.system);
+    expect(stored.soundEffects, isFalse);
+    expect(stored.haptics, isTrue);
+    expect(stored.showExplanations, isTrue);
+  });
+
   test('the memory repository is the fake tests can share', () {
     final repo = MemoryProgressRepository(games: [game], settings: settings);
     expect(repo.readGames().single.score, 8);
@@ -179,4 +444,29 @@ void main() {
     expect(repo.readGames(), isEmpty);
     expect(repo.readSettings(), settings);
   });
+}
+
+FinishedGameRecord? _parse({
+  Object? score = 8,
+  Object? total = 10,
+  Object? bestStreak,
+  Object? questionCount,
+}) {
+  return FinishedGameRecord.tryParse({
+    'score': score,
+    'total': total,
+    'playedAt': '2026-11-09T08:00:00.000',
+    'volumes': ['OT'],
+    'bestStreak': ?bestStreak,
+    'questionCount': ?questionCount,
+  });
+}
+
+final class _FailingPrefsStore extends InMemorySharedPreferencesStore {
+  _FailingPrefsStore() : super.empty();
+
+  @override
+  Future<bool> setValue(String valueType, String key, Object value) {
+    return Future<bool>.error(StateError('disk full'));
+  }
 }
