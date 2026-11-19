@@ -174,7 +174,7 @@ class _ReportFlagState extends ConsumerState<ReportFlag> {
         (memory) => memory.isReported(widget.target.questionId),
       ),
     );
-    final reduced = _reducedMotion(context);
+    final reduced = isReducedMotion(MediaQuery.of(context));
     final scheme = Theme.of(context).colorScheme;
     return AnimatedSwitcher(
       duration: reduced ? Duration.zero : StMotion.fast,
@@ -228,11 +228,6 @@ bool _lifecycleAway(AppLifecycleState? state) {
   };
 }
 
-bool _reducedMotion(BuildContext context) {
-  final media = MediaQuery.of(context);
-  return media.disableAnimations || media.reduceMotion;
-}
-
 bool _reportUsesCupertino() {
   return switch (defaultTargetPlatform) {
     TargetPlatform.iOS || TargetPlatform.macOS => true,
@@ -261,7 +256,7 @@ Future<bool?> showReportSheet(
   required ReportTarget target,
 }) {
   final media = MediaQuery.of(context);
-  final reduced = media.disableAnimations || media.reduceMotion;
+  final reduced = isReducedMotion(media);
   final launch = _SheetLaunch();
   unawaited(
     showModalBottomSheet<void>(
