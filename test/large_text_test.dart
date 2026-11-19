@@ -377,9 +377,13 @@ void main() {
 
     for (final scale in <double>[1, 2]) {
       await tester.binding.setSurfaceSize(const Size(360, 640));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
       tester.platformDispatcher.textScaleFactorTestValue = scale;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 
       final container = ProviderContainer();
+      addTearDown(container.dispose);
+      addTearDown(() => tester.pumpWidget(const SizedBox.shrink()));
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
@@ -394,13 +398,7 @@ void main() {
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull, reason: '$path at $scale');
       }
-
-      await tester.pumpWidget(const SizedBox.shrink());
-      container.dispose();
     }
-
-    tester.platformDispatcher.clearTextScaleFactorTestValue();
-    await tester.binding.setSurfaceSize(null);
   });
 }
 
