@@ -8,7 +8,7 @@ bool isLargeText(BuildContext context) {
   return MediaQuery.textScalerOf(context).scale(1) >= 1.5;
 }
 
-/// True when a transition should use the short duration.
+/// True for Remove animations on Android or Reduce Motion on iOS.
 ///
 /// Android's "Remove animations" is [MediaQueryData.disableAnimations].
 /// iOS "Reduce Motion" is [MediaQueryData.reduceMotion] and does not set

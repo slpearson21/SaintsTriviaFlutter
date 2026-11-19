@@ -69,15 +69,16 @@ final class QuestionReport {
   String get clipboardText =>
       'To: $kReportEmail\r\nSubject: $subject\r\n\r\n$body';
 
-  /// Encoded mailto. At or under 1,800 characters when the question id fits.
+  /// Encoded mailto. At or under 1,800 characters when the subject fits.
   ///
   /// App version, platform, bank version, and source are capped first. The
   /// question and the note shrink next, then the correct answer, the
   /// reference, and the player's answer. Those metadata fields shrink
-  /// further if the link is still too long. The question id is never
-  /// trimmed. Only the body value is cut after that, and never inside a
-  /// character. A question id whose subject leaves no room for `&body=`
-  /// makes the link longer than 1,800. [body] and [clipboardText] stay full.
+  /// further if the link is still too long. The subject always keeps the
+  /// question id whole. The body's "Question ID:" line can be shortened
+  /// by the final body cut, which never splits a character. A subject
+  /// already over 1,800 is returned on its own, without `&body=`.
+  /// [body] and [clipboardText] stay full.
   Uri get mailto {
     var version = _bounded(appVersion, maxReportAppVersionLength);
     var platformName = _bounded(platform, maxReportPlatformLength);
@@ -411,15 +412,17 @@ final class QuestionReport {
 
   /// Cuts the body value without splitting a character or the subject.
   ///
-  /// The question id stays whole in the subject. When that subject leaves
-  /// no room for `&body=`, the link is returned as built and can be longer
-  /// than [maxMailtoLength].
+  /// The subject keeps the question id whole. The body's question id can
+  /// be shortened. When the subject alone is already over
+  /// [maxMailtoLength], the link stops at the subject and drops `&body=`.
   Uri _clipMailto(String text) {
     const marker = '&body=';
     final markerAt = text.indexOf(marker);
     if (markerAt < 0) return Uri.parse(text);
     final prefixLength = markerAt + marker.length;
-    if (prefixLength > maxMailtoLength) return Uri.parse(text);
+    if (markerAt > maxMailtoLength) {
+      return Uri.parse(text.substring(0, markerAt));
+    }
     var end = text.length;
     while (end >= prefixLength) {
       if (end > maxMailtoLength) end = maxMailtoLength;
@@ -495,8 +498,8 @@ final class QuestionReport {
   }
 }
 
-/// Target length of an encoded mailto. A question id that leaves no room
-/// for `&body=` can make the link longer.
+/// Target length of an encoded mailto. A subject already over this
+/// length is returned on its own, without the body.
 const maxMailtoLength = 1800;
 
 /// The note field stops at this many characters.
