@@ -391,8 +391,8 @@ void main() {
     tester,
   ) async {
     final semantics = tester.ensureSemantics();
-    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     try {
       await _pumpGame(tester);
       await tester.tap(find.text('Alpha'));
@@ -630,8 +630,8 @@ void main() {
 
   testWidgets('the iOS no-mail dialog is a Cupertino alert', (tester) async {
     _mockClipboard(tester);
-    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     await _pumpGame(
       tester,
       canOpen: (_) async => false,
@@ -905,7 +905,7 @@ Future<ProviderContainer> _pumpGame(
           questionCount: count,
         ),
       );
-  await tester.pump();
-  await tester.pump();
+  // Two frames leave a Cupertino page slide moving, past the hit-test root.
+  await tester.pumpAndSettle();
   return container;
 }

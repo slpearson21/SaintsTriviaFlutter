@@ -634,8 +634,8 @@ void main() {
           }
           expect(tester.takeException(), isNull, reason: reason);
 
-          addTearDown(container.dispose);
-          addTearDown(() => tester.pumpWidget(const SizedBox.shrink()));
+          await tester.pumpWidget(const SizedBox.shrink());
+          container.dispose();
         }
       }
     }

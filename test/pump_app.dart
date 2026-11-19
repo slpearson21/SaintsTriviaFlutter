@@ -3,6 +3,19 @@ import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:saints_trivia_flutter/app.dart';
 
+/// Builds [lightTheme] and [darkTheme] on the current platform.
+///
+/// Both are created on first use and then kept. `flutter_test_config.dart`
+/// calls this from `setUpAll`, before a test can set
+/// `debugDefaultTargetPlatformOverride`. A first read after that override
+/// leaves every later [SaintsTriviaApp] on that platform, and tearDown
+/// cannot rebuild the themes.
+void captureAppThemes() {
+  if (lightTheme.platform != darkTheme.platform) {
+    throw StateError('App themes were built on different platforms.');
+  }
+}
+
 Future<void> pumpApp(
   WidgetTester tester, {
   List<Override> overrides = const [],

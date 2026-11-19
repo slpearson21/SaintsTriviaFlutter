@@ -893,8 +893,8 @@ void main() {
   testWidgets('iOS centers the title and Android keeps a back arrow', (
     tester,
   ) async {
-    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     await _openResults(tester, session: _mixed());
     expect(find.text('BY SCRIPTURE'), findsOneWidget);
     expect(find.text('By scripture'), findsNothing);
