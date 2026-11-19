@@ -51,7 +51,7 @@ Future<ProgressRepository> progressRepositoryForLaunch({
   try {
     final prefs = await loadPrefs();
     return SharedPreferencesProgressRepository(prefs);
-  } catch (error, stackTrace) {
+  } on Object catch (error, stackTrace) {
     debugPrint('Shared preferences failed to load: $error\n$stackTrace');
     return MemoryProgressRepository();
   }
@@ -82,7 +82,7 @@ Future<void> removeSplashAfterBundledQuestionBank({
     } else {
       await _awaitQuestionBank(container);
     }
-  } catch (error) {
+  } on Object catch (error) {
     debugPrint('Bundled question bank failed to load: $error');
     _openContentLoadError(container);
   } finally {
@@ -104,7 +104,7 @@ void _openContentLoadError(ProviderContainer? container) {
   if (container == null) return;
   try {
     container.read(appRouterProvider).go(AppRoutes.contentError);
-  } catch (error) {
+  } on Object catch (error) {
     debugPrint('Could not open the content-load error screen: $error');
   }
 }

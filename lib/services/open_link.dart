@@ -9,7 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 /// Gospel Library universal link.
 typedef OpenLink = Future<bool> Function(Uri uri, {LaunchMode mode});
 
-/// Sends [uri] to the platform. Tests override this.
+/// Sends `uri` to the platform. Tests override this.
 final openLinkProvider = Provider<OpenLink>((ref) => openLink);
 
 /// Whether the platform has an app that can open [uri].

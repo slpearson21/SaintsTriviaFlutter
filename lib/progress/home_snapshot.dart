@@ -34,7 +34,10 @@ final class LastGameSummary {
     required this.total,
     required this.playedAt,
   }) : assert(total > 0, 'A finished game has at least one question.'),
-       assert(correct >= 0 && correct <= total);
+       assert(
+         correct >= 0 && correct <= total,
+         'correct is between 0 and total',
+       );
 
   final int correct;
   final int total;
@@ -55,7 +58,7 @@ final class LastGameSummary {
 /// What Home renders. [gamesPlayed] of 0 is the first-run screen.
 ///
 /// STRIV-16 owns on-device storage. It should publish this same value
-/// from [homeSnapshotProvider], including [HomeSnapshot.firstRun] after
+/// from `homeSnapshotProvider`, including [HomeSnapshot.firstRun] after
 /// reset stats. Home does not read shared_preferences itself.
 @immutable
 final class HomeSnapshot {
@@ -66,12 +69,12 @@ final class HomeSnapshot {
     this.lastGame,
     this.lastSettings,
     this.bestScorePercent,
-  }) : assert(gamesPlayed >= 0),
+  }) : assert(gamesPlayed >= 0, 'games played cannot be negative'),
        assert(
          accuracyPercent >= 0 && accuracyPercent <= 100,
          'Accuracy is a whole percent from 0 to 100.',
        ),
-       assert(bestStreak >= 0),
+       assert(bestStreak >= 0, 'best streak cannot be negative'),
        assert(
          bestScorePercent == null ||
              (bestScorePercent >= 0 && bestScorePercent <= 100),

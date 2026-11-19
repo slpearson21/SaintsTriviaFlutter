@@ -59,8 +59,8 @@ class HomeSnapshotController extends Notifier<HomeSnapshot> {
 
 /// The best percent from before a game that has just been recorded.
 ///
-/// [session] is the [GameSession] instance Results is showing. [previous]
-/// is null for the first game. A later visit to the same session still
+/// [session] is the [GameSession] instance Results is showing.
+/// [previousBestPercent] is null for the first game. A later visit to the same session still
 /// sees this, so the personal-best chip does not disappear after the game
 /// is included in [HomeSnapshot.bestScorePercent].
 @immutable

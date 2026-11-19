@@ -17,7 +17,7 @@ enum SplashHandoff {
   revealing,
 }
 
-/// Phase of the splash handoff. [main] moves this from [SplashHandoff.holding]
+/// Phase of the splash handoff. `main` moves this from [SplashHandoff.holding]
 /// to [SplashHandoff.revealing] in the same finally block that removes the
 /// native splash.
 final ValueNotifier<SplashHandoff> splashHandoff = ValueNotifier(
@@ -50,7 +50,7 @@ const splashMarkExtent = 192.0;
 /// An icon background would switch this to 240 dp, and none is set.
 const splashAndroid12MarkExtent = 288.0;
 
-/// Android 12, when [windowSplashScreenAnimatedIcon] replaced launch_background.
+/// Android 12, when `windowSplashScreenAnimatedIcon` replaced launch_background.
 const splashAndroid12Api = 31;
 
 const splashMarkLightAsset = 'assets/splash/splash-image-light-768.png';
@@ -60,7 +60,7 @@ const splashAndroid12MarkLightAsset =
 const splashAndroid12MarkDarkAsset =
     'assets/splash/splash-android12-dark-1152.png';
 
-/// SDK_INT once [main] has read it from the Android entrypoint arguments.
+/// SDK_INT once `main` has read it from the Android entrypoint arguments.
 /// Null on iOS and in tests
 /// that never set it, which selects the pre-12 mark.
 int? _splashAndroidSdkInt;
@@ -144,9 +144,9 @@ Color splashLaunchColor(Brightness brightness) {
 
 /// Decodes the splash mark before the first frame.
 ///
-/// [FlutterNativeSplash.preserve] keeps the native splash up while this runs,
+/// `FlutterNativeSplash.preserve` keeps the native splash up while this runs,
 /// so the first Flutter frame can paint the logo instead of an empty color.
-/// On Android, [main] must already have stored the SDK from the entrypoint
+/// On Android, `main` must already have stored the SDK from the entrypoint
 /// arguments. An unknown SDK uses the pre-12 mark.
 Future<void> prepareSplashHandoff() async {
   final platform = defaultTargetPlatform;
@@ -193,7 +193,7 @@ Future<void> warmSplashMark(String asset) async {
       const Duration(seconds: 2),
       onTimeout: () {},
     );
-  } catch (error) {
+  } on Object catch (error) {
     debugPrint('Splash mark failed to decode ($asset): $error');
   }
 }
@@ -209,7 +209,7 @@ class SplashMark {
 
 /// Marks the app as waiting under the native splash.
 ///
-/// Call this before [runApp], after [FlutterNativeSplash.preserve]. The first
+/// Call this before [runApp], after `FlutterNativeSplash.preserve`. The first
 /// frame then paints the launch color and logo instead of popping Home in.
 void holdSplashForHandoff() {
   splashHandoff.value = SplashHandoff.holding;

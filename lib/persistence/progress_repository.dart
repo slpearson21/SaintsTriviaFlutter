@@ -5,7 +5,7 @@ import 'finished_game_record.dart';
 ///
 /// Reads are synchronous so Home can render on the first frame. The
 /// shared_preferences implementation caches them. Tests pass a
-/// [MemoryProgressRepository] or a repository wrapped around
+/// `MemoryProgressRepository` or a repository wrapped around
 /// `SharedPreferences.setMockInitialValues`.
 abstract interface class ProgressRepository {
   List<FinishedGameRecord> readGames();

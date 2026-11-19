@@ -246,7 +246,7 @@ bool _reportUsesCupertino() {
 /// Tracks a launch that can outlive the sheet. A swipe while the mail
 /// app is opening dismisses the route before [openLink] returns.
 final class _SheetLaunch {
-  var inFlight = false;
+  bool inFlight = false;
   final done = Completer<bool?>();
 
   void complete(bool? opened) {
@@ -263,18 +263,20 @@ Future<bool?> showReportSheet(
   final media = MediaQuery.of(context);
   final reduced = media.disableAnimations || media.reduceMotion;
   final launch = _SheetLaunch();
-  showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
-    showDragHandle: true,
-    sheetAnimationStyle: reduced ? AnimationStyle.noAnimation : null,
-    builder: (context) {
-      return _ReportSheet(target: target, launch: launch);
-    },
-  ).whenComplete(() {
-    if (!launch.inFlight) launch.complete(null);
-  });
+  unawaited(
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      sheetAnimationStyle: reduced ? AnimationStyle.noAnimation : null,
+      builder: (context) {
+        return _ReportSheet(target: target, launch: launch);
+      },
+    ).whenComplete(() {
+      if (!launch.inFlight) launch.complete(null);
+    }),
+  );
   return launch.done.future;
 }
 

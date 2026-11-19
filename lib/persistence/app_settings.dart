@@ -51,13 +51,9 @@ final class AppSettings {
     if (json is! Map) return defaults;
     return AppSettings(
       themeMode: _themeMode(json['themeMode']) ?? ThemeMode.system,
-      soundEffects: json['soundEffects'] is bool
-          ? json['soundEffects'] as bool
-          : false,
-      haptics: json['haptics'] is bool ? json['haptics'] as bool : true,
-      showExplanations: json['showExplanations'] is bool
-          ? json['showExplanations'] as bool
-          : true,
+      soundEffects: json['soundEffects'] == true,
+      haptics: json['haptics'] != false,
+      showExplanations: json['showExplanations'] != false,
     );
   }
 

@@ -1,6 +1,6 @@
+// TODO(STRIV-19): replace this placeholder before a store build.
 /// Inbox for question reports and the Settings feedback row.
 ///
-/// TODO(STRIV-19): replace this placeholder before a store build.
 /// release-smoke does not check it.
 const kReportEmail = 'reports@example.com';
 

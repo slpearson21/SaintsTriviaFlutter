@@ -10,7 +10,7 @@ import 'home_providers.dart';
 /// call for the same [GameSession] instance.
 typedef RecordFinishedGame = void Function(GameSession session);
 
-/// Persists [session] through [homeSnapshotProvider].
+/// Persists a [GameSession] through [homeSnapshotProvider].
 final recordFinishedGameProvider = Provider<RecordFinishedGame>((ref) {
   return (GameSession session) {
     ref.read(homeSnapshotProvider.notifier).recordFinishedGame(session);
