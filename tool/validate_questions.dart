@@ -6,6 +6,7 @@ import 'package:saints_trivia_flutter/data/questions/question_bank_exception.dar
 import 'package:saints_trivia_flutter/data/questions/question_bank_loader.dart';
 import 'package:saints_trivia_flutter/data/questions/review_status.dart';
 import 'package:saints_trivia_flutter/data/questions/scripture_volume.dart';
+import 'package:saints_trivia_flutter/scripture/scripture_link.dart';
 
 /// How many questions each volume of [QuestionAssets.v1Directory] must have.
 ///
@@ -57,8 +58,10 @@ Options:
 
   --bank <directory>
       Directory of volume JSON files. Defaults to assets/questions/v1.
-      The v1 schema rules are always what is checked. The 100-question
-      minimum applies only to the bundled assets/questions/v1 bank.
+      The v1 schema rules are always what is checked, along with
+      reference, whitespace, duplicate-prompt, and chapter rules.
+      The 100-question minimum applies only to the bundled
+      assets/questions/v1 bank.
 
   --help
       Show this message.
@@ -101,6 +104,7 @@ Options:
   try {
     final bank = await loader.load();
     final violations = <QuestionBankViolation>[
+      ...questionContentViolations(bank, assets),
       if (requireApproved) ...unapprovedQuestionViolations(bank, assets),
       if (isBundledQuestionBank(directory))
         ...bundledVolumeMinimumViolations(
@@ -207,4 +211,214 @@ List<QuestionBankViolation> bundledVolumeMinimumViolations(
     );
   }
   return violations;
+}
+
+/// Chapter counts for the Latter-day Saint edition of each Gospel Library book.
+///
+/// Keys are [GospelLibraryBook.slug]. Official Declaration uses the
+/// declaration number as its chapter, so `od` is 2.
+const scriptureChapterCounts = <String, int>{
+  'gen': 50,
+  'ex': 40,
+  'lev': 27,
+  'num': 36,
+  'deut': 34,
+  'josh': 24,
+  'judg': 21,
+  'ruth': 4,
+  '1-sam': 31,
+  '2-sam': 24,
+  '1-kgs': 22,
+  '2-kgs': 25,
+  '1-chr': 29,
+  '2-chr': 36,
+  'ezra': 10,
+  'neh': 13,
+  'esth': 10,
+  'job': 42,
+  'ps': 150,
+  'prov': 31,
+  'eccl': 12,
+  'song': 8,
+  'isa': 66,
+  'jer': 52,
+  'lam': 5,
+  'ezek': 48,
+  'dan': 12,
+  'hosea': 14,
+  'joel': 3,
+  'amos': 9,
+  'obad': 1,
+  'jonah': 4,
+  'micah': 7,
+  'nahum': 3,
+  'hab': 3,
+  'zeph': 3,
+  'hag': 2,
+  'zech': 14,
+  'mal': 4,
+  'matt': 28,
+  'mark': 16,
+  'luke': 24,
+  'john': 21,
+  'acts': 28,
+  'rom': 16,
+  '1-cor': 16,
+  '2-cor': 13,
+  'gal': 6,
+  'eph': 6,
+  'philip': 4,
+  'col': 4,
+  '1-thes': 5,
+  '2-thes': 3,
+  '1-tim': 6,
+  '2-tim': 4,
+  'titus': 3,
+  'philem': 1,
+  'heb': 13,
+  'james': 5,
+  '1-pet': 5,
+  '2-pet': 3,
+  '1-jn': 5,
+  '2-jn': 1,
+  '3-jn': 1,
+  'jude': 1,
+  'rev': 22,
+  '1-ne': 22,
+  '2-ne': 33,
+  'jacob': 7,
+  'enos': 1,
+  'jarom': 1,
+  'omni': 1,
+  'w-of-m': 1,
+  'mosiah': 29,
+  'alma': 63,
+  'hel': 16,
+  '3-ne': 30,
+  '4-ne': 1,
+  'morm': 9,
+  'ether': 15,
+  'moro': 10,
+  'dc': 138,
+  'od': 2,
+  'moses': 8,
+  'abr': 5,
+  'js-m': 1,
+  'js-h': 1,
+  'a-of-f': 1,
+};
+
+const _bankVolumeForGospelLibrary = <String, ScriptureVolume>{
+  'ot': ScriptureVolume.ot,
+  'nt': ScriptureVolume.nt,
+  'bofm': ScriptureVolume.bom,
+  'dc-testament': ScriptureVolume.dc,
+  'pgp': ScriptureVolume.pgp,
+};
+
+/// Content rules that sit on top of the v1 schema.
+///
+/// The loader already accepted [bank]. These checks use [invalidValue]
+/// so the tool does not need a new violation kind.
+List<QuestionBankViolation> questionContentViolations(
+  QuestionBank bank,
+  QuestionAssets assets,
+) {
+  final violations = <QuestionBankViolation>[];
+  final seenPrompts = <String, String>{};
+  final nextIndex = <ScriptureVolume, int>{};
+
+  for (final question in bank.questions) {
+    final index = nextIndex[question.volume] ?? 0;
+    nextIndex[question.volume] = index + 1;
+    final path = assets.pathFor(question.volume);
+
+    void add(String message, {required String field}) {
+      violations.add(
+        QuestionBankViolation(
+          kind: QuestionBankViolationKind.invalidValue,
+          message: message,
+          assetPath: path,
+          questionId: question.id,
+          index: index,
+          field: field,
+        ),
+      );
+    }
+
+    _checkEdgeWhitespace(question.prompt, 'prompt', add);
+    _checkEdgeWhitespace(question.explanation, 'explanation', add);
+    _checkEdgeWhitespace(question.reference, 'reference', add);
+    for (var i = 0; i < question.options.length; i++) {
+      _checkEdgeWhitespace(
+        question.options[i],
+        'options',
+        add,
+        label: 'Option ${i + 1}',
+      );
+    }
+    if (question.prompt.contains('\n') || question.prompt.contains('\r')) {
+      add('Field "prompt" must be a single line.', field: 'prompt');
+    }
+
+    final folded = _foldedPrompt(question.prompt);
+    final previous = seenPrompts[folded];
+    if (previous != null) {
+      add(
+        'Prompt repeats $previous after case-folding and collapsing whitespace.',
+        field: 'prompt',
+      );
+    } else {
+      seenPrompts[folded] = question.id;
+    }
+
+    final parsed = parseScriptureReference(question.reference);
+    if (parsed == null) {
+      add(
+        'Reference "${question.reference}" does not parse as scripture.',
+        field: 'reference',
+      );
+      continue;
+    }
+
+    final bookVolume = _bankVolumeForGospelLibrary[parsed.book.volume];
+    if (bookVolume != question.volume) {
+      add(
+        'Reference "${question.reference}" belongs to '
+        '${parsed.book.volume}, not ${question.volume.code}.',
+        field: 'reference',
+      );
+    }
+
+    final chapters = scriptureChapterCounts[parsed.book.slug];
+    final chapter = int.tryParse(parsed.uri.pathSegments.last);
+    if (chapters == null || chapter == null || chapter > chapters) {
+      final name = parsed.book.names.first;
+      final limit = chapters == null
+          ? 'no recorded chapter count'
+          : '$chapters chapters';
+      add(
+        'Reference "${question.reference}" uses chapter $chapter, but $name has $limit.',
+        field: 'reference',
+      );
+    }
+  }
+
+  return violations;
+}
+
+/// Case-folded prompt with whitespace collapsed, for duplicate detection.
+String _foldedPrompt(String prompt) {
+  return prompt.toLowerCase().replaceAll(RegExp(r'\s+'), ' ').trim();
+}
+
+void _checkEdgeWhitespace(
+  String value,
+  String field,
+  void Function(String message, {required String field}) add, {
+  String? label,
+}) {
+  if (value == value.trim()) return;
+  final name = label ?? 'Field "$field"';
+  add('$name has leading or trailing whitespace.', field: field);
 }
