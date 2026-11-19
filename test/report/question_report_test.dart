@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -128,13 +129,13 @@ void main() {
         expect(
           report.mailto.toString().length,
           lessThanOrEqualTo(maxMailtoLength),
-          reason: question['id'],
+          reason: question['id'] as String,
         );
         expect(report.mailto.toString(), isNot(contains('+')));
         count += 1;
       }
     }
-    expect(count, 591);
+    expect(count, _bundledQuestionCount());
   });
 
   test('a note is trimmed on grapheme boundaries', () {
@@ -199,12 +200,12 @@ void main() {
               .join('&')
               .replaceFirst('body=', ''),
         );
-        expect(body, report.body, reason: question['id']);
+        expect(body, report.body, reason: question['id'] as String);
         expect(body, contains('Note: $note'));
         count += 1;
       }
     }
-    expect(count, 591);
+    expect(count, _bundledQuestionCount());
   });
 
   test('a long prompt is cut to 120 characters plus an ellipsis', () {
@@ -366,16 +367,9 @@ void main() {
       formatReportUtc(DateTime.utc(2026, 1, 2, 3, 4, 5)),
       '2026-01-02T03:04:05Z',
     );
-    final local = DateTime(2026, 1, 2, 3, 4, 5);
+    final local = DateTime.utc(2026, 1, 2, 3, 4, 5).toLocal();
     expect(local.isUtc, isFalse);
-    final utc = local.toUtc();
-    String two(int value) => value.toString().padLeft(2, '0');
-    expect(
-      formatReportUtc(local),
-      '${utc.year.toString().padLeft(4, '0')}-'
-      '${two(utc.month)}-${two(utc.day)}'
-      'T${two(utc.hour)}:${two(utc.minute)}:${two(utc.second)}Z',
-    );
+    expect(formatReportUtc(local), '2026-01-02T03:04:05Z');
   });
 
   test('reportPlatformLabel follows the debug platform override', () {
@@ -423,6 +417,393 @@ void main() {
     expect(both.note, 'gone');
   });
 
+  test('step 1 caps metadata graphemes before the link is built', () {
+    final report = _sized(
+      version: 'é' * 40,
+      platform: '字' * 40,
+      bank: 'b' * 20,
+      source: '😀' * 40,
+      prompt: 'Prompt stays',
+      note: 'Note stays',
+      answer: 'Answer stays',
+      selected: 'Selected stays',
+      reference: 'Ref stays',
+    );
+    final decoded = _mailtoBody(report);
+    final app = _mailtoField(decoded, 'App: ');
+    final version = app
+        .replaceFirst('App: Scripture Trivia ', '')
+        .split(' · ')
+        .first;
+    final platform = app.split(' · ').last;
+
+    expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
+    expect(version.characters.length, maxReportAppVersionLength);
+    expect(version, 'é' * maxReportAppVersionLength);
+    expect(platform.characters.length, maxReportPlatformLength);
+    expect(platform, '字' * maxReportPlatformLength);
+    expect(
+      _mailtoField(decoded, 'Question bank: '),
+      'Question bank: ${'b' * maxReportBankVersionLength}',
+    );
+    expect(
+      _mailtoField(decoded, 'Source: '),
+      'Source: ${'😀' * maxReportSourceLength}',
+    );
+    expect(_mailtoField(decoded, 'Question: '), 'Question: Prompt stays');
+    expect(_mailtoField(decoded, 'Note: '), 'Note: Note stays');
+    expect(
+      _mailtoField(decoded, 'Correct answer (app): '),
+      'Correct answer (app): Answer stays',
+    );
+    expect(
+      _mailtoField(decoded, "Player's answer: "),
+      "Player's answer: Selected stays",
+    );
+    expect(_mailtoField(decoded, 'Reference: '), 'Reference: Ref stays');
+    expect(decoded, contains('--- end of report ---'));
+    expect(report.body, contains('é' * 40));
+    expect(report.body, contains('字' * 40));
+    expect(report.body, contains('b' * 20));
+    expect(report.body, contains('😀' * 40));
+    expect(report.clipboardText, contains(report.body));
+  });
+
+  test('step 2 returns a link at or under 1,800 unchanged', () {
+    final report = _sized(prompt: 'Q' * 121, note: 'note');
+    final decoded = _mailtoBody(report);
+
+    expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
+    expect(decoded, report.body);
+    expect(_mailtoField(decoded, 'Question: '), 'Question: ${'Q' * 121}');
+    expect(decoded, isNot(contains('…')));
+    expect(_mailtoField(decoded, 'Note: '), 'Note: note');
+    expect(report.clipboardText, contains(report.body));
+  });
+
+  test('step 3 shortens a long prompt to 120 graphemes plus an ellipsis', () {
+    final prompt = 'Q' * 2000;
+    final report = _sized(prompt: prompt, note: 'Keep this note');
+    final decoded = _mailtoBody(report);
+
+    expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
+    expect(_mailtoField(decoded, 'Question: '), 'Question: ${'Q' * 120}…');
+    expect(_mailtoField(decoded, 'Note: '), 'Note: Keep this note');
+    expect(
+      _mailtoField(decoded, 'Correct answer (app): '),
+      'Correct answer (app): A',
+    );
+    expect(_mailtoField(decoded, "Player's answer: "), "Player's answer: S");
+    expect(_mailtoField(decoded, 'Reference: '), 'Reference: R');
+    expect(decoded, contains('--- end of report ---'));
+    expect(report.body, contains(prompt));
+    expect(report.clipboardText, contains(prompt));
+    expect(report.clipboardText, contains('Keep this note'));
+  });
+
+  test('step 4 keeps the longest note prefix that fits', () {
+    final note = 'n' * 280;
+    final report = _sized(
+      prompt: 'P' * 80,
+      note: note,
+      answer: 'A' * 900,
+      selected: 'Selected stays',
+      reference: 'Ref stays',
+    );
+    final decoded = _mailtoBody(report);
+    final shown = _mailtoField(decoded, 'Note: ').replaceFirst('Note: ', '');
+
+    expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
+    expect(shown, 'n' * 262);
+    expect(note.startsWith(shown), isTrue);
+    expect(_mailtoField(decoded, 'Question: '), 'Question: ${'P' * 80}');
+    expect(
+      _mailtoField(decoded, 'Correct answer (app): '),
+      'Correct answer (app): ${'A' * 900}',
+    );
+    expect(
+      _mailtoField(decoded, "Player's answer: "),
+      "Player's answer: Selected stays",
+    );
+    expect(_mailtoField(decoded, 'Reference: '), 'Reference: Ref stays');
+    expect(decoded, contains('--- end of report ---'));
+    expect(report.body, contains(note));
+    expect(report.body, contains('A' * 900));
+    expect(report.clipboardText, contains(report.body));
+  });
+
+  test('step 5 trims the prompt tail and clears the note', () {
+    final prompt = 'P' * 80;
+    final report = _sized(
+      prompt: prompt,
+      note: 'n' * 280,
+      answer: 'A' * 1175,
+      selected: 'Selected stays',
+      reference: 'Ref stays',
+    );
+    final decoded = _mailtoBody(report);
+    final shown = _mailtoField(
+      decoded,
+      'Question: ',
+    ).replaceFirst('Question: ', '');
+
+    expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
+    expect(shown, 'P' * 58);
+    expect(prompt.startsWith(shown), isTrue);
+    expect(shown.characters.length, greaterThan(1));
+    expect(_mailtoField(decoded, 'Note: '), 'Note: —');
+    expect(
+      _mailtoField(decoded, 'Correct answer (app): '),
+      'Correct answer (app): ${'A' * 1175}',
+    );
+    expect(
+      _mailtoField(decoded, "Player's answer: "),
+      "Player's answer: Selected stays",
+    );
+    expect(_mailtoField(decoded, 'Reference: '), 'Reference: Ref stays');
+    expect(decoded, contains('--- end of report ---'));
+    expect(report.body, contains(prompt));
+    expect(report.body, contains('n' * 280));
+    expect(report.clipboardText, contains(report.body));
+  });
+
+  test('step 6 trims the correct answer and leaves the reference', () {
+    final answer = 'A' * 1250;
+    final report = _sized(
+      prompt: 'P',
+      answer: answer,
+      selected: 'Selected stays',
+      reference: 'Ref stays',
+    );
+    final decoded = _mailtoBody(report);
+    final shown = _mailtoField(
+      decoded,
+      'Correct answer (app): ',
+    ).replaceFirst('Correct answer (app): ', '');
+
+    expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
+    expect(shown, 'A' * 1232);
+    expect(answer.startsWith(shown), isTrue);
+    expect(_mailtoField(decoded, 'Question: '), 'Question: P');
+    expect(_mailtoField(decoded, 'Note: '), 'Note: —');
+    expect(_mailtoField(decoded, 'Reference: '), 'Reference: Ref stays');
+    expect(
+      _mailtoField(decoded, "Player's answer: "),
+      "Player's answer: Selected stays",
+    );
+    expect(decoded, contains('--- end of report ---'));
+    expect(report.body, contains(answer));
+    expect(report.clipboardText, contains(report.body));
+  });
+
+  test('step 7 trims the reference and leaves the player answer', () {
+    final reference = 'R' * 1250;
+    final report = _sized(
+      prompt: 'P',
+      answer: '',
+      selected: 'Selected stays',
+      reference: reference,
+    );
+    final decoded = _mailtoBody(report);
+    final shown = _mailtoField(
+      decoded,
+      'Reference: ',
+    ).replaceFirst('Reference: ', '');
+
+    expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
+    expect(shown.length, lessThan(reference.length));
+    expect(shown.isNotEmpty, isTrue);
+    expect(reference.startsWith(shown), isTrue);
+    expect(_mailtoField(decoded, 'Question: '), 'Question: P');
+    expect(_mailtoField(decoded, 'Note: '), 'Note: —');
+    expect(
+      _mailtoField(decoded, 'Correct answer (app): '),
+      'Correct answer (app): ',
+    );
+    expect(
+      _mailtoField(decoded, "Player's answer: "),
+      "Player's answer: Selected stays",
+    );
+    expect(_mailtoField(decoded, 'App: '), 'App: Scripture Trivia v · p');
+    expect(decoded, contains('--- end of report ---'));
+    expect(report.body, contains(reference));
+    expect(report.clipboardText, contains(report.body));
+  });
+
+  test('step 8 trims the player answer and leaves the metadata', () {
+    final selected = 'S' * 1175;
+    final report = _sized(
+      prompt: 'P',
+      answer: '',
+      selected: selected,
+      reference: '',
+      version: 'v' * 32,
+      platform: 'p' * 32,
+      bank: 'b' * 16,
+      source: 's' * 32,
+    );
+    final decoded = _mailtoBody(report);
+    final shown = _mailtoField(
+      decoded,
+      "Player's answer: ",
+    ).replaceFirst("Player's answer: ", '');
+
+    expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
+    expect(shown.length, lessThan(selected.length));
+    expect(shown.isNotEmpty, isTrue);
+    expect(selected.startsWith(shown), isTrue);
+    expect(_mailtoField(decoded, 'Reference: '), 'Reference: ');
+    expect(
+      _mailtoField(decoded, 'Correct answer (app): '),
+      'Correct answer (app): ',
+    );
+    expect(
+      _mailtoField(decoded, 'App: '),
+      'App: Scripture Trivia ${'v' * 32} · ${'p' * 32}',
+    );
+    expect(
+      _mailtoField(decoded, 'Question bank: '),
+      'Question bank: ${'b' * 16}',
+    );
+    expect(_mailtoField(decoded, 'Source: '), 'Source: ${'s' * 32}');
+    expect(decoded, contains('--- end of report ---'));
+    expect(report.body, contains(selected));
+    expect(report.clipboardText, contains(report.body));
+  });
+
+  test('step 9 trims app version before the other metadata', () {
+    final report = _sized(
+      id: 'i' * 580,
+      prompt: 'P',
+      answer: '',
+      selected: '',
+      reference: '',
+      version: 'v' * 40,
+      platform: 'p' * 40,
+      bank: 'b' * 20,
+      source: 's' * 40,
+    );
+    final decoded = _mailtoBody(report);
+    final app = _mailtoField(decoded, 'App: ');
+    final version = app
+        .replaceFirst('App: Scripture Trivia ', '')
+        .split(' · ')
+        .first;
+    final platform = app.split(' · ').last;
+
+    expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
+    expect(version, 'v' * 25);
+    expect(platform, 'p' * maxReportPlatformLength);
+    expect(
+      _mailtoField(decoded, 'Question bank: '),
+      'Question bank: ${'b' * maxReportBankVersionLength}',
+    );
+    expect(
+      _mailtoField(decoded, 'Source: '),
+      'Source: ${'s' * maxReportSourceLength}',
+    );
+    expect(_mailtoField(decoded, 'Question: '), 'Question: P');
+    expect(decoded, contains('Question ID: ${'i' * 580}'));
+    expect(decoded, contains('--- end of report ---'));
+    expect(report.body, contains('v' * 40));
+    expect(report.body, contains('p' * 40));
+    expect(report.clipboardText, contains(report.body));
+  });
+
+  test('step 10 clips the body on a character boundary', () {
+    final id = 'é' * 130;
+    final prompt = '😀' * 8;
+    final report = _sized(
+      id: id,
+      prompt: prompt,
+      answer: 'A' * 400,
+      selected: 'S' * 400,
+      reference: 'R' * 400,
+      version: 'v' * 32,
+      platform: 'p' * 32,
+      bank: 'b' * 16,
+      source: '字' * 32,
+    );
+    final mailto = report.mailto.toString();
+    final markerAt = mailto.indexOf('&body=');
+    final encodedBody = mailto.substring(markerAt + '&body='.length);
+    final subject = Uri.decodeComponent(
+      mailto.split('?').last.split('&').first.replaceFirst('subject=', ''),
+    );
+    final decoded = utf8.decode(_percentBytes(encodedBody));
+
+    expect(markerAt + '&body='.length, lessThanOrEqualTo(maxMailtoLength));
+    expect(mailto.length, 1798);
+    expect(mailto.length, lessThan(maxMailtoLength));
+    expect(encodedBody, endsWith('%F0%9F%98%80%0D'));
+    expect(encodedBody, isNot(matches(RegExp(r'%[0-9A-Fa-f]{0,1}$'))));
+    expect(subject, report.subject);
+    expect(subject, contains(id));
+    expect(decoded, contains('Question ID: $id'));
+    expect(decoded, endsWith('😀\r'));
+    expect(decoded, isNot(contains('\uFFFD')));
+    expect(decoded, isNot(contains('--- end of report ---')));
+    expect(report.body, contains(prompt));
+    expect(report.body, contains(id));
+    expect(report.body, contains('A' * 400));
+    expect(report.body, contains('字' * 32));
+    expect(report.clipboardText, contains(report.body));
+  });
+
+  test('seeded reports stay inside the cap when the subject fits', () {
+    final random = Random(20261119);
+    const glyphs = ['a', 'é', '字', '😀', 'Q', '&', ' '];
+    var fitted = 0;
+    var subjectTooLong = 0;
+
+    String field(int max) {
+      final count = random.nextInt(max + 1);
+      return [
+        for (var i = 0; i < count; i++) glyphs[random.nextInt(glyphs.length)],
+      ].join();
+    }
+
+    for (var sample = 0; sample < 40; sample++) {
+      final report = _sized(
+        id: sample == 39 ? 'é' * 400 : field(sample.isEven ? 80 : 360),
+        prompt: field(240),
+        answer: field(180),
+        selected: field(180),
+        reference: field(120),
+        note: field(200),
+        version: field(48),
+        platform: field(48),
+        bank: field(24),
+        source: field(48),
+      );
+      expect(report.body, contains(report.prompt));
+      expect(report.body, contains(report.questionId));
+      expect(report.clipboardText, contains(report.body));
+      expect(report.clipboardText, contains(report.correctAnswer));
+      expect(report.clipboardText, contains(report.reference));
+
+      final mailto = report.mailto.toString();
+      final markerAt = mailto.indexOf('&body=');
+      if (markerAt < 0 || markerAt + '&body='.length > maxMailtoLength) {
+        subjectTooLong++;
+        continue;
+      }
+      fitted++;
+      final encodedBody = mailto.substring(markerAt + '&body='.length);
+      final decoded = utf8.decode(_percentBytes(encodedBody));
+      final subject = Uri.decodeComponent(
+        mailto.split('?').last.split('&').first.replaceFirst('subject=', ''),
+      );
+      expect(mailto.length, lessThanOrEqualTo(maxMailtoLength));
+      expect(decoded, isNot(contains('\uFFFD')));
+      expect(subject, report.subject);
+      expect(encodedBody, isNot(matches(RegExp(r'%[0-9A-Fa-f]{0,1}$'))));
+    }
+
+    expect(fitted, greaterThan(0));
+    expect(subjectTooLong, greaterThan(0));
+  });
+
   test('markReported is a no-op the second time', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);
@@ -448,4 +829,65 @@ String _mailtoBody(QuestionReport report) {
   return Uri.decodeComponent(
     report.mailto.query.split('&').skip(1).join('&').replaceFirst('body=', ''),
   );
+}
+
+QuestionReport _sized({
+  String id = 'q',
+  String prompt = 'Q',
+  String answer = 'A',
+  String selected = 'S',
+  String reference = 'R',
+  String note = '',
+  String version = 'v',
+  String platform = 'p',
+  String bank = 'b',
+  String source = 's',
+}) {
+  return QuestionReport(
+    questionId: id,
+    prompt: prompt,
+    correctAnswer: answer,
+    selectedAnswer: selected,
+    reference: reference,
+    reason: ReportReason.other,
+    note: note,
+    appVersion: version,
+    platform: platform,
+    bankVersion: bank,
+    source: source,
+    createdAtUtc: DateTime.utc(2026, 11, 18, 15, 46),
+  );
+}
+
+String _mailtoField(String body, String prefix) {
+  return body.split('\r\n').firstWhere((line) => line.startsWith(prefix));
+}
+
+List<int> _percentBytes(String value) {
+  final bytes = <int>[];
+  for (var i = 0; i < value.length; i++) {
+    final unit = value[i];
+    if (unit == '%') {
+      bytes.add(int.parse(value.substring(i + 1, i + 3), radix: 16));
+      i += 2;
+    } else {
+      bytes.add(unit.codeUnitAt(0));
+    }
+  }
+  return bytes;
+}
+
+int _bundledQuestionCount() {
+  const files = [
+    'assets/questions/v1/old_testament.json',
+    'assets/questions/v1/new_testament.json',
+    'assets/questions/v1/book_of_mormon.json',
+    'assets/questions/v1/doctrine_and_covenants.json',
+    'assets/questions/v1/pearl_of_great_price.json',
+  ];
+  var count = 0;
+  for (final path in files) {
+    count += (jsonDecode(File(path).readAsStringSync()) as List).length;
+  }
+  return count;
 }
