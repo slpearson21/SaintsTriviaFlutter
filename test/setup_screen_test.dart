@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -60,6 +61,10 @@ Future<ProviderContainer> _openSetup(
   addTearDown(() => tester.binding.setSurfaceSize(null));
   tester.platformDispatcher.textScaleFactorTestValue = textScale;
   addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+  if (platform != null) {
+    debugDefaultTargetPlatformOverride = platform;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+  }
 
   final container = ProviderContainer(
     overrides: [
@@ -78,7 +83,7 @@ Future<ProviderContainer> _openSetup(
   final child = platform == null
       ? const SaintsTriviaApp()
       : MaterialApp.router(
-          theme: buildTheme(Brightness.light).copyWith(platform: platform),
+          theme: buildTheme(Brightness.light),
           routerConfig: container.read(appRouterProvider),
         );
   await tester.pumpWidget(
@@ -612,6 +617,7 @@ void main() {
     expect(find.text('Home'), findsOneWidget);
 
     await _openSetup(tester, bank: _bank(), platform: TargetPlatform.android);
+    // Select all, plus one checkbox for each of the five standard works.
     expect(find.byType(Checkbox), findsNWidgets(6));
     expect(find.text('Choose scriptures'), findsOneWidget);
     expect(find.text('Home'), findsNothing);
