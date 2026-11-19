@@ -119,6 +119,50 @@ void main() {
     );
   });
 
+  test(
+    'rejects a reversed range, chapter or verse 0, and a trailing comma',
+    () {
+      expect(gospelLibraryUri('Genesis 2:20-19'), isNull);
+      expect(gospelLibraryUri('Genesis 2:20–19'), isNull);
+      expect(gospelLibraryUri('Genesis 0:1'), isNull);
+      expect(gospelLibraryUri('Genesis 0'), isNull);
+      expect(gospelLibraryUri('Genesis 1:0'), isNull);
+      expect(gospelLibraryUri('Genesis 1:0-2'), isNull);
+      expect(gospelLibraryUri('Genesis 1:1,'), isNull);
+      expect(gospelLibraryUri('Alma 1:3, 9,'), isNull);
+    },
+  );
+
+  test('accepts extra spaces, mixed case, and the long book names', () {
+    expect(link('  gEnEsIs   1:1 ').toString(), link('Genesis 1:1').toString());
+    expect(link('Psalm 23:1').toString(), link('Psalms 23:1').toString());
+    expect(
+      link('Doctrine and Covenants 1:38').toString(),
+      link('D&C 1:38').toString(),
+    );
+    expect(
+      link('OD 2').toString(),
+      'https://www.churchofjesuschrist.org/study/scriptures/dc-testament/od/2',
+    );
+    expect(
+      link('JS\u2013History 1:17').toString(),
+      link('JS—History 1:17').toString(),
+    );
+  });
+
+  test('known references keep their chapter', () {
+    expect(link('Genesis 1:1').pathSegments.last, '1');
+    expect(link('Psalms 119:105').pathSegments.last, '119');
+    expect(link('Psalm 23:1').pathSegments.last, '23');
+    expect(link('3 Nephi 11:1').pathSegments.last, '11');
+    expect(link('1 Nephi 3:7').pathSegments.last, '3');
+    expect(link('D&C 138:1').pathSegments.last, '138');
+    expect(link('Official Declaration 1').pathSegments.last, '1');
+    expect(link('OD 2').pathSegments.last, '2');
+    expect(link('JS—History 1:17').pathSegments.last, '1');
+    expect(link('Articles of Faith 1:13').pathSegments.last, '1');
+  });
+
   test('returns null for a reference it cannot parse', () {
     expect(gospelLibraryUri(''), isNull);
     expect(gospelLibraryUri('not a reference'), isNull);
@@ -247,7 +291,11 @@ void main() {
         final reference = (question as Map)['reference'] as String;
         final parsed = parseScriptureReference(reference);
         expect(parsed, isNotNull, reason: reference);
-        expect(gospelLibraryBooks, contains(parsed!.book));
+        expect(
+          parsed!.book.volume,
+          _volumeForBankFile(path),
+          reason: reference,
+        );
         final normalized = normalizeScriptureName(reference);
         expect(
           parsed.book.names.any(
@@ -262,8 +310,6 @@ void main() {
           reason: reference,
         );
         expect(parsed.uri.toString(), isNot(contains('lang=')));
-        final chapter = _chapterIn(normalized, parsed.book);
-        expect(parsed.uri.pathSegments.last, chapter, reason: reference);
         count += 1;
       }
     }
@@ -279,13 +325,11 @@ final _gospelLibraryUrl = RegExp(
   r'(\?id=p\d+(-p\d+)?(,p\d+(-p\d+)?)*#p\d+)?$',
 );
 
-String _chapterIn(String normalized, GospelLibraryBook book) {
-  var matchedName = '';
-  for (final name in book.names) {
-    final key = normalizeScriptureName(name);
-    final matches = normalized == key || normalized.startsWith('$key ');
-    if (matches && key.length > matchedName.length) matchedName = key;
-  }
-  final rest = normalized.substring(matchedName.length).trim();
-  return RegExp(r'^(\d+)').firstMatch(rest)!.group(1)!;
+String _volumeForBankFile(String path) {
+  if (path.endsWith('old_testament.json')) return 'ot';
+  if (path.endsWith('new_testament.json')) return 'nt';
+  if (path.endsWith('book_of_mormon.json')) return 'bofm';
+  if (path.endsWith('doctrine_and_covenants.json')) return 'dc-testament';
+  if (path.endsWith('pearl_of_great_price.json')) return 'pgp';
+  throw StateError(path);
 }
