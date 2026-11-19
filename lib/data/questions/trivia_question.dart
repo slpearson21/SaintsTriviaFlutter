@@ -515,6 +515,7 @@ ReviewStatus? _readReviewStatus(
     );
     return null;
   }
+  // See QuestionBankValidator.requireApproved.
   if (requireApproved && status != ReviewStatus.approved) {
     final label = questionId == null ? 'A question' : 'Question $questionId';
     add(

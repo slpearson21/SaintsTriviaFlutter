@@ -2,6 +2,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'question_report.dart';
 
+/// Clock for the "Reported at" line on a question report.
+///
+/// Tests override this. Defaults to [DateTime.now].
+typedef ReportClock = DateTime Function();
+
+final reportClockProvider = Provider<ReportClock>((ref) => DateTime.now);
+
 /// Reason and note typed for one question, kept until the next deal.
 final class ReportDraft {
   const ReportDraft({this.reason, this.note = ''});

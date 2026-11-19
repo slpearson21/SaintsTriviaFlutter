@@ -1,5 +1,4 @@
 import 'question_assets.dart';
-import 'question_bank.dart';
 import 'question_bank_exception.dart';
 import 'scripture_volume.dart';
 import 'trivia_question.dart';
@@ -13,9 +12,9 @@ final class QuestionBankValidator {
 
   /// When true, a question that is not `approved` is a violation.
   ///
-  /// The in-app loader does not set this. A release build skips those
-  /// questions. `tool/validate_questions.dart --require-approved` is the
-  /// gate that rejects them.
+  /// Nothing passes true today. The in-app loader skips unapproved questions
+  /// in release builds, and `tool/validate_questions.dart` checks approval on
+  /// its own. STRIV-19's release review gate may need this flag.
   final bool requireApproved;
 
   QuestionBankValidation validate({
@@ -90,41 +89,20 @@ final class QuestionBankValidator {
       }
     }
 
-    return QuestionBankValidation(
-      assets: assets,
-      questions: questions,
-      violations: violations,
-    );
+    return QuestionBankValidation(questions: questions, violations: violations);
   }
 }
 
 /// Questions and schema problems from one validation pass.
 final class QuestionBankValidation {
   QuestionBankValidation({
-    required this.assets,
     required List<TriviaQuestion> questions,
     required List<QuestionBankViolation> violations,
   }) : questions = List.unmodifiable(questions),
        violations = List.unmodifiable(violations);
 
-  final QuestionAssets assets;
   final List<TriviaQuestion> questions;
   final List<QuestionBankViolation> violations;
-
-  bool get isValid => violations.isEmpty;
-
-  /// A bank, or null when [violations] is not empty.
-  ///
-  /// Never returns a partial bank. One bad question fails the load.
-  QuestionBank? get bank {
-    if (!isValid) {
-      return null;
-    }
-    return QuestionBank(
-      schemaVersion: assets.schemaVersion,
-      questions: questions,
-    );
-  }
 }
 
 final class _IdSite {

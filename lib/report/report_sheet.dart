@@ -347,7 +347,7 @@ class _ReportSheetState extends ConsumerState<_ReportSheet> {
       platform: reportPlatformLabel(),
       bankVersion: 'v1',
       source: widget.target.source,
-      createdAtUtc: DateTime.now().toUtc(),
+      createdAtUtc: ref.read(reportClockProvider)().toUtc(),
     );
     final uri = report.mailto;
     final canOpenLink = ref.read(canOpenLinkProvider);

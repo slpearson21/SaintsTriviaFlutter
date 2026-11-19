@@ -38,7 +38,7 @@ bool usesMaterialChrome(BuildContext context) {
 /// Toolbar height when text is large enough to need a second title line.
 ///
 /// The Material toolbar is 56, which clips one scaled titleLarge line.
-/// Large text gets two lines, the same room the placeholder screens use.
+/// Large text gets two lines of that style.
 double? largeTitleToolbarHeight(BuildContext context) {
   if (!isLargeText(context)) return null;
   final scaler = MediaQuery.textScalerOf(context);
