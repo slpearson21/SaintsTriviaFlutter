@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:saints_trivia_flutter/app.dart';
-import 'package:saints_trivia_flutter/data/questions/questions.dart';
 import 'package:saints_trivia_flutter/data/questions/question_bank_provider.dart';
+import 'package:saints_trivia_flutter/data/questions/questions.dart';
 import 'package:saints_trivia_flutter/game/game_launch.dart';
 import 'package:saints_trivia_flutter/game/game_providers.dart';
 import 'package:saints_trivia_flutter/progress/home_snapshot.dart';
@@ -48,8 +48,8 @@ void main() {
   testWidgets('a game link with no settings opens setup', (tester) async {
     await pumpApp(tester);
 
-    final router = GoRouter.of(tester.element(find.text('Scripture Trivia')));
-    router.go(AppRoutes.game);
+    GoRouter.of(tester.element(find.text('Scripture Trivia')))
+        .go(AppRoutes.game);
     await tester.pumpAndSettle();
 
     expect(find.text('New game'), findsOneWidget);
@@ -62,8 +62,8 @@ void main() {
   ) async {
     await pumpApp(tester, overrides: [fixedHomeSnapshot(_returning)]);
 
-    final router = GoRouter.of(tester.element(find.text('Scripture Trivia')));
-    router.go(AppRoutes.game, extra: 'deep link');
+    GoRouter.of(tester.element(find.text('Scripture Trivia')))
+        .go(AppRoutes.game, extra: 'deep link');
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
@@ -76,8 +76,8 @@ void main() {
   testWidgets('route extra wins over the saved game', (tester) async {
     await pumpApp(tester, overrides: [fixedHomeSnapshot(_returning)]);
 
-    final router = GoRouter.of(tester.element(find.text('Scripture Trivia')));
-    router.go(AppRoutes.game, extra: _routeSettings);
+    GoRouter.of(tester.element(find.text('Scripture Trivia')))
+        .go(AppRoutes.game, extra: _routeSettings);
     await tester.pumpAndSettle();
 
     expect(
@@ -89,8 +89,8 @@ void main() {
   testWidgets('a null extra uses the saved game', (tester) async {
     await pumpApp(tester, overrides: [fixedHomeSnapshot(_returning)]);
 
-    final router = GoRouter.of(tester.element(find.text('Scripture Trivia')));
-    router.go(AppRoutes.game);
+    GoRouter.of(tester.element(find.text('Scripture Trivia')))
+        .go(AppRoutes.game);
     await tester.pumpAndSettle();
 
     expect(

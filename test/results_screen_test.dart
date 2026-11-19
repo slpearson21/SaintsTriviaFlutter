@@ -12,10 +12,10 @@ import 'package:saints_trivia_flutter/app.dart';
 import 'package:saints_trivia_flutter/data/questions/question_bank_provider.dart';
 import 'package:saints_trivia_flutter/data/questions/questions.dart';
 import 'package:saints_trivia_flutter/game/game_engine.dart';
+import 'package:saints_trivia_flutter/game/game_providers.dart';
 import 'package:saints_trivia_flutter/persistence/finished_game_record.dart';
 import 'package:saints_trivia_flutter/persistence/memory_progress_repository.dart';
 import 'package:saints_trivia_flutter/persistence/persistence_providers.dart';
-import 'package:saints_trivia_flutter/game/game_providers.dart';
 import 'package:saints_trivia_flutter/progress/home_providers.dart';
 import 'package:saints_trivia_flutter/progress/home_snapshot.dart';
 import 'package:saints_trivia_flutter/progress/play_again.dart';
@@ -400,7 +400,7 @@ void main() {
           total: 10,
           percent: 80,
           bestStreak: 4,
-          playedAt: DateTime(2026, 11, 1),
+          playedAt: DateTime(2026, 11),
           volumes: const [ScriptureVolume.bom],
           questionCount: 10,
           volumeCorrect: const {ScriptureVolume.bom: 8},
@@ -719,8 +719,7 @@ void main() {
     tester,
   ) async {
     await _pump(tester);
-    final router = _router(tester);
-    router.go(AppRoutes.results);
+    final router = _router(tester)..go(AppRoutes.results);
     await tester.pumpAndSettle();
     expect(find.text('Scripture Trivia'), findsOneWidget);
     expect(find.text('Results'), findsNothing);

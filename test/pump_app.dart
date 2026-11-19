@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
@@ -11,8 +12,12 @@ import 'package:saints_trivia_flutter/app.dart';
 /// leaves every later [SaintsTriviaApp] on that platform, and tearDown
 /// cannot rebuild the themes.
 void captureAppThemes() {
-  if (lightTheme.platform != darkTheme.platform) {
-    throw StateError('App themes were built on different platforms.');
+  final platform = defaultTargetPlatform;
+  if (lightTheme.platform != platform || darkTheme.platform != platform) {
+    throw StateError(
+      'App themes were built for ${lightTheme.platform} and '
+      '${darkTheme.platform}, not $platform.',
+    );
   }
 }
 

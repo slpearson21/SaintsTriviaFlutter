@@ -619,12 +619,12 @@ void main() {
       random: Random(11),
       open: false,
     );
-    final notifier = container.read(gameControllerProvider.notifier);
-    notifier.start(
-      bank: bank,
-      volumes: settings.volumes,
-      requestedCount: settings.questionCount,
-    );
+    final notifier = container.read(gameControllerProvider.notifier)
+      ..start(
+        bank: bank,
+        volumes: settings.volumes,
+        requestedCount: settings.questionCount,
+      );
     final finished = container.read(gameControllerProvider)!;
     for (final question in finished.questions) {
       notifier.answer(question.answerIndex);
@@ -659,12 +659,12 @@ void main() {
       random: Random(12),
       open: false,
     );
-    final notifier = container.read(gameControllerProvider.notifier);
-    notifier.start(
-      bank: bank,
-      volumes: settings.volumes,
-      requestedCount: settings.questionCount,
-    );
+    final notifier = container.read(gameControllerProvider.notifier)
+      ..start(
+        bank: bank,
+        volumes: settings.volumes,
+        requestedCount: settings.questionCount,
+      );
     final before = container.read(gameControllerProvider)!;
     notifier.answer(before.questions.first.answerIndex);
     final dealt = container.read(gameControllerProvider)!;

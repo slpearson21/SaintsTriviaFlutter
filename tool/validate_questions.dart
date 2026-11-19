@@ -82,16 +82,18 @@ Options:
     }
     if (arg == '--bank') {
       if (i + 1 >= args.length) {
-        err.writeln('Missing directory after --bank.');
-        err.writeln(usage.trimRight());
+        err
+          ..writeln('Missing directory after --bank.')
+          ..writeln(usage.trimRight());
         return 64;
       }
       i += 1;
       directory = args[i];
       continue;
     }
-    err.writeln('Unknown argument "$arg".');
-    err.writeln(usage.trimRight());
+    err
+      ..writeln('Unknown argument "$arg".')
+      ..writeln(usage.trimRight());
     return 64;
   }
 
