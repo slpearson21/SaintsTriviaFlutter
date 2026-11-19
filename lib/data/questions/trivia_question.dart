@@ -47,9 +47,6 @@ final class TriviaQuestion {
   /// Throws [QuestionBankException] when the object breaks the schema.
   /// Duplicate ids are a bank-level rule and are checked by the question
   /// bank validator, not here.
-  ///
-  /// `requireApproved` stays false for every caller today. STRIV-19's release
-  /// review gate may pass true.
   factory TriviaQuestion.fromJson(
     Object? json, {
     bool requireApproved = false,
@@ -71,9 +68,6 @@ final class TriviaQuestion {
   }
 
   /// Parses one JSON object and reports every field problem it can find.
-  ///
-  /// `requireApproved` stays false for every caller today. STRIV-19's release
-  /// review gate may pass true.
   static ParsedTriviaQuestion parse(
     Object? json, {
     bool requireApproved = false,
@@ -521,8 +515,7 @@ ReviewStatus? _readReviewStatus(
     );
     return null;
   }
-  // Nothing passes true today. Kept because STRIV-19's release review
-  // gate may need it.
+  // See QuestionBankValidator.requireApproved.
   if (requireApproved && status != ReviewStatus.approved) {
     final label = questionId == null ? 'A question' : 'Question $questionId';
     add(
