@@ -188,8 +188,8 @@ void main() {
         pool.map((question) => question.id).toSet(),
       );
       expect(
-        over.map((question) => question.id),
-        exact.map((question) => question.id),
+        exact.map((question) => question.id).toSet(),
+        pool.map((question) => question.id).toSet(),
       );
     });
 

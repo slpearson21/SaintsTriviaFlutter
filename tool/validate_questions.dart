@@ -213,6 +213,12 @@ List<QuestionBankViolation> bundledVolumeMinimumViolations(
   return violations;
 }
 
+/// Generic 176-verse cap, the length of Psalm 119.
+///
+/// This is not a per-chapter verse count. Every chapter that
+/// [scriptureChapterCounts] allows uses this same ceiling.
+const longestChapterVerseCount = 176;
+
 /// Chapter counts for the Latter-day Saint edition of each Gospel Library book.
 ///
 /// Keys are [GospelLibraryBook.slug]. Official Declaration uses the
@@ -402,10 +408,34 @@ List<QuestionBankViolation> questionContentViolations(
         'Reference "${question.reference}" uses chapter $chapter, but $name has $limit.',
         field: 'reference',
       );
+    } else {
+      for (final verse in _verseNumbers(parsed.uri)) {
+        if (verse < 1 || verse > longestChapterVerseCount) {
+          add(
+            'Reference "${question.reference}" verse $verse is past the '
+            'generic $longestChapterVerseCount-verse cap (Psalm 119).',
+            field: 'reference',
+          );
+        }
+      }
     }
   }
 
   return violations;
+}
+
+/// Verse numbers from a Gospel Library `id=p1,p6-p7` query.
+Iterable<int> _verseNumbers(Uri uri) sync* {
+  final id = uri.queryParameters['id'];
+  if (id == null || id.isEmpty) return;
+  final partPattern = RegExp(r'^p(\d+)(?:-p(\d+))?$');
+  for (final part in id.split(',')) {
+    final match = partPattern.firstMatch(part);
+    if (match == null) continue;
+    yield int.parse(match.group(1)!);
+    final end = match.group(2);
+    if (end != null) yield int.parse(end);
+  }
 }
 
 /// Case-folded prompt with whitespace collapsed, for duplicate detection.

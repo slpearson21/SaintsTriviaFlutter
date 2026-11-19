@@ -256,7 +256,8 @@ void main() {
       tester,
       overrides: [
         questionBankLoaderProvider.overrideWith(
-          (ref) => () async => throw Exception('unreadable'),
+          (ref) =>
+              () async => throw Exception('unreadable'),
         ),
       ],
       settle: false,
@@ -301,6 +302,7 @@ Future<void> _surface(WidgetTester tester) async {
 /// Enabled buttons and links a screen reader can land on need a tap action.
 void _expectTaps(WidgetTester tester) {
   final missing = <String>[];
+  var controls = 0;
 
   void walk(SemanticsNode node) {
     if (!node.isMergedIntoParent && !node.areUserActionsBlocked) {
@@ -308,11 +310,14 @@ void _expectTaps(WidgetTester tester) {
       final flags = data.flagsCollection;
       final control = (flags.isButton || flags.isLink) && !flags.isHidden;
       final disabled = flags.isEnabled == Tristate.isFalse;
-      if (control && !disabled && !data.hasAction(SemanticsAction.tap)) {
-        final label = data.label.trim().isNotEmpty
-            ? data.label
-            : (data.tooltip.trim().isNotEmpty ? data.tooltip : '(unlabeled)');
-        missing.add(label);
+      if (control && !disabled) {
+        controls++;
+        if (!data.hasAction(SemanticsAction.tap)) {
+          final label = data.label.trim().isNotEmpty
+              ? data.label
+              : (data.tooltip.trim().isNotEmpty ? data.tooltip : '(unlabeled)');
+          missing.add(label);
+        }
       }
     }
     node.visitChildren((child) {
@@ -326,6 +331,12 @@ void _expectTaps(WidgetTester tester) {
     if (root != null) walk(root);
   }
 
+  expect(
+    controls,
+    greaterThan(0),
+    reason:
+        'A screen with no enabled button or link passes this check vacuously.',
+  );
   expect(
     missing,
     isEmpty,
