@@ -899,7 +899,8 @@ void main() {
     expect(find.text('BY SCRIPTURE'), findsOneWidget);
     expect(find.text('By scripture'), findsNothing);
     final title = tester.getRect(find.text('Results'));
-    expect(title.center.dx, closeTo(800 / 2, 40));
+    final width = tester.getSize(find.byType(Scaffold)).width;
+    expect(title.center.dx, closeTo(width / 2, 40));
 
     await _tap(tester, const Key('results-review'));
     expect(find.text('Review answers'), findsOneWidget);
