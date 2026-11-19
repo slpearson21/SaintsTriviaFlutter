@@ -222,7 +222,7 @@ void main() {
   test('the last shrink loop shortens the prompt with an empty note', () {
     final prompt = 'Q' * 300;
     final report = QuestionReport(
-      questionId: 'q' * 320,
+      questionId: 'q' * 550,
       prompt: prompt,
       correctAnswer: 'The same',
       selectedAnswer: 'picked',
@@ -247,6 +247,62 @@ void main() {
     expect(body, contains('Note: —'));
     expect(report.clipboardText, contains(prompt));
     expect(report.clipboardText, contains('n' * 280));
+  });
+
+  test('a clipped non-ASCII id stays decodable', () {
+    final id = 'é' * 200;
+    final report = QuestionReport(
+      questionId: id,
+      prompt: 'é' * 400,
+      correctAnswer: 'The same',
+      selectedAnswer: 'picked',
+      reference: 'D&C 1:38',
+      reason: ReportReason.other,
+      note: '',
+      appVersion: 'v1.0.0',
+      platform: 'Android',
+      bankVersion: 'v1',
+      source: 'game',
+      createdAtUtc: DateTime.utc(2026, 11, 18, 15, 46),
+    );
+
+    final mailto = report.mailto.toString();
+    expect(mailto.length, lessThanOrEqualTo(maxMailtoLength));
+    expect(mailto, contains('&body='));
+    expect(report.subject, contains(id));
+    final body = _mailtoBody(report);
+    final shownId = body
+        .split('\r\n')
+        .firstWhere((line) => line.startsWith('Question ID: '))
+        .replaceFirst('Question ID: ', '');
+    expect(shownId, isNotEmpty);
+    expect(id.startsWith(shownId), isTrue);
+    expect(body, isNot(contains('\uFFFD')));
+  });
+
+  test('a question id that fills the subject is left whole', () {
+    final id = 'é' * 900;
+    final report = QuestionReport(
+      questionId: id,
+      prompt: 'Prompt',
+      correctAnswer: 'The same',
+      selectedAnswer: 'picked',
+      reference: 'D&C 1:38',
+      reason: ReportReason.other,
+      note: '',
+      appVersion: 'v1.0.0',
+      platform: 'Android',
+      bankVersion: 'v1',
+      source: 'game',
+      createdAtUtc: DateTime.utc(2026, 11, 18, 15, 46),
+    );
+
+    expect(report.mailto.toString().length, greaterThan(maxMailtoLength));
+    expect(report.subject, contains(id));
+    final subject = Uri.decodeComponent(
+      report.mailto.query.split('&').first.replaceFirst('subject=', ''),
+    );
+    expect(subject, report.subject);
   });
 
   test('formatReportUtc zero-pads a UTC time and converts a local one', () {

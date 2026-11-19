@@ -69,14 +69,15 @@ final class QuestionReport {
   String get clipboardText =>
       'To: $kReportEmail\r\nSubject: $subject\r\n\r\n$body';
 
-  /// Encoded mailto, kept at or under 1,800 characters.
+  /// Encoded mailto. At or under 1,800 characters when the question id fits.
   ///
   /// App version, platform, bank version, and source are capped first. The
   /// question and the note shrink next, then the correct answer, the
   /// reference, and the player's answer. Those metadata fields shrink
-  /// further if the link is still too long. The question id is not trimmed.
-  /// A link that still does not fit is cut on a `%HH` boundary. [body] and
-  /// [clipboardText] stay full.
+  /// further if the link is still too long. The question id is never
+  /// trimmed. Only the body value is cut after that, and never inside a
+  /// character. A question id whose subject leaves no room for `&body=`
+  /// makes the link longer than 1,800. [body] and [clipboardText] stay full.
   Uri get mailto {
     var version = _bounded(appVersion, maxReportAppVersionLength);
     var platformName = _bounded(platform, maxReportPlatformLength);
@@ -325,14 +326,24 @@ final class QuestionReport {
     return value.characters.take(max).string;
   }
 
-  /// Drops characters from the end of [value] until [build] fits.
+  /// Longest grapheme prefix of [value] whose [build] fits.
   String _trimTail(String value, Uri Function(String candidate) build) {
-    var current = value;
-    while (current.characters.isNotEmpty &&
-        build(current).toString().length > maxMailtoLength) {
-      current = current.characters.skipLast(1).string;
+    if (build(value).toString().length <= maxMailtoLength) return value;
+    final chars = value.characters;
+    var low = 0;
+    var high = chars.length;
+    var best = '';
+    while (low <= high) {
+      final mid = (low + high) ~/ 2;
+      final candidate = chars.take(mid).string;
+      if (build(candidate).toString().length <= maxMailtoLength) {
+        best = candidate;
+        low = mid + 1;
+      } else {
+        high = mid - 1;
+      }
     }
-    return current;
+    return best;
   }
 
   String _body(
@@ -398,27 +409,82 @@ final class QuestionReport {
     );
   }
 
-  /// Cuts an encoded mailto without splitting a `%HH` escape.
+  /// Cuts the body value without splitting a character or the subject.
+  ///
+  /// The question id stays whole in the subject. When that subject leaves
+  /// no room for `&body=`, the link is returned as built and can be longer
+  /// than [maxMailtoLength].
   Uri _clipMailto(String text) {
+    const marker = '&body=';
+    final markerAt = text.indexOf(marker);
+    if (markerAt < 0) return Uri.parse(text);
+    final prefixLength = markerAt + marker.length;
+    if (prefixLength > maxMailtoLength) return Uri.parse(text);
     var end = text.length;
-    while (end > 0) {
+    while (end >= prefixLength) {
       if (end > maxMailtoLength) end = maxMailtoLength;
-      final safe = _percentSafeEnd(text, end);
-      if (safe <= 0) break;
-      final parsed = Uri.parse(text.substring(0, safe));
-      if (parsed.toString().length <= maxMailtoLength) return parsed;
-      end = safe - 1;
+      final safe = _characterBoundary(text, end);
+      final cut = safe < prefixLength ? prefixLength : safe;
+      final parsed = Uri.parse(text.substring(0, cut));
+      final rendered = parsed.toString();
+      if (rendered.length <= maxMailtoLength && rendered.contains(marker)) {
+        return parsed;
+      }
+      if (cut <= prefixLength) break;
+      end = cut - 1;
     }
-    return Uri.parse('mailto:$kReportEmail');
+    return Uri.parse(text.substring(0, prefixLength));
   }
 
-  /// [end] is exclusive. Moves back when it lands inside `%HH`.
-  int _percentSafeEnd(String text, int end) {
-    final cut = end > text.length ? text.length : end;
+  /// [end] is exclusive. Backs up out of a partial `%HH` or a split character.
+  int _characterBoundary(String text, int end) {
+    final limit = end > text.length ? text.length : end;
+    if (limit <= 0) return 0;
+    return _utf8Boundary(text, _escapeBoundary(text, limit));
+  }
+
+  int _escapeBoundary(String text, int cut) {
     if (cut <= 0) return 0;
     if (text[cut - 1] == '%') return cut - 1;
     if (cut >= 2 && text[cut - 2] == '%') return cut - 2;
     return cut;
+  }
+
+  /// The byte encoded by the `%HH` ending at [cut], if that is where it ends.
+  int? _percentByte(String text, int cut) {
+    if (cut < 3 || text[cut - 3] != '%') return null;
+    final byte = int.tryParse(text.substring(cut - 2, cut), radix: 16);
+    if (byte == null || byte > 0xFF) return null;
+    return byte;
+  }
+
+  int _utf8Continuations(int lead) {
+    if (lead >= 0xC2 && lead <= 0xDF) return 1;
+    if (lead >= 0xE0 && lead <= 0xEF) return 2;
+    if (lead >= 0xF0 && lead <= 0xF4) return 3;
+    return 0;
+  }
+
+  /// Backs up when [cut] ends on a UTF-8 continuation (`%80`–`%BF`).
+  int _utf8Boundary(String text, int cut) {
+    final last = _percentByte(text, cut);
+    if (last == null || last < 0x80) return cut;
+    if (last <= 0xBF) {
+      var pos = cut;
+      var seen = 0;
+      while (pos >= 3 && seen < 3) {
+        final byte = _percentByte(text, pos);
+        if (byte == null || byte < 0x80 || byte > 0xBF) break;
+        seen++;
+        pos -= 3;
+      }
+      final lead = _percentByte(text, pos);
+      final expected = lead == null ? 0 : _utf8Continuations(lead);
+      if (expected == seen && expected > 0) return cut;
+      if (expected > 0) return pos - 3;
+      return pos;
+    }
+    return cut - 3;
   }
 
   static String _trimNote(String value) {
@@ -429,7 +495,8 @@ final class QuestionReport {
   }
 }
 
-/// Encoded mailto links stay at or under this length.
+/// Target length of an encoded mailto. A question id that leaves no room
+/// for `&body=` can make the link longer.
 const maxMailtoLength = 1800;
 
 /// The note field stops at this many characters.
