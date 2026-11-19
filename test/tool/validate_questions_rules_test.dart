@@ -32,7 +32,10 @@ void main() {
       0,
     );
     expect(errors.toString(), isEmpty);
-    expect(output.toString(), contains('Validated 591 questions'));
+    expect(
+      output.toString(),
+      contains('Validated ${_bundledQuestionCount()} questions'),
+    );
   });
 
   test('a clean sample bank has no content violations', () async {
@@ -206,6 +209,38 @@ void main() {
       isTrue,
     );
   });
+
+  test('verse numbers stay inside a chapter the table allows', () async {
+    final directory = await _writeBank(
+      replace: {
+        ScriptureVolume.ot: [
+          _question(ScriptureVolume.ot, reference: 'Psalms 119:176'),
+          _question(
+            ScriptureVolume.ot,
+            number: 2,
+            reference: 'Genesis 1:177',
+            prompt: 'Past the longest chapter',
+          ),
+          _question(
+            ScriptureVolume.ot,
+            number: 3,
+            reference: 'Genesis 51:200',
+            prompt: 'The chapter is already out of range',
+          ),
+        ],
+      },
+    );
+
+    final violations = await _violations(directory);
+    expect(violations.map((violation) => violation.questionId), [
+      'ot-0002',
+      'ot-0003',
+    ]);
+    expect(violations[0].message, contains('verse 177'));
+    expect(violations[0].message, contains('1–$longestChapterVerseCount'));
+    expect(violations[1].message, contains('chapter 51'));
+    expect(violations[1].message, isNot(contains('verse')));
+  });
 }
 
 Map<String, Object?> _question(
@@ -251,6 +286,17 @@ Future<String> _writeBank({
     await File(assets.pathFor(volume)).writeAsString(jsonEncode(questions));
   }
   return root.path;
+}
+
+int _bundledQuestionCount() {
+  final assets = QuestionAssets();
+  var count = 0;
+  for (final volume in ScriptureVolume.values) {
+    final questions =
+        jsonDecode(File(assets.pathFor(volume)).readAsStringSync()) as List;
+    count += questions.length;
+  }
+  return count;
 }
 
 Future<List<QuestionBankViolation>> _violations(String directory) async {
