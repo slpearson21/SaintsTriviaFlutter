@@ -399,6 +399,8 @@ List<QuestionBankViolation> questionContentViolations(
 
     final chapters = scriptureChapterCounts[parsed.book.slug];
     final chapter = int.tryParse(parsed.uri.pathSegments.last);
+    // Verse numbers are not checked when the chapter is missing from
+    // scriptureChapterCounts, or is past that book's count.
     if (chapters == null || chapter == null || chapter > chapters) {
       final name = parsed.book.names.first;
       final limit = chapters == null
@@ -431,6 +433,9 @@ Iterable<int> _verseNumbers(Uri uri) sync* {
   final partPattern = RegExp(r'^p(\d+)(?:-p(\d+))?$');
   for (final part in id.split(',')) {
     final match = partPattern.firstMatch(part);
+    // Skip an id token that is not `pN` or `pN-pM`. Those ids come from
+    // our parser. Verse checks also never reach this loop when the chapter
+    // is not in scriptureChapterCounts; that case is reported by the caller.
     if (match == null) continue;
     yield int.parse(match.group(1)!);
     final end = match.group(2);

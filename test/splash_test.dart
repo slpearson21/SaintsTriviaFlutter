@@ -12,6 +12,8 @@ import 'package:saints_trivia_flutter/main.dart';
 import 'package:saints_trivia_flutter/splash_fade.dart';
 import 'package:saints_trivia_flutter/theme/st_theme.dart';
 
+import 'pump_app.dart';
+
 void main() {
   tearDown(debugResetSplashHandoff);
   testWidgets('splash stays up until the question bank load finishes', (
@@ -301,8 +303,9 @@ void main() {
     );
 
     debugResetSplashHandoff();
-    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    captureAppThemes();
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     holdSplashForHandoff();
     await tester.pumpWidget(_insetApp());
     final iosOverlay = tester.getRect(find.byKey(splashFadeKey));
@@ -315,8 +318,9 @@ void main() {
   testWidgets('iOS first frame uses the centered 192 pt launch image', (
     tester,
   ) async {
-    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    captureAppThemes();
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     await _pumpHeldSplash(tester, brightness: Brightness.dark);
     _expectLaunchFrame(
       tester,

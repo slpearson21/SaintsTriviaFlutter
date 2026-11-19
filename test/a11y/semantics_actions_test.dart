@@ -94,6 +94,7 @@ void main() {
     tester,
   ) async {
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    captureAppThemes();
 
     debugDefaultTargetPlatformOverride = TargetPlatform.android;
     await _openSetup(tester, platform: TargetPlatform.android);
@@ -399,6 +400,10 @@ Future<ProviderContainer> _openSetup(
   required TargetPlatform platform,
 }) async {
   await _surface(tester);
+  captureAppThemes();
+  debugDefaultTargetPlatformOverride = platform;
+  addTearDown(() => debugDefaultTargetPlatformOverride = null);
+  final theme = buildTheme(Brightness.light).copyWith(platform: platform);
   final container = ProviderContainer(
     overrides: [
       questionBankLoaderProvider.overrideWith(
@@ -413,7 +418,7 @@ Future<ProviderContainer> _openSetup(
     UncontrolledProviderScope(
       container: container,
       child: MaterialApp.router(
-        theme: buildTheme(Brightness.light).copyWith(platform: platform),
+        theme: theme,
         routerConfig: container.read(appRouterProvider),
       ),
     ),

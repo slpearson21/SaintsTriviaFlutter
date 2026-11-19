@@ -23,6 +23,8 @@ import 'package:saints_trivia_flutter/report/report_config.dart';
 import 'package:saints_trivia_flutter/screens/settings_screen.dart';
 import 'package:saints_trivia_flutter/services/open_link.dart';
 
+import 'pump_app.dart';
+
 const _guidelines = <AccessibilityGuideline>[
   androidTapTargetGuideline,
   iOSTapTargetGuideline,
@@ -217,6 +219,7 @@ void main() {
     tester,
   ) async {
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    captureAppThemes();
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     await _pump(tester);
     await tester.ensureVisible(find.byKey(const Key('settings-reset')));
@@ -367,6 +370,7 @@ void main() {
     addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
     try {
       for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+        captureAppThemes();
         debugDefaultTargetPlatformOverride = platform;
         for (final brightness in Brightness.values) {
           tester.platformDispatcher.platformBrightnessTestValue = brightness;

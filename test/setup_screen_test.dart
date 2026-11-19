@@ -15,6 +15,8 @@ import 'package:saints_trivia_flutter/routing/routes.dart';
 import 'package:saints_trivia_flutter/screens/game_screen.dart';
 import 'package:saints_trivia_flutter/theme/st_theme.dart';
 
+import 'pump_app.dart';
+
 QuestionBank _bank({
   int ot = 40,
   int nt = 30,
@@ -61,6 +63,7 @@ Future<ProviderContainer> _openSetup(
   addTearDown(() => tester.binding.setSurfaceSize(null));
   tester.platformDispatcher.textScaleFactorTestValue = textScale;
   addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+  captureAppThemes();
   if (platform != null) {
     debugDefaultTargetPlatformOverride = platform;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);

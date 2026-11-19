@@ -27,6 +27,7 @@ import 'package:saints_trivia_flutter/screens/game_screen.dart';
 import 'package:saints_trivia_flutter/screens/results_screen.dart';
 import 'package:saints_trivia_flutter/theme/st_theme.dart';
 
+import 'pump_app.dart';
 import 'support/fixed_home_snapshot.dart';
 
 const _guidelines = <AccessibilityGuideline>[
@@ -893,8 +894,9 @@ void main() {
   testWidgets('iOS centers the title and Android keeps a back arrow', (
     tester,
   ) async {
-    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    captureAppThemes();
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     await _openResults(tester, session: _mixed());
     expect(find.text('BY SCRIPTURE'), findsOneWidget);
     expect(find.text('By scripture'), findsNothing);

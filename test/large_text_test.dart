@@ -382,8 +382,6 @@ void main() {
       addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 
       final container = ProviderContainer();
-      addTearDown(container.dispose);
-      addTearDown(() => tester.pumpWidget(const SizedBox.shrink()));
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
@@ -398,6 +396,8 @@ void main() {
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull, reason: '$path at $scale');
       }
+      await tester.pumpWidget(const SizedBox.shrink());
+      container.dispose();
     }
   });
 }

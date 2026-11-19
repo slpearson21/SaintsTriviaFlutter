@@ -24,6 +24,8 @@ import 'package:saints_trivia_flutter/routing/routes.dart';
 import 'package:saints_trivia_flutter/services/open_link.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../pump_app.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -391,8 +393,9 @@ void main() {
     tester,
   ) async {
     final semantics = tester.ensureSemantics();
-    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    captureAppThemes();
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     try {
       await _pumpGame(tester);
       await tester.tap(find.text('Alpha'));
@@ -630,8 +633,9 @@ void main() {
 
   testWidgets('the iOS no-mail dialog is a Cupertino alert', (tester) async {
     _mockClipboard(tester);
-    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    captureAppThemes();
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     await _pumpGame(
       tester,
       canOpen: (_) async => false,
