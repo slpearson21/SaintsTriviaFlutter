@@ -9,11 +9,11 @@ import '../data/questions/scripture_volume.dart';
 import '../game/game_engine.dart';
 import '../game/game_providers.dart';
 import '../layout/adaptive_actions.dart';
+import '../layout/platform_style.dart';
 import '../layout/screen_body.dart';
 import '../layout/section_label.dart';
 import '../layout/st_icon.dart';
-import '../layout/platform_style.dart';
-import '../layout/text_scale.dart' hide usesMaterialChrome;
+import '../layout/text_scale.dart';
 import '../progress/home_providers.dart';
 import '../progress/play_again.dart';
 import '../progress/record_finished_game.dart';
@@ -82,7 +82,7 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
       finished.questionCount,
     );
     final large = isLargeText(context);
-    final material = usesMaterialChrome(context);
+    final material = usesMaterialChrome();
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 

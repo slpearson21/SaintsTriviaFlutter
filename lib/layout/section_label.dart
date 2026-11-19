@@ -12,7 +12,7 @@ class SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final material = usesMaterialChrome(context);
+    final material = usesMaterialChrome();
     final style = material
         ? theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary)
         : theme.textTheme.labelMedium?.copyWith(

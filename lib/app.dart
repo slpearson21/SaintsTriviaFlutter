@@ -21,19 +21,15 @@ ThemeData buildLightTheme() => _theme(Brightness.light);
 /// Dark theme for the platform at the moment it is built.
 ThemeData buildDarkTheme() => _theme(Brightness.dark);
 
-/// Fresh light theme. Same result as [buildLightTheme].
-ThemeData get lightTheme => buildLightTheme();
-
-/// Fresh dark theme. Same result as [buildDarkTheme].
-ThemeData get darkTheme => buildDarkTheme();
-
 class SaintsTriviaApp extends ConsumerWidget {
   const SaintsTriviaApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
-    final themeMode = ref.watch(settingsProvider).themeMode;
+    final themeMode = ref.watch(
+      settingsProvider.select((settings) => settings.themeMode),
+    );
     return MaterialApp.router(
       title: 'Scripture Trivia',
       theme: buildLightTheme(),

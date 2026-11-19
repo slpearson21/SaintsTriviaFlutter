@@ -193,7 +193,6 @@ class _ErrorCopy extends StatelessWidget {
     final tone = theme.extension<StColors>()!;
     final badge = ExcludeSemantics(
       child: Align(
-        alignment: Alignment.center,
         child: SizedBox(
           key: const Key('error-state-icon'),
           width: _badgeSize,
@@ -235,7 +234,6 @@ class _ErrorCopy extends StatelessWidget {
         const SizedBox(height: StSpace.sm),
         if (limitWidth)
           Align(
-            alignment: Alignment.center,
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: _bodyMaxWidth),
               child: message,

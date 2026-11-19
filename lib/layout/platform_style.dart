@@ -25,10 +25,13 @@ bool isCupertinoPlatform(TargetPlatform platform) {
 /// Android, and the other Material platforms. iOS and macOS keep the
 /// Cupertino chrome the mockups show.
 ///
-/// This reads [defaultTargetPlatform], not [ThemeData.platform]. The app
-/// themes are built once, so a test that overrides the platform would
-/// otherwise keep the theme's original platform. Cupertino page transitions
-/// stay on the theme, which is what the game screen's edge swipe expects.
-bool usesMaterialChrome(BuildContext context) {
+/// This reads [defaultTargetPlatform], not the theme platform. Chrome
+/// follows the platform at the call, including a test override. Page
+/// transitions stay on the theme built for that same platform. The game
+/// screen's edge swipe follows those transitions.
+///
+/// [context] is ignored. An existing test still passes one, so the
+/// argument stays optional.
+bool usesMaterialChrome([Object? context]) {
   return !isCupertinoPlatform(defaultTargetPlatform);
 }

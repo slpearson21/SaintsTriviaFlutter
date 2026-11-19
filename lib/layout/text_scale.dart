@@ -3,8 +3,6 @@ import 'package:material_ui/material_ui.dart';
 import '../theme/st_theme.dart';
 import 'platform_style.dart';
 
-export 'platform_style.dart' show isReducedMotion, usesMaterialChrome;
-
 /// Mikey's large-text breakpoint. True at 150% and above, including 200%.
 bool isLargeText(BuildContext context) {
   return MediaQuery.textScalerOf(context).scale(1) >= 1.5;

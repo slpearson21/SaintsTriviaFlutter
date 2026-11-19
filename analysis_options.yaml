@@ -1,11 +1,7 @@
 # Stricter than `package:flutter_lints` where the extra rules are already
-# clean, or only needed fixes under `lib/`.
+# clean.
 #
 # Left off on purpose:
-# - `strict-casts`: two `dynamic` arguments in `test/report/question_report_test.dart`.
-# - `avoid_redundant_argument_values`, `cascade_invocations`, and
-#   `directives_ordering`: they fail in `test/` or `tool/`, which this
-#   change does not edit.
 # - `avoid_multiple_declarations_per_line`: the spacing and color tokens
 #   are grouped on one line on purpose.
 include: package:flutter_lints/flutter.yaml
@@ -17,6 +13,7 @@ analyzer:
     - ios/**
     - macos/**
   language:
+    strict-casts: true
     strict-inference: true
     strict-raw-types: true
 
@@ -25,14 +22,17 @@ linter:
     always_declare_return_types: true
     avoid_bool_literals_in_conditional_expressions: true
     avoid_catches_without_on_clauses: true
+    avoid_redundant_argument_values: true
     avoid_slow_async_io: true
     avoid_type_to_string: true
     avoid_unused_constructor_parameters: true
     avoid_void_async: true
     cancel_subscriptions: true
+    cascade_invocations: true
     close_sinks: true
     combinators_ordering: true
     comment_references: true
+    directives_ordering: true
     discarded_futures: true
     eol_at_end_of_file: true
     flutter_style_todos: true

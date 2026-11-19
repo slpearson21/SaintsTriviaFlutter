@@ -13,11 +13,11 @@ import '../data/questions/question_bank_provider.dart';
 import '../data/questions/scripture_volume.dart';
 import '../game/game_engine.dart';
 import '../game/game_providers.dart';
+import '../layout/platform_style.dart';
 import '../layout/question_progress.dart';
 import '../layout/screen_body.dart';
 import '../layout/st_icon.dart';
-import '../layout/platform_style.dart';
-import '../layout/text_scale.dart' hide isReducedMotion, usesMaterialChrome;
+import '../layout/text_scale.dart';
 import '../progress/home_snapshot.dart';
 import '../report/report_sheet.dart';
 import '../report/reported_questions_provider.dart';
@@ -278,7 +278,7 @@ Future<bool> showQuitGameDialog(BuildContext context) async {
     builder: (context) {
       const title = Text('Quit game?');
       const message = Text('Your progress in this game will be lost.');
-      if (!usesMaterialChrome(context)) {
+      if (!usesMaterialChrome()) {
         return CupertinoAlertDialog(
           title: title,
           content: message,
@@ -348,7 +348,7 @@ class _IosBackSwipeState extends State<_IosBackSwipe> {
 
   @override
   Widget build(BuildContext context) {
-    if (usesMaterialChrome(context)) return widget.child;
+    if (usesMaterialChrome()) return widget.child;
     final toolbar = largeTitleToolbarHeight(context) ?? kToolbarHeight;
     return Stack(
       fit: StackFit.expand,
@@ -851,7 +851,6 @@ class _FeedbackSheet extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Flexible(
-              fit: FlexFit.loose,
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(
                   StSpace.screenH,
@@ -915,7 +914,6 @@ class _FeedbackSheet extends ConsumerWidget {
                     ],
                     const SizedBox(height: StSpace.sm),
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
                           child: Align(

@@ -7,11 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../app_info.dart';
+import '../layout/platform_style.dart';
 import '../layout/section_label.dart';
 import '../layout/st_icon.dart';
-import '../layout/platform_style.dart';
-import '../layout/text_scale.dart' hide isReducedMotion, usesMaterialChrome;
-import '../app_info.dart';
+import '../layout/text_scale.dart';
 import '../services/open_link.dart';
 import '../theme/st_theme.dart';
 import 'question_report.dart';
@@ -363,7 +363,7 @@ class _ReportSheetState extends ConsumerState<_ReportSheet> {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final large = isLargeText(context);
-    final cupertino = !usesMaterialChrome(context);
+    final cupertino = !usesMaterialChrome();
     final hint = _reason?.noteHint ?? reportNoteHintNone;
     final maxHeight = MediaQuery.sizeOf(context).height * 0.92;
     return ConstrainedBox(
@@ -622,7 +622,7 @@ class _ReasonRow extends StatelessWidget {
 
 /// Shown when the mail app does not open. The report is already on the clipboard.
 Future<void> showNoMailDialog(BuildContext context) {
-  if (!usesMaterialChrome(context)) {
+  if (!usesMaterialChrome()) {
     return showCupertinoDialog<void>(
       context: context,
       builder: (context) => const _IosNoMailDialog(),

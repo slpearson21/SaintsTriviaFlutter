@@ -7,10 +7,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../app_info.dart';
 import '../layout/home_back_button.dart';
+import '../layout/platform_style.dart';
 import '../layout/section_label.dart';
 import '../layout/st_icon.dart';
-import '../layout/platform_style.dart';
-import '../layout/text_scale.dart' hide usesMaterialChrome;
+import '../layout/text_scale.dart';
 import '../persistence/persistence_providers.dart';
 import '../progress/home_providers.dart';
 import '../report/report_config.dart';
@@ -41,7 +41,7 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
-    final material = usesMaterialChrome(context);
+    final material = usesMaterialChrome();
     final large = isLargeText(context);
     final controller = ref.read(settingsProvider.notifier);
     return Scaffold(
@@ -174,7 +174,7 @@ Future<void> _showAbout(BuildContext context) {
   final message = Text(
     '$scriptureTriviaVersionLabel\n\n$scriptureTriviaDisclaimer\n\n$reportPrivacyLine',
   );
-  if (!usesMaterialChrome(context)) {
+  if (!usesMaterialChrome()) {
     return showDialog<void>(
       context: context,
       builder: (context) {
@@ -219,7 +219,7 @@ Future<bool> showResetStatsDialog(BuildContext context) async {
   final reset = await showDialog<bool>(
     context: context,
     builder: (context) {
-      if (!usesMaterialChrome(context)) {
+      if (!usesMaterialChrome()) {
         return CupertinoAlertDialog(
           title: title,
           content: message,
@@ -270,7 +270,7 @@ class _ThemeSegments extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final material = usesMaterialChrome(context);
+    final material = usesMaterialChrome();
     final selectedBackground = material
         ? scheme.secondaryContainer
         : scheme.surfaceContainerLowest;
