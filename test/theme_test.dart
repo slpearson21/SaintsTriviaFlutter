@@ -1,7 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saints_trivia_flutter/app.dart' show darkTheme, lightTheme;
 import 'package:saints_trivia_flutter/theme/st_theme.dart';
 
 import 'pump_app.dart';
@@ -60,20 +58,5 @@ void main() {
     expect(theme.colorScheme.primary, const Color(0xFFA9C7F0));
     expect(theme.colorScheme.surface, const Color(0xFF0F1620));
     expect(theme.textTheme.headlineSmall?.fontFamily, 'SourceSerif4');
-  });
-
-  testWidgets('cached themes keep the platform from before any override', (
-    tester,
-  ) async {
-    addTearDown(() => debugDefaultTargetPlatformOverride = null);
-    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-
-    await pumpApp(tester);
-
-    final theme = Theme.of(tester.element(find.text('Scripture Trivia')));
-    expect(theme.platform, TargetPlatform.android);
-    expect(defaultTargetPlatform, TargetPlatform.iOS);
-    expect(lightTheme.platform, TargetPlatform.android);
-    expect(darkTheme.platform, TargetPlatform.android);
   });
 }

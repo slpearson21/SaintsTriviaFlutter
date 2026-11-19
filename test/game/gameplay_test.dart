@@ -98,8 +98,8 @@ Future<ProviderContainer> _pumpGame(
   if (!open) return container;
 
   container.read(appRouterProvider).go(AppRoutes.game, extra: settings);
-  await tester.pump();
-  await tester.pump();
+  // Two frames leave a Cupertino page slide moving, past the hit-test root.
+  await tester.pumpAndSettle();
   return container;
 }
 

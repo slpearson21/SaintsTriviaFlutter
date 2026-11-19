@@ -905,7 +905,7 @@ Future<ProviderContainer> _pumpGame(
           questionCount: count,
         ),
       );
-  await tester.pump();
-  await tester.pump();
+  // Two frames leave a Cupertino page slide moving, past the hit-test root.
+  await tester.pumpAndSettle();
   return container;
 }
