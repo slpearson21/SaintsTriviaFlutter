@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:saints_trivia_flutter/app.dart'
-    show SaintsTriviaApp, darkTheme, lightTheme;
+    show SaintsTriviaApp, buildDarkTheme, buildLightTheme;
 import 'package:saints_trivia_flutter/data/questions/scripture_volume.dart';
 import 'package:saints_trivia_flutter/layout/adaptive_actions.dart';
 import 'package:saints_trivia_flutter/layout/question_progress.dart';
@@ -269,7 +269,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       MaterialApp(
-        theme: lightTheme,
+        theme: buildLightTheme(),
         home: const Scaffold(
           body: Row(
             children: [
@@ -324,7 +324,7 @@ void main() {
         ),
       ];
 
-      for (final theme in [lightTheme, darkTheme]) {
+      for (final theme in [buildLightTheme(), buildDarkTheme()]) {
         for (final (control, finder, minHeight) in controls) {
           await _pumpButtons(
             tester,

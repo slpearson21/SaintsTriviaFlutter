@@ -249,6 +249,7 @@ void main() {
   });
 
   test('a score above the total or below zero is dropped', () {
+    // total defaults to 10, so these scores are out of range.
     expect(_parse(score: 11), isNull);
     expect(_parse(score: -1), isNull);
     expect(_parse(score: 0, total: 0), isNull);

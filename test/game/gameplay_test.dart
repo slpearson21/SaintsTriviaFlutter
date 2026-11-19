@@ -46,6 +46,7 @@ LastGameSettings _settings(int count) {
   );
 }
 
+/// Omitted [platform] and [brightness] stay on the host theme.
 Future<ProviderContainer> _pumpGame(
   WidgetTester tester, {
   required QuestionBank bank,

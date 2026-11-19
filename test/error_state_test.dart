@@ -64,6 +64,7 @@ const _emptySettings = LastGameSettings(
   questionCount: 5,
 );
 
+/// Omitted [brightness] stays on the host theme.
 Future<ProviderContainer> _pump(
   WidgetTester tester, {
   required QuestionBankLoad load,
