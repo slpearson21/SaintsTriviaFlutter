@@ -210,7 +210,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('No games yet'), findsOneWidget);
     expect(find.text('Welcome back!'), findsNothing);
-    expect(find.text('WELCOME'), findsWidgets);
+    expect(find.text('WELCOME'), findsOneWidget);
   });
 
   testWidgets('iOS reset dialog is destructive and Android uses an alert', (
@@ -326,10 +326,36 @@ void main() {
     await tester.ensureVisible(find.byKey(const Key('settings-about')));
     await tester.tap(find.byKey(const Key('settings-about')));
     await tester.pumpAndSettle();
-    expect(find.text('About Scripture Trivia'), findsWidgets);
-    expect(find.textContaining('not an official product'), findsWidgets);
-    expect(find.textContaining(reportPrivacyLine), findsWidgets);
-    expect(find.text(scriptureTriviaVersionLabel), findsWidgets);
+    final dialog = find.byType(AlertDialog);
+    expect(dialog, findsOneWidget);
+    expect(
+      find.descendant(
+        of: dialog,
+        matching: find.text('About Scripture Trivia'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: dialog,
+        matching: find.textContaining('not an official product'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: dialog,
+        matching: find.textContaining(reportPrivacyLine),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: dialog,
+        matching: find.textContaining(scriptureTriviaVersionLabel),
+      ),
+      findsOneWidget,
+    );
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
     expect(find.text('OK'), findsNothing);

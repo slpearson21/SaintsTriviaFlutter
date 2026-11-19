@@ -252,7 +252,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('report-sheet')), findsNothing);
-    expect(find.text(reportNoMailTitle), findsWidgets);
+    expect(find.text(reportNoMailTitle), findsOneWidget);
     expect(find.text('Reported'), findsOneWidget);
     expect(find.byKey(const Key('report-no-mail-dialog')), findsOneWidget);
     final reportedNode = tester
