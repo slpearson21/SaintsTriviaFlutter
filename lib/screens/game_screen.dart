@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math' show max, min;
 
 import 'package:cupertino_ui/cupertino_ui.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,7 +16,8 @@ import '../game/game_providers.dart';
 import '../layout/question_progress.dart';
 import '../layout/screen_body.dart';
 import '../layout/st_icon.dart';
-import '../layout/text_scale.dart';
+import '../layout/platform_style.dart';
+import '../layout/text_scale.dart' hide isReducedMotion, usesMaterialChrome;
 import '../progress/home_snapshot.dart';
 import '../report/report_sheet.dart';
 import '../report/reported_questions_provider.dart';
@@ -272,29 +272,13 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 }
 
-/// iOS and macOS use a Cupertino alert. Android and the other Material
-/// platforms use a Material 3 alert.
-///
-/// [defaultTargetPlatform] is read at the call, not [ThemeData.platform].
-/// The app themes are built once, so a test that overrides the platform
-/// after that would otherwise keep the theme's original platform.
-bool _usesCupertino() {
-  return switch (defaultTargetPlatform) {
-    TargetPlatform.iOS || TargetPlatform.macOS => true,
-    TargetPlatform.android ||
-    TargetPlatform.fuchsia ||
-    TargetPlatform.linux ||
-    TargetPlatform.windows => false,
-  };
-}
-
 Future<bool> showQuitGameDialog(BuildContext context) async {
   final quit = await showDialog<bool>(
     context: context,
     builder: (context) {
       const title = Text('Quit game?');
       const message = Text('Your progress in this game will be lost.');
-      if (_usesCupertino()) {
+      if (!usesMaterialChrome(context)) {
         return CupertinoAlertDialog(
           title: title,
           content: message,
@@ -364,7 +348,7 @@ class _IosBackSwipeState extends State<_IosBackSwipe> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_usesCupertino()) return widget.child;
+    if (usesMaterialChrome(context)) return widget.child;
     final toolbar = largeTitleToolbarHeight(context) ?? kToolbarHeight;
     return Stack(
       fit: StackFit.expand,

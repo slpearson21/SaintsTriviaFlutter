@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:material_ui/material_ui.dart';
 
-import 'layout/text_scale.dart';
+import 'layout/platform_style.dart';
 import 'theme/st_theme.dart';
 
 /// How the native splash hands off to the first Flutter frame.

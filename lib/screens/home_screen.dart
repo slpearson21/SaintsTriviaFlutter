@@ -4,7 +4,8 @@ import 'package:material_ui/material_ui.dart';
 
 import '../layout/screen_body.dart';
 import '../layout/st_icon.dart';
-import '../layout/text_scale.dart';
+import '../layout/platform_style.dart';
+import '../layout/text_scale.dart' hide usesMaterialChrome;
 import '../progress/home_providers.dart';
 import '../progress/home_snapshot.dart';
 import '../progress/play_again.dart';
@@ -25,7 +26,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final snapshot = ref.watch(homeSnapshotProvider);
     final now = ref.watch(homeClockProvider)();
-    final material = _materialChrome(context);
+    final material = usesMaterialChrome(context);
     final settings = snapshot.lastSettings;
     final lastGame = snapshot.lastGame;
 
@@ -62,16 +63,6 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
-}
-
-bool _materialChrome(BuildContext context) {
-  return switch (Theme.of(context).platform) {
-    TargetPlatform.iOS || TargetPlatform.macOS => false,
-    TargetPlatform.android ||
-    TargetPlatform.fuchsia ||
-    TargetPlatform.linux ||
-    TargetPlatform.windows => true,
-  };
 }
 
 /// Room for two serif lines at the current text scale, and at least 64 dp.
@@ -191,7 +182,7 @@ class _HomeIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final color = _materialChrome(context)
+    final color = usesMaterialChrome(context)
         ? scheme.onSurfaceVariant
         : scheme.primary;
     final target = minTapTarget(context);
@@ -303,7 +294,7 @@ class _SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final material = _materialChrome(context);
+    final material = usesMaterialChrome(context);
     final style = material
         ? theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary)
         : theme.textTheme.labelMedium?.copyWith(

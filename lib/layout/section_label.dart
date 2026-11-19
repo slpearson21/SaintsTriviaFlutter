@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
-import 'text_scale.dart';
+import 'platform_style.dart';
 
 /// Small section title. iOS draws it as small caps; Android keeps title case.
 class SectionLabel extends StatelessWidget {

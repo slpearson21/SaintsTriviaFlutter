@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cupertino_ui/cupertino_ui.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,7 +9,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../layout/section_label.dart';
 import '../layout/st_icon.dart';
-import '../layout/text_scale.dart';
+import '../layout/platform_style.dart';
+import '../layout/text_scale.dart' hide isReducedMotion, usesMaterialChrome;
 import '../app_info.dart';
 import '../services/open_link.dart';
 import '../theme/st_theme.dart';
@@ -228,16 +228,6 @@ bool _lifecycleAway(AppLifecycleState? state) {
   };
 }
 
-bool _reportUsesCupertino() {
-  return switch (defaultTargetPlatform) {
-    TargetPlatform.iOS || TargetPlatform.macOS => true,
-    TargetPlatform.android ||
-    TargetPlatform.fuchsia ||
-    TargetPlatform.linux ||
-    TargetPlatform.windows => false,
-  };
-}
-
 /// Tracks a launch that can outlive the sheet. A swipe while the mail
 /// app is opening dismisses the route before [openLink] returns.
 final class _SheetLaunch {
@@ -373,7 +363,7 @@ class _ReportSheetState extends ConsumerState<_ReportSheet> {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final large = isLargeText(context);
-    final cupertino = _reportUsesCupertino();
+    final cupertino = !usesMaterialChrome(context);
     final hint = _reason?.noteHint ?? reportNoteHintNone;
     final maxHeight = MediaQuery.sizeOf(context).height * 0.92;
     return ConstrainedBox(
@@ -632,7 +622,7 @@ class _ReasonRow extends StatelessWidget {
 
 /// Shown when the mail app does not open. The report is already on the clipboard.
 Future<void> showNoMailDialog(BuildContext context) {
-  if (_reportUsesCupertino()) {
+  if (!usesMaterialChrome(context)) {
     return showCupertinoDialog<void>(
       context: context,
       builder: (context) => const _IosNoMailDialog(),
