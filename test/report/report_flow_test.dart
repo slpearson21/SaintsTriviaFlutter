@@ -140,9 +140,13 @@ void main() {
   ) async {
     final opened = <({Uri uri, LaunchMode mode})>[];
     final messages = await _announcements(tester);
+    // Local, so the sheet's toUtc() is what prints the Z timestamp.
+    final reportedAt = DateTime.utc(2026, 11, 18, 15, 46).toLocal();
+    expect(reportedAt.isUtc, isFalse);
     await _pumpGame(
       tester,
       count: 2,
+      reportedAt: reportedAt,
       canOpen: (_) async => true,
       open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async {
         opened.add((uri: uri, mode: mode));
@@ -183,6 +187,7 @@ void main() {
     );
     expect(body, contains('Correct answer (app): Alpha'));
     expect(body, contains("Player's answer: Beta"));
+    expect(body.split('\r\n'), contains('Reported at: 2026-11-18T15:46:00Z'));
     expect(body, isNot(contains("Player's answer: Alpha")));
     expect(body, contains('Source: game'));
 
@@ -860,6 +865,7 @@ Future<List<String>> _announcements(WidgetTester tester) async {
 Future<ProviderContainer> _pumpGame(
   WidgetTester tester, {
   int count = 1,
+  DateTime? reportedAt,
   CanOpenLink? canOpen,
   OpenLink? open,
 }) async {
@@ -872,6 +878,11 @@ Future<ProviderContainer> _pumpGame(
             () async => _bank(count: count),
       ),
       gameRandomProvider.overrideWith((ref) => Random(1)),
+      if (reportedAt != null)
+        reportClockProvider.overrideWith(
+          (ref) =>
+              () => reportedAt,
+        ),
       if (canOpen != null) canOpenLinkProvider.overrideWith((ref) => canOpen),
       if (open != null) openLinkProvider.overrideWith((ref) => open),
     ],
