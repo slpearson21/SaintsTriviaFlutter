@@ -8,6 +8,16 @@ bool isLargeText(BuildContext context) {
   return MediaQuery.textScalerOf(context).scale(1) >= 1.5;
 }
 
+/// True when a transition should use the short duration.
+///
+/// Android's "Remove animations" is [MediaQueryData.disableAnimations].
+/// iOS "Reduce Motion" is [MediaQueryData.reduceMotion] and does not set
+/// the Android flag. [MediaQueryData.accessibleNavigation] is a screen
+/// reader, not a motion setting, so it stays false here.
+bool isReducedMotion(MediaQueryData media) {
+  return media.disableAnimations || media.reduceMotion;
+}
+
 /// Android, and the other Material platforms. iOS and macOS keep the
 /// Cupertino chrome the mockups show.
 ///

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:material_ui/material_ui.dart';
 
+import 'layout/text_scale.dart';
 import 'theme/st_theme.dart';
 
 /// How the native splash hands off to the first Flutter frame.
@@ -249,8 +250,7 @@ void debugSetSplashAndroidSdkInt(int? sdkInt) {
 /// a motion setting, so it keeps the 250ms fade.
 @visibleForTesting
 Duration splashFadeDuration(MediaQueryData media) {
-  final reducedMotion = media.disableAnimations || media.reduceMotion;
-  return reducedMotion ? StMotion.fast : StMotion.medium;
+  return isReducedMotion(media) ? StMotion.fast : StMotion.medium;
 }
 
 /// Covers [child] with the native splash, then fades that cover out.

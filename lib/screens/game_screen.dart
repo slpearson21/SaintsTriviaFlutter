@@ -237,7 +237,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         child: Scaffold(
           appBar: AppBar(
             automaticallyImplyLeading: false,
-            toolbarHeight: _toolbarHeight(context),
+            toolbarHeight: largeTitleToolbarHeight(context),
             leading: IconButton(
               tooltip: 'Close',
               onPressed: () => unawaited(_requestQuit()),
@@ -347,20 +347,6 @@ bool _sessionMatches(GameSession session, LastGameSettings settings) {
   return true;
 }
 
-double? _toolbarHeight(BuildContext context) {
-  if (!isLargeText(context)) return null;
-  final titleStyle = Theme.of(context).textTheme.titleLarge;
-  final fontSize = titleStyle?.fontSize ?? 22;
-  final heightFactor = titleStyle?.height ?? 30 / 22;
-  final line = MediaQuery.textScalerOf(context).scale(fontSize * heightFactor);
-  return line * 2 + StSpace.md;
-}
-
-bool _reducedMotion(BuildContext context) {
-  final media = MediaQuery.of(context);
-  return media.disableAnimations || media.reduceMotion;
-}
-
 /// The framework turns the iOS edge swipe off when [PopScope] refuses the
 /// pop. This strip calls the same quit path the system back button uses.
 class _IosBackSwipe extends StatefulWidget {
@@ -379,7 +365,7 @@ class _IosBackSwipeState extends State<_IosBackSwipe> {
   @override
   Widget build(BuildContext context) {
     if (!_usesCupertino()) return widget.child;
-    final toolbar = _toolbarHeight(context) ?? kToolbarHeight;
+    final toolbar = largeTitleToolbarHeight(context) ?? kToolbarHeight;
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -467,7 +453,7 @@ class _QuestionBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final large = isLargeText(context);
-    final reduced = _reducedMotion(context);
+    final reduced = isReducedMotion(MediaQuery.of(context));
     final index = _displayIndex(session, showingFeedback);
     final question = session.questions[index];
     final answer =

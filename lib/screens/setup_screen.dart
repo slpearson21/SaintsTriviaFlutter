@@ -178,7 +178,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: !material,
-        toolbarHeight: _toolbarHeight(context),
+        toolbarHeight: largeTitleToolbarHeight(context),
         leadingWidth: !material && !large ? 112 : null,
         leading: _SetupBackButton(showHomeLabel: !material && !large),
         title: const Text('New game', maxLines: 2),
@@ -238,15 +238,6 @@ bool _materialChrome(BuildContext context) {
     TargetPlatform.linux ||
     TargetPlatform.windows => true,
   };
-}
-
-double? _toolbarHeight(BuildContext context) {
-  if (!isLargeText(context)) return null;
-  final titleStyle = Theme.of(context).textTheme.titleLarge;
-  final fontSize = titleStyle?.fontSize ?? 22;
-  final heightFactor = titleStyle?.height ?? 30 / 22;
-  final line = MediaQuery.textScalerOf(context).scale(fontSize * heightFactor);
-  return line * 2 + StSpace.md;
 }
 
 String _word(int count) => count == 1 ? 'question' : 'questions';
