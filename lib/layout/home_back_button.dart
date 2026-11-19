@@ -3,8 +3,9 @@ import 'package:material_ui/material_ui.dart';
 
 import '../routing/routes.dart';
 import '../theme/st_theme.dart';
+import 'platform_style.dart';
 import 'st_icon.dart';
-import 'text_scale.dart';
+import 'text_scale.dart' hide usesMaterialChrome;
 
 /// Back control for screens opened from Home.
 ///

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cupertino_ui/cupertino_ui.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,7 +9,8 @@ import '../app_info.dart';
 import '../layout/home_back_button.dart';
 import '../layout/section_label.dart';
 import '../layout/st_icon.dart';
-import '../layout/text_scale.dart';
+import '../layout/platform_style.dart';
+import '../layout/text_scale.dart' hide usesMaterialChrome;
 import '../persistence/persistence_providers.dart';
 import '../progress/home_providers.dart';
 import '../report/report_config.dart';
@@ -174,7 +174,7 @@ Future<void> _showAbout(BuildContext context) {
   final message = Text(
     '$scriptureTriviaVersionLabel\n\n$scriptureTriviaDisclaimer\n\n$reportPrivacyLine',
   );
-  if (_usesCupertino()) {
+  if (!usesMaterialChrome(context)) {
     return showDialog<void>(
       context: context,
       builder: (context) {
@@ -208,22 +208,6 @@ Future<void> _showAbout(BuildContext context) {
   );
 }
 
-/// iOS and macOS use a Cupertino alert. Android and the other Material
-/// platforms use a Material 3 alert.
-///
-/// [defaultTargetPlatform] is read at the call, not [ThemeData.platform].
-/// The app themes are built once, so a test that overrides the platform
-/// after that would otherwise keep the theme's original platform.
-bool _usesCupertino() {
-  return switch (defaultTargetPlatform) {
-    TargetPlatform.iOS || TargetPlatform.macOS => true,
-    TargetPlatform.android ||
-    TargetPlatform.fuchsia ||
-    TargetPlatform.linux ||
-    TargetPlatform.windows => false,
-  };
-}
-
 /// Confirms a stats reset. Cancel leaves everything in place.
 Future<bool> showResetStatsDialog(BuildContext context) async {
   const title = Text('Reset all stats?');
@@ -235,7 +219,7 @@ Future<bool> showResetStatsDialog(BuildContext context) async {
   final reset = await showDialog<bool>(
     context: context,
     builder: (context) {
-      if (_usesCupertino()) {
+      if (!usesMaterialChrome(context)) {
         return CupertinoAlertDialog(
           title: title,
           content: message,

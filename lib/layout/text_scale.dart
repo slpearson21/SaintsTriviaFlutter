@@ -1,38 +1,13 @@
-import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../theme/st_theme.dart';
+import 'platform_style.dart';
+
+export 'platform_style.dart' show isReducedMotion, usesMaterialChrome;
 
 /// Mikey's large-text breakpoint. True at 150% and above, including 200%.
 bool isLargeText(BuildContext context) {
   return MediaQuery.textScalerOf(context).scale(1) >= 1.5;
-}
-
-/// True for Remove animations on Android or Reduce Motion on iOS.
-///
-/// Android's "Remove animations" is [MediaQueryData.disableAnimations].
-/// iOS "Reduce Motion" is [MediaQueryData.reduceMotion] and does not set
-/// the Android flag. [MediaQueryData.accessibleNavigation] is a screen
-/// reader, not a motion setting, so it stays false here.
-bool isReducedMotion(MediaQueryData media) {
-  return media.disableAnimations || media.reduceMotion;
-}
-
-/// Android, and the other Material platforms. iOS and macOS keep the
-/// Cupertino chrome the mockups show.
-///
-/// This reads [defaultTargetPlatform], not [ThemeData.platform]. The app
-/// themes are built once, so a test that overrides the platform would
-/// otherwise keep the theme's original platform. Cupertino page transitions
-/// stay on the theme, which is what the game screen's edge swipe expects.
-bool usesMaterialChrome(BuildContext context) {
-  return switch (defaultTargetPlatform) {
-    TargetPlatform.iOS || TargetPlatform.macOS => false,
-    TargetPlatform.android ||
-    TargetPlatform.fuchsia ||
-    TargetPlatform.linux ||
-    TargetPlatform.windows => true,
-  };
 }
 
 /// Toolbar height when text is large enough to need a second title line.
@@ -50,12 +25,10 @@ double? largeTitleToolbarHeight(BuildContext context) {
 }
 
 /// Minimum hit target: 48 dp on Android, 44 pt on iOS.
+///
+/// This follows [ThemeData.platform], so a theme can ask for the 44 pt
+/// target without changing the device platform.
 double minTapTarget(BuildContext context) {
-  return switch (Theme.of(context).platform) {
-    TargetPlatform.iOS || TargetPlatform.macOS => 44,
-    TargetPlatform.android ||
-    TargetPlatform.fuchsia ||
-    TargetPlatform.linux ||
-    TargetPlatform.windows => StSpace.minTap,
-  };
+  if (isCupertinoPlatform(Theme.of(context).platform)) return 44;
+  return StSpace.minTap;
 }

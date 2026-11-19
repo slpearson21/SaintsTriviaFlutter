@@ -9,7 +9,8 @@ import '../game/game_engine.dart';
 import '../game/game_providers.dart';
 import '../layout/screen_body.dart';
 import '../layout/st_icon.dart';
-import '../layout/text_scale.dart';
+import '../layout/platform_style.dart';
+import '../layout/text_scale.dart' hide usesMaterialChrome;
 import '../progress/home_snapshot.dart';
 import '../routing/routes.dart';
 import '../theme/st_theme.dart';
@@ -172,7 +173,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
             available: _max(bank),
           )
         : null;
-    final material = _materialChrome(context);
+    final material = usesMaterialChrome(context);
     final large = isLargeText(context);
 
     return Scaffold(
@@ -228,16 +229,6 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
       ),
     );
   }
-}
-
-bool _materialChrome(BuildContext context) {
-  return switch (Theme.of(context).platform) {
-    TargetPlatform.iOS || TargetPlatform.macOS => false,
-    TargetPlatform.android ||
-    TargetPlatform.fuchsia ||
-    TargetPlatform.linux ||
-    TargetPlatform.windows => true,
-  };
 }
 
 String _word(int count) => count == 1 ? 'question' : 'questions';
@@ -302,7 +293,7 @@ class _SetupBackButton extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final target = minTapTarget(context);
     if (!showHomeLabel) {
-      final material = _materialChrome(context);
+      final material = usesMaterialChrome(context);
       return IconButton(
         tooltip: material ? 'Back' : 'Home',
         onPressed: () => _leave(context),
@@ -357,7 +348,7 @@ class _SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final material = _materialChrome(context);
+    final material = usesMaterialChrome(context);
     final style = material
         ? theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary)
         : theme.textTheme.labelMedium?.copyWith(
@@ -566,7 +557,7 @@ class _CheckMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (_materialChrome(context)) {
+    if (usesMaterialChrome(context)) {
       return IgnorePointer(
         child: Checkbox(
           value: value,
