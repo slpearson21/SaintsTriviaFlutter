@@ -333,6 +333,33 @@ void main() {
     expect(Uri.decodeComponent(mailto.split('subject=').last), report.subject);
   });
 
+  test('a subject that ends on the cap keeps an empty body', () {
+    final id = 'x' * 1715;
+    final report = QuestionReport(
+      questionId: id,
+      prompt: 'Prompt',
+      correctAnswer: 'The same',
+      selectedAnswer: 'picked',
+      reference: 'D&C 1:38',
+      reason: ReportReason.other,
+      note: '',
+      appVersion: 'v1.0.0',
+      platform: 'Android',
+      bankVersion: 'v1',
+      source: 'game',
+      createdAtUtc: DateTime.utc(2026, 11, 18, 15, 46),
+    );
+
+    final mailto = report.mailto.toString();
+    final subject = Uri.decodeComponent(
+      mailto.split('?').last.split('&').first.replaceFirst('subject=', ''),
+    );
+    expect(mailto.length, maxMailtoLength);
+    expect(mailto, endsWith('&body='));
+    expect(subject, report.subject);
+    expect(subject, contains(id));
+  });
+
   test('a subject with no room for the body marker drops it', () {
     final ids = ['x' * 1716, 'é' * 286, '😀' * 143, '—' * 191];
     for (final id in ids) {
@@ -925,7 +952,10 @@ void main() {
       final encodedBody = mailto.substring(markerAt + '&body='.length);
       // The clip keeps an empty `&body=` when that marker lands on 1,800,
       // because the subject-only cut uses `>`.
-      if (encodedBody.isEmpty) continue;
+      if (encodedBody.isEmpty) {
+        expect(mailto.length, maxMailtoLength);
+        continue;
+      }
       final decoded = utf8.decode(_percentBytes(encodedBody));
       expect(decoded, isNot(contains('\uFFFD')));
       expect(encodedBody, isNot(matches(RegExp(r'%[0-9A-Fa-f]{0,1}$'))));

@@ -74,6 +74,7 @@ void main() {
     expect(find.text(reportExpectation), findsOneWidget);
     expect(find.text('0/280'), findsOneWidget);
     final semantics = tester.ensureSemantics();
+    // Omitted flags default to false: disabled, and no tap.
     expect(
       tester.getSemantics(find.byKey(const Key('report-continue'))),
       matchesSemantics(
@@ -856,6 +857,7 @@ Future<List<String>> _announcements(WidgetTester tester) async {
   return messages;
 }
 
+/// Defaults to one question on the host theme.
 Future<ProviderContainer> _pumpGame(
   WidgetTester tester, {
   int count = 1,

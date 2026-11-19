@@ -48,6 +48,7 @@ QuestionBank _bank({
   );
 }
 
+/// A null [platform] pumps [SaintsTriviaApp] on the host theme.
 Future<ProviderContainer> _openSetup(
   WidgetTester tester, {
   QuestionBank? bank,
@@ -310,6 +311,7 @@ void main() {
   });
 
   testWidgets('volume rows show their question counts', (tester) async {
+    // Pearl of Great Price stays at the helper default, 23.
     await _openSetup(tester, bank: _bank(ot: 1180, nt: 1, bom: 0, dc: 12));
 
     expect(find.text('1,180 questions'), findsOneWidget);
@@ -456,6 +458,7 @@ void main() {
   ) async {
     final handle = tester.ensureSemantics();
     try {
+      // Pearl of Great Price stays at the helper default, 23.
       await _openSetup(tester, bank: _bank(ot: 0, nt: 0, bom: 0, dc: 0));
 
       expect(
