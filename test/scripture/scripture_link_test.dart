@@ -310,10 +310,23 @@ void main() {
           reason: reference,
         );
         expect(parsed.uri.toString(), isNot(contains('lang=')));
+        final bookName = parsed.book.names.firstWhere(
+          (name) => normalized.startsWith('${normalizeScriptureName(name)} '),
+        );
+        final afterBook = normalized
+            .substring(normalizeScriptureName(bookName).length)
+            .trimLeft();
+        final chapter = RegExp(r'^(\d+)').firstMatch(afterBook);
+        expect(chapter, isNotNull, reason: reference);
+        expect(
+          chapter!.group(1),
+          parsed.uri.pathSegments.last,
+          reason: reference,
+        );
         count += 1;
       }
     }
-    expect(count, 591);
+    expect(count, _questionsIn(files));
   });
 }
 
@@ -324,6 +337,14 @@ final _gospelLibraryUrl = RegExp(
   r'(ot|nt|bofm|dc-testament|pgp)/[a-z0-9-]+/[1-9]\d*'
   r'(\?id=p\d+(-p\d+)?(,p\d+(-p\d+)?)*#p\d+)?$',
 );
+
+int _questionsIn(List<String> files) {
+  var count = 0;
+  for (final path in files) {
+    count += (jsonDecode(File(path).readAsStringSync()) as List).length;
+  }
+  return count;
+}
 
 String _volumeForBankFile(String path) {
   if (path.endsWith('old_testament.json')) return 'ot';

@@ -1,10 +1,16 @@
+import 'dart:math';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:saints_trivia_flutter/game/game_providers.dart';
 
 import 'pump_app.dart';
 
 Future<void> _openGame(WidgetTester tester) async {
-  await pumpApp(tester);
+  await pumpApp(
+    tester,
+    overrides: [gameRandomProvider.overrideWith((ref) => Random(1))],
+  );
   await tester.tap(find.text('Start a game'));
   await tester.pumpAndSettle();
   await tester.tap(find.textContaining('Start game'));

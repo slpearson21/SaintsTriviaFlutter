@@ -669,9 +669,7 @@ void main() {
 
   group('malformed fixture file', () {
     test('the on-disk malformed file fails as a typed error', () async {
-      const assets = QuestionAssets(
-        directory: 'test/fixtures/questions/v1',
-      );
+      const assets = QuestionAssets(directory: 'test/fixtures/questions/v1');
       final files = <String, String>{};
       for (final volume in ScriptureVolume.values) {
         final path = assets.pathFor(volume);
@@ -709,13 +707,7 @@ void main() {
         0,
       );
       expect(errorOutput.toString(), isEmpty);
-      expect(
-        output.toString(),
-        contains(
-          'Validated 591 questions (OT=128, NT=124, BOM=112, DC=109, PGP=118), '
-          'schema v1, structure only, from assets/questions/v1.',
-        ),
-      );
+      expect(output.toString(), contains(_structureSummary()));
     });
 
     test('require-approved and release reject the draft bank', () async {
@@ -741,7 +733,7 @@ void main() {
       expect(required.toString(), contains('notApproved'));
       expect(required.toString(), contains('ot-0001'));
       expect(required.toString(), contains('tooFewQuestions'));
-      expect(release.toString(), contains('pgp-0118'));
+      expect(release.toString(), contains(_lastQuestionId('PGP')));
       expect(release.toString(), contains('tooFewQuestions'));
     });
 
@@ -971,4 +963,28 @@ Map<String, Object?> validQuestion(
 
 String idFor(ScriptureVolume volume, {int number = 1}) {
   return '${volume.idPrefix}-${number.toString().padLeft(4, '0')}';
+}
+
+String _structureSummary() {
+  final counts = <String, int>{};
+  var total = 0;
+  for (final volume in ScriptureVolume.values) {
+    final path = '${QuestionAssets.v1Directory}/${volume.fileName}';
+    final length = (jsonDecode(File(path).readAsStringSync()) as List).length;
+    counts[volume.code] = length;
+    total += length;
+  }
+  return 'Validated $total questions '
+      '(OT=${counts['OT']}, NT=${counts['NT']}, BOM=${counts['BOM']}, '
+      'DC=${counts['DC']}, PGP=${counts['PGP']}), '
+      'schema v1, structure only, from ${QuestionAssets.v1Directory}.';
+}
+
+String _lastQuestionId(String code) {
+  final volume = ScriptureVolume.values.firstWhere(
+    (volume) => volume.code == code,
+  );
+  final path = '${QuestionAssets.v1Directory}/${volume.fileName}';
+  final questions = jsonDecode(File(path).readAsStringSync()) as List;
+  return (questions.last as Map)['id'] as String;
 }
