@@ -122,7 +122,7 @@ void main() {
     final weaker = _game(
       score: 9,
       total: 10,
-      streak: 20,
+      streak: 5,
       playedAt: DateTime(2026, 11, 15),
       correct: {ScriptureVolume.nt: 9},
       dealt: {ScriptureVolume.nt: 10},
@@ -140,6 +140,78 @@ void main() {
     expect(
       bestGameLine(laterPerfect, now),
       '10 / 10 · Doctrine and Covenants · Yesterday',
+    );
+    expect(
+      bestGameSemanticsLabel(longPerfect, now),
+      'Best game, 10 out of 10, Book of Mormon, Nov 9',
+    );
+    expect(
+      bestGameSemanticsLabel(laterPerfect, now),
+      'Best game, 10 out of 10, Doctrine and Covenants, yesterday',
+    );
+  });
+
+  test('best percent is the highest stored percent', () {
+    final low = _game(
+      score: 1,
+      total: 10,
+      streak: 1,
+      playedAt: DateTime(2026, 11, 2),
+      correct: {ScriptureVolume.ot: 1},
+      dealt: {ScriptureVolume.ot: 10},
+    );
+    final high = _game(
+      score: 1,
+      total: 1,
+      streak: 1,
+      playedAt: DateTime(2026, 11, 3),
+      correct: {ScriptureVolume.nt: 1},
+      dealt: {ScriptureVolume.nt: 1},
+    );
+
+    expect(bestPercentOf(const []), isNull);
+    expect(bestPercentOf([low, high]), 100);
+    expect(bestPercentOf([high, low]), 100);
+  });
+
+  test('a tied playedAt keeps the later stored game', () {
+    final stamp = DateTime(2026, 11, 9, 8);
+    final first = _game(
+      score: 1,
+      total: 2,
+      streak: 1,
+      playedAt: stamp,
+      correct: {ScriptureVolume.ot: 1},
+      dealt: {ScriptureVolume.ot: 2},
+    );
+    final second = _game(
+      score: 2,
+      total: 2,
+      streak: 2,
+      playedAt: stamp,
+      correct: {ScriptureVolume.nt: 2},
+      dealt: {ScriptureVolume.nt: 2},
+    );
+
+    expect(identical(mostRecentGame([first, second]), second), isTrue);
+    expect(identical(mostRecentGame([second, first]), first), isTrue);
+  });
+
+  test('volume names fall back to the picked volumes', () {
+    final game = _game(
+      score: 1,
+      total: 1,
+      streak: 1,
+      playedAt: DateTime(2026, 11, 9),
+      correct: const {},
+      dealt: const {},
+      volumes: const [ScriptureVolume.nt],
+    );
+
+    expect(bestGameLine(game, now), '1 / 1 · New Testament · Nov 9');
+    expect(
+      bestGameSemanticsLabel(game, now),
+      'Best game, 1 out of 1, New Testament, Nov 9',
     );
   });
 }
