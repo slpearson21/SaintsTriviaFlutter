@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
@@ -633,8 +634,8 @@ void main() {
           }
           expect(tester.takeException(), isNull, reason: reason);
 
-          await tester.pumpWidget(const SizedBox.shrink());
-          container.dispose();
+          addTearDown(container.dispose);
+          addTearDown(() => tester.pumpWidget(const SizedBox.shrink()));
         }
       }
     }
@@ -680,6 +681,9 @@ Future<ProviderContainer> _pumpHome(
   Size surface = const Size(800, 600),
 }) async {
   await tester.binding.setSurfaceSize(surface);
+  addTearDown(() => tester.binding.setSurfaceSize(null));
+  debugDefaultTargetPlatformOverride = platform;
+  addTearDown(() => debugDefaultTargetPlatformOverride = null);
   final container = ProviderContainer(
     overrides: [
       fixedHomeSnapshot(snapshot),
@@ -689,7 +693,7 @@ Future<ProviderContainer> _pumpHome(
       ),
     ],
   );
-  final theme = buildTheme(brightness).copyWith(platform: platform);
+  final theme = buildTheme(brightness);
   await tester.pumpWidget(
     UncontrolledProviderScope(
       container: container,
