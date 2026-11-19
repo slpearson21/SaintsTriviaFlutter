@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:saints_trivia_flutter/data/questions/questions.dart';
 import 'package:saints_trivia_flutter/game/game_engine.dart';
 import 'package:saints_trivia_flutter/game/game_providers.dart';
+import 'package:saints_trivia_flutter/report/question_report.dart';
+import 'package:saints_trivia_flutter/report/reported_questions_provider.dart';
 
 void main() {
   group('max available', () {
@@ -168,6 +170,47 @@ void main() {
       }
       expect(shuffled, greaterThan(0));
       expect(_ids(session), isNot(_idsInBankOrder(bank, ScriptureVolume.ot)));
+    });
+
+    test('a count past the pool deals each question once', () {
+      final pool = _bank(ot: 4).questions;
+      final over = dealQuestions(pool: pool, count: 10, random: Random(7));
+      final exact = dealQuestions(
+        pool: pool,
+        count: pool.length,
+        random: Random(7),
+      );
+
+      expect(over, hasLength(pool.length));
+      expect(exact, hasLength(pool.length));
+      expect(
+        over.map((question) => question.id).toSet(),
+        pool.map((question) => question.id).toSet(),
+      );
+      expect(
+        over.map((question) => question.id),
+        exact.map((question) => question.id),
+      );
+    });
+
+    test('a repeated volume does not deal a question twice', () {
+      final bank = _bank(ot: 4, nt: 2);
+      const volumes = [
+        ScriptureVolume.ot,
+        ScriptureVolume.ot,
+        ScriptureVolume.nt,
+      ];
+      final once = questionsInVolumes(bank, const [
+        ScriptureVolume.ot,
+        ScriptureVolume.nt,
+      ]);
+      final twice = questionsInVolumes(bank, volumes);
+
+      expect(
+        twice.map((question) => question.id),
+        once.map((question) => question.id),
+      );
+      expect(twice, hasLength(6));
     });
 
     test('an empty selection deals nothing', () {
@@ -343,6 +386,74 @@ void main() {
       addTearDown(container.dispose);
       container.read(gameControllerProvider.notifier).answer(0);
       expect(container.read(gameControllerProvider), isNull);
+    });
+
+    test('discard drops the game in progress', () {
+      final bank = _bank(ot: 4);
+      final container = ProviderContainer(
+        overrides: [gameRandomProvider.overrideWith((ref) => Random(3))],
+      );
+      addTearDown(container.dispose);
+
+      container
+          .read(gameControllerProvider.notifier)
+          .start(
+            bank: bank,
+            volumes: const [ScriptureVolume.ot],
+            requestedCount: 3,
+          );
+      expect(container.read(gameControllerProvider), isNotNull);
+
+      container.read(gameControllerProvider.notifier).discard();
+      expect(container.read(gameControllerProvider), isNull);
+    });
+
+    test('start replaces a game in progress and clears reports', () {
+      final bank = _bank(ot: 6);
+      final container = ProviderContainer(
+        overrides: [gameRandomProvider.overrideWith((ref) => Random(5))],
+      );
+      addTearDown(container.dispose);
+      final games = container.read(gameControllerProvider.notifier);
+
+      games.start(
+        bank: bank,
+        volumes: const [ScriptureVolume.ot],
+        requestedCount: 4,
+      );
+      final first = container.read(gameControllerProvider)!;
+      games.answer(first.questions.first.answerIndex);
+      container
+          .read(reportedQuestionIdsProvider.notifier)
+          .markReported(first.questions.first.id);
+      container
+          .read(reportedQuestionIdsProvider.notifier)
+          .saveDraft(
+            first.questions.first.id,
+            reason: ReportReason.other,
+            note: 'check',
+          );
+      expect(container.read(gameControllerProvider)!.score, 1);
+      expect(
+        container.read(reportedQuestionIdsProvider).reportedIds,
+        isNotEmpty,
+      );
+
+      games.start(
+        bank: bank,
+        volumes: const [ScriptureVolume.ot],
+        requestedCount: 2,
+      );
+      final replaced = container.read(gameControllerProvider)!;
+      expect(replaced.questionCount, 2);
+      expect(replaced.currentIndex, 0);
+      expect(replaced.score, 0);
+      expect(replaced.currentStreak, 0);
+      expect(replaced.bestStreak, 0);
+      expect(replaced.answers, isEmpty);
+      expect(replaced.requestedCount, 2);
+      expect(container.read(reportedQuestionIdsProvider).reportedIds, isEmpty);
+      expect(container.read(reportedQuestionIdsProvider).drafts, isEmpty);
     });
   });
 }
