@@ -213,10 +213,10 @@ List<QuestionBankViolation> bundledVolumeMinimumViolations(
   return violations;
 }
 
-/// Longest chapter in the books [scriptureChapterCounts] describes.
+/// Generic 176-verse cap, the length of Psalm 119.
 ///
-/// Psalm 119 has 176 verses, and no other chapter in that edition is longer.
-/// Verse numbers are checked only when the chapter itself is inside the table.
+/// This is not a per-chapter verse count. Every chapter that
+/// [scriptureChapterCounts] allows uses this same ceiling.
 const longestChapterVerseCount = 176;
 
 /// Chapter counts for the Latter-day Saint edition of each Gospel Library book.
@@ -412,8 +412,8 @@ List<QuestionBankViolation> questionContentViolations(
       for (final verse in _verseNumbers(parsed.uri)) {
         if (verse < 1 || verse > longestChapterVerseCount) {
           add(
-            'Reference "${question.reference}" verse $verse is outside '
-            '1–$longestChapterVerseCount.',
+            'Reference "${question.reference}" verse $verse is past the '
+            'generic $longestChapterVerseCount-verse cap (Psalm 119).',
             field: 'reference',
           );
         }

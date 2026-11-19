@@ -210,7 +210,7 @@ void main() {
     );
   });
 
-  test('verse numbers stay inside a chapter the table allows', () async {
+  test('a verse past the generic 176 cap is rejected', () async {
     final directory = await _writeBank(
       replace: {
         ScriptureVolume.ot: [
@@ -219,7 +219,7 @@ void main() {
             ScriptureVolume.ot,
             number: 2,
             reference: 'Genesis 1:177',
-            prompt: 'Past the longest chapter',
+            prompt: 'Past the generic 176 cap',
           ),
           _question(
             ScriptureVolume.ot,
@@ -237,7 +237,10 @@ void main() {
       'ot-0003',
     ]);
     expect(violations[0].message, contains('verse 177'));
-    expect(violations[0].message, contains('1–$longestChapterVerseCount'));
+    expect(
+      violations[0].message,
+      contains('generic $longestChapterVerseCount-verse cap (Psalm 119)'),
+    );
     expect(violations[1].message, contains('chapter 51'));
     expect(violations[1].message, isNot(contains('verse')));
   });
