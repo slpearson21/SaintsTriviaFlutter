@@ -5,8 +5,9 @@ import 'scripture_volume.dart';
 
 /// One multiple-choice scripture question.
 ///
-/// Instances are immutable. Build them with [fromJson] or [parse] so malformed
-/// content becomes a [QuestionBankException] instead of a later crash.
+/// Instances are immutable. Build them with [TriviaQuestion.fromJson] or
+/// [TriviaQuestion.parse] so malformed content becomes a
+/// [QuestionBankException] instead of a later crash.
 final class TriviaQuestion {
   TriviaQuestion({
     required this.id,

@@ -24,7 +24,7 @@ bool skipUnapprovedQuestions({bool? skipUnapproved}) {
 /// [QuestionBank.forVolume] for the "no questions for this selection" state.
 Future<QuestionBank> loadBundledQuestionBank({
   bool? skipUnapproved,
-  QuestionAssets assets = const QuestionAssets(),
+  QuestionAssets assets = QuestionAssets.v1,
 }) {
   return QuestionBankLoader(
     read: readBundledQuestionAsset,

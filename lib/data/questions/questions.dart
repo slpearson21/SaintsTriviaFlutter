@@ -1,6 +1,6 @@
 /// Offline scripture question bank: model, loader, and schema checks.
 ///
-/// The app reads `assets/questions/v1/` through [loadBundledQuestionBank].
+/// The app reads `assets/questions/v1/` through `loadBundledQuestionBank`.
 /// `tool/validate_questions.dart` runs the same checks. That script must
 /// import the pure loader files directly. This library also exports the
 /// Flutter asset reader, so a plain Dart VM script cannot import it.

@@ -18,7 +18,7 @@ import 'routes.dart';
 
 /// Settings the game route will deal.
 ///
-/// [state.extra] is read twice on purpose: it is a getter, so the `is`
+/// [GoRouterState.extra] is read twice on purpose: it is a getter, so the `is`
 /// check does not promote it, and the cast runs only after that check.
 LastGameSettings? gameRouteSettings(Ref ref, GoRouterState state) {
   final fromRoute = state.extra is LastGameSettings

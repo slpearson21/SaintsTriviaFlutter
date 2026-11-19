@@ -46,7 +46,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   /// Question ids of the deal this screen is already showing.
   ///
   /// Answering the last question marks the session complete, which no longer
-  /// matches [widget.settings]. That deal is still the one on screen, so it
+  /// matches [GameScreen.settings]. That deal is still the one on screen, so it
   /// must not be hidden or replaced while its feedback is up.
   List<String>? _presentedQuestionIds;
 

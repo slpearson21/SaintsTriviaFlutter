@@ -21,7 +21,7 @@ import 'scripture_volume.dart';
 final class QuestionBankLoader {
   const QuestionBankLoader({
     required this.read,
-    this.assets = const QuestionAssets(),
+    this.assets = QuestionAssets.v1,
     this.skipUnapproved = false,
   });
 

@@ -69,7 +69,7 @@ class _ContentLoadErrorViewState extends ConsumerState<ContentLoadErrorView> {
     if (onLoaded == null) return;
     try {
       await ref.read(questionBankProvider.future);
-    } catch (error) {
+    } on Object catch (error) {
       debugPrint('Question bank retry failed: $error');
       return;
     }

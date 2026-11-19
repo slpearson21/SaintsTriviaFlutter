@@ -92,9 +92,15 @@ final class GameSession {
        questions = List.unmodifiable(questions),
        answers = List.unmodifiable(answers) {
     assert(currentIndex >= 0, 'currentIndex cannot be negative');
-    assert(currentIndex <= this.questions.length);
-    assert(score >= 0 && score <= this.answers.length);
-    assert(currentStreak >= 0);
+    assert(
+      currentIndex <= this.questions.length,
+      'currentIndex cannot pass the question list',
+    );
+    assert(
+      score >= 0 && score <= this.answers.length,
+      'score has to be between 0 and the number of answers',
+    );
+    assert(currentStreak >= 0, 'current streak cannot be negative');
     assert(bestStreak >= currentStreak, 'best streak is the max so far');
   }
 
