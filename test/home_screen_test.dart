@@ -72,7 +72,7 @@ void main() {
         formatLastGameDate(DateTime(2026, 11, 14, 23, 30), now),
         'Yesterday',
       );
-      expect(formatLastGameDate(DateTime(2026, 11, 1), now), 'Nov 1');
+      expect(formatLastGameDate(DateTime(2026, 11), now), 'Nov 1');
       expect(
         formatLastGameDate(
           DateTime(2026, 10, 31, 22),

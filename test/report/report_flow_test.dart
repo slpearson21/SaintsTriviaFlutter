@@ -1,6 +1,5 @@
-import 'dart:math';
-
 import 'dart:async';
+import 'dart:math';
 import 'dart:ui' show CheckedState;
 
 import 'package:cupertino_ui/cupertino_ui.dart';
@@ -80,10 +79,8 @@ void main() {
       matchesSemantics(
         isButton: true,
         hasEnabledState: true,
-        isEnabled: false,
         hint: reportChooseReasonHint,
         label: reportContinueLabel,
-        hasTapAction: false,
         textDirection: TextDirection.ltr,
       ),
     );
@@ -305,7 +302,6 @@ void main() {
     try {
       final container = await _pumpGame(
         tester,
-        count: 1,
         canOpen: (_) async => true,
         open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async =>
             true,
@@ -493,7 +489,6 @@ void main() {
     final opened = <Uri>[];
     final container = await _pumpGame(
       tester,
-      count: 1,
       canOpen: (_) async => true,
       open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async {
         opened.add(uri);
@@ -729,7 +724,6 @@ void main() {
     try {
       final container = await _pumpGame(
         tester,
-        count: 1,
         canOpen: (_) async => false,
         open: (uri, {LaunchMode mode = LaunchMode.platformDefault}) async =>
             false,

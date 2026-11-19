@@ -310,10 +310,7 @@ void main() {
   });
 
   testWidgets('volume rows show their question counts', (tester) async {
-    await _openSetup(
-      tester,
-      bank: _bank(ot: 1180, nt: 1, bom: 0, dc: 12, pgp: 23),
-    );
+    await _openSetup(tester, bank: _bank(ot: 1180, nt: 1, bom: 0, dc: 12));
 
     expect(find.text('1,180 questions'), findsOneWidget);
     expect(find.text('1 question'), findsOneWidget);
@@ -459,10 +456,7 @@ void main() {
   ) async {
     final handle = tester.ensureSemantics();
     try {
-      await _openSetup(
-        tester,
-        bank: _bank(ot: 0, nt: 0, bom: 0, dc: 0, pgp: 23),
-      );
+      await _openSetup(tester, bank: _bank(ot: 0, nt: 0, bom: 0, dc: 0));
 
       expect(
         tester.getSemantics(find.byKey(const Key('setup-preset-10'))),

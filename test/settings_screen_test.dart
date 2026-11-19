@@ -5,23 +5,22 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 import 'package:saints_trivia_flutter/app.dart';
 import 'package:saints_trivia_flutter/app_info.dart';
 import 'package:saints_trivia_flutter/data/questions/scripture_volume.dart';
 import 'package:saints_trivia_flutter/persistence/app_settings.dart';
 import 'package:saints_trivia_flutter/persistence/finished_game_record.dart';
 import 'package:saints_trivia_flutter/persistence/memory_progress_repository.dart';
-import 'package:saints_trivia_flutter/persistence/progress_repository.dart';
 import 'package:saints_trivia_flutter/persistence/persistence_providers.dart';
+import 'package:saints_trivia_flutter/persistence/progress_repository.dart';
 import 'package:saints_trivia_flutter/persistence/shared_preferences_progress_repository.dart';
+import 'package:saints_trivia_flutter/report/report_config.dart';
 import 'package:saints_trivia_flutter/routing/app_router.dart';
 import 'package:saints_trivia_flutter/routing/routes.dart';
-import 'package:saints_trivia_flutter/report/report_config.dart';
 import 'package:saints_trivia_flutter/screens/settings_screen.dart';
 import 'package:saints_trivia_flutter/services/open_link.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 const _guidelines = <AccessibilityGuideline>[
   androidTapTargetGuideline,

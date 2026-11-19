@@ -99,7 +99,7 @@ void main() {
       score: 1,
       total: 1,
       streak: 1,
-      playedAt: DateTime(2026, 11, 1),
+      playedAt: DateTime(2026, 11),
       correct: {ScriptureVolume.ot: 1},
       dealt: {ScriptureVolume.ot: 1},
     );

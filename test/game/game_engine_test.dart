@@ -414,13 +414,12 @@ void main() {
         overrides: [gameRandomProvider.overrideWith((ref) => Random(5))],
       );
       addTearDown(container.dispose);
-      final games = container.read(gameControllerProvider.notifier);
-
-      games.start(
-        bank: bank,
-        volumes: const [ScriptureVolume.ot],
-        requestedCount: 4,
-      );
+      final games = container.read(gameControllerProvider.notifier)
+        ..start(
+          bank: bank,
+          volumes: const [ScriptureVolume.ot],
+          requestedCount: 4,
+        );
       final first = container.read(gameControllerProvider)!;
       games.answer(first.questions.first.answerIndex);
       container

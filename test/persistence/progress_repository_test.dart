@@ -1,7 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 import 'package:saints_trivia_flutter/data/questions/scripture_volume.dart';
 import 'package:saints_trivia_flutter/game/game_engine.dart';
 import 'package:saints_trivia_flutter/main.dart';
@@ -9,6 +7,8 @@ import 'package:saints_trivia_flutter/persistence/app_settings.dart';
 import 'package:saints_trivia_flutter/persistence/finished_game_record.dart';
 import 'package:saints_trivia_flutter/persistence/memory_progress_repository.dart';
 import 'package:saints_trivia_flutter/persistence/shared_preferences_progress_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -41,8 +41,9 @@ void main() {
       expect(repo.readGames(), isEmpty);
       expect(repo.readSettings(), AppSettings.defaults);
 
-      repo.writeGames([game]);
-      repo.writeSettings(settings);
+      repo
+        ..writeGames([game])
+        ..writeSettings(settings);
 
       final again = SharedPreferencesProgressRepository(prefs);
       expect(again.readGames(), hasLength(1));
@@ -70,11 +71,10 @@ void main() {
     test('clearing games leaves settings in place', () async {
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
-      final repo = SharedPreferencesProgressRepository(prefs);
-      repo.writeGames([game]);
-      repo.writeSettings(settings);
-
-      repo.writeGames(const []);
+      final repo = SharedPreferencesProgressRepository(prefs)
+        ..writeGames([game])
+        ..writeSettings(settings)
+        ..writeGames(const []);
 
       expect(repo.readGames(), isEmpty);
       expect(repo.readSettings(), settings);
@@ -208,10 +208,9 @@ void main() {
     SharedPreferences.resetStatic();
     SharedPreferencesStorePlatform.instance = _FailingPrefsStore();
     final prefs = await SharedPreferences.getInstance();
-    final repo = SharedPreferencesProgressRepository(prefs);
-
-    repo.writeGames([game]);
-    repo.writeSettings(settings);
+    final repo = SharedPreferencesProgressRepository(prefs)
+      ..writeGames([game])
+      ..writeSettings(settings);
     await pumpEventQueue();
 
     final log = printed.join('\n');
@@ -250,8 +249,8 @@ void main() {
   });
 
   test('a score above the total or below zero is dropped', () {
-    expect(_parse(score: 11, total: 10), isNull);
-    expect(_parse(score: -1, total: 10), isNull);
+    expect(_parse(score: 11), isNull);
+    expect(_parse(score: -1), isNull);
     expect(_parse(score: 0, total: 0), isNull);
   });
 

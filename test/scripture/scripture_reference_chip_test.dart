@@ -54,7 +54,6 @@ void main() {
           matchesSemantics(
             label: 'Open Acts 3:2, 6-7 in Gospel Library',
             isLink: true,
-            isButton: false,
             hasTapAction: true,
             textDirection: TextDirection.ltr,
           ),
@@ -188,7 +187,6 @@ void main() {
         matchesSemantics(
           label: 'Open D&C 1:38 in Gospel Library',
           isLink: true,
-          isButton: false,
           hasTapAction: true,
           textDirection: TextDirection.ltr,
         ),
