@@ -206,8 +206,8 @@ void main() {
       find.textContaining('Correct answer: Nephi', findRichText: true),
       findsOneWidget,
     );
-    expect(find.text('Missed'), findsWidgets);
-    expect(find.text('Correct'), findsWidgets);
+    expect(find.text('Missed'), findsOneWidget);
+    expect(find.text('Correct'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('review-filter-missed')));
     await tester.pumpAndSettle();

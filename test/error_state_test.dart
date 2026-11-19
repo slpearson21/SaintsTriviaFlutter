@@ -227,7 +227,7 @@ void main() {
 
     expect(find.text(_contentTitle), findsNothing);
     expect(find.text('Select all'), findsOneWidget);
-    expect(find.text('4 questions'), findsWidgets);
+    expect(find.text('4 questions'), findsOneWidget);
     expect(
       tester
           .widget<FilledButton>(find.byKey(const Key('setup-start')))

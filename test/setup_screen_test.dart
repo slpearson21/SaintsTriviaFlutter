@@ -612,7 +612,7 @@ void main() {
     expect(find.text('Home'), findsOneWidget);
 
     await _openSetup(tester, bank: _bank(), platform: TargetPlatform.android);
-    expect(find.byType(Checkbox), findsWidgets);
+    expect(find.byType(Checkbox), findsNWidgets(6));
     expect(find.text('Choose scriptures'), findsOneWidget);
     expect(find.text('Home'), findsNothing);
   });
