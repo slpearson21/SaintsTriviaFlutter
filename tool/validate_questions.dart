@@ -318,8 +318,9 @@ const _bankVolumeForGospelLibrary = <String, ScriptureVolume>{
 
 /// Content rules that sit on top of the v1 schema.
 ///
-/// The loader already accepted [bank]. These checks use [invalidValue]
-/// so the tool does not need a new violation kind.
+/// The loader already accepted [bank]. These checks use
+/// [QuestionBankViolationKind.invalidValue] so the tool does not need a
+/// new violation kind.
 List<QuestionBankViolation> questionContentViolations(
   QuestionBank bank,
   QuestionAssets assets,
