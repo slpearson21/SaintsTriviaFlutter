@@ -782,21 +782,33 @@ void main() {
       expect(report.clipboardText, contains(report.correctAnswer));
       expect(report.clipboardText, contains(report.reference));
 
+      final subjectLink = Uri.parse(
+        'mailto:$kReportEmail?subject=${Uri.encodeComponent(report.subject)}',
+      ).toString();
       final mailto = report.mailto.toString();
-      final markerAt = mailto.indexOf('&body=');
-      if (markerAt < 0 || markerAt + '&body='.length > maxMailtoLength) {
+      if (subjectLink.length > maxMailtoLength) {
         subjectTooLong++;
         continue;
       }
       fitted++;
-      final encodedBody = mailto.substring(markerAt + '&body='.length);
-      final decoded = utf8.decode(_percentBytes(encodedBody));
+      expect(mailto.length, lessThanOrEqualTo(maxMailtoLength));
       final subject = Uri.decodeComponent(
         mailto.split('?').last.split('&').first.replaceFirst('subject=', ''),
       );
-      expect(mailto.length, lessThanOrEqualTo(maxMailtoLength));
-      expect(decoded, isNot(contains('\uFFFD')));
       expect(subject, report.subject);
+      final markerAt = mailto.indexOf('&body=');
+      if (markerAt < 0) {
+        expect(mailto, subjectLink);
+        continue;
+      }
+      final encodedBody = mailto.substring(markerAt + '&body='.length);
+      if (encodedBody.isEmpty) {
+        expect(mailto.length, maxMailtoLength);
+        expect(mailto, endsWith('&body='));
+        continue;
+      }
+      final decoded = utf8.decode(_percentBytes(encodedBody));
+      expect(decoded, isNot(contains('\uFFFD')));
       expect(encodedBody, isNot(matches(RegExp(r'%[0-9A-Fa-f]{0,1}$'))));
     }
 
