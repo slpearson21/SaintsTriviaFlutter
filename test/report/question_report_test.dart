@@ -671,9 +671,10 @@ void main() {
     expect(report.clipboardText, contains(report.body));
   });
 
-  test('step 9 trims app version before the other metadata', () {
+  test('step 9 trims app version and leaves the later metadata capped', () {
+    final id = 'i' * 580;
     final report = _sized(
-      id: 'i' * 580,
+      id: id,
       prompt: 'P',
       answer: '',
       selected: '',
@@ -683,6 +684,7 @@ void main() {
       bank: 'b' * 20,
       source: 's' * 40,
     );
+    final mailto = report.mailto.toString();
     final decoded = _mailtoBody(report);
     final app = _mailtoField(decoded, 'App: ');
     final version = app
@@ -691,7 +693,8 @@ void main() {
         .first;
     final platform = app.split(' · ').last;
 
-    expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
+    expect(mailto.length, lessThanOrEqualTo(maxMailtoLength));
+    expect(mailto, contains('&body='));
     expect(version, 'v' * 25);
     expect(platform, 'p' * maxReportPlatformLength);
     expect(
@@ -703,10 +706,126 @@ void main() {
       'Source: ${'s' * maxReportSourceLength}',
     );
     expect(_mailtoField(decoded, 'Question: '), 'Question: P');
-    expect(decoded, contains('Question ID: ${'i' * 580}'));
+    expect(decoded, contains('Question ID: $id'));
     expect(decoded, contains('--- end of report ---'));
     expect(report.body, contains('v' * 40));
     expect(report.body, contains('p' * 40));
+    expect(report.clipboardText, contains(report.body));
+  });
+
+  test('step 9 trims platform after the app version is gone', () {
+    final id = 'i' * 600;
+    final report = _sized(
+      id: id,
+      prompt: 'P',
+      answer: '',
+      selected: '',
+      reference: '',
+      version: 'v' * 40,
+      platform: 'p' * 40,
+      bank: 'b' * 20,
+      source: 's' * 40,
+    );
+    final mailto = report.mailto.toString();
+    final decoded = _mailtoBody(report);
+    final app = _mailtoField(decoded, 'App: ');
+    final version = app
+        .replaceFirst('App: Scripture Trivia ', '')
+        .split(' · ')
+        .first;
+    final platform = app.split(' · ').last;
+
+    expect(mailto.length, lessThanOrEqualTo(maxMailtoLength));
+    expect(mailto, contains('&body='));
+    expect(version, isEmpty);
+    expect(platform, 'p' * 17);
+    expect(
+      _mailtoField(decoded, 'Question bank: '),
+      'Question bank: ${'b' * maxReportBankVersionLength}',
+    );
+    expect(
+      _mailtoField(decoded, 'Source: '),
+      'Source: ${'s' * maxReportSourceLength}',
+    );
+    expect(_mailtoField(decoded, 'Question: '), 'Question: P');
+    expect(decoded, contains('Question ID: $id'));
+    expect(decoded, contains('--- end of report ---'));
+    expect(report.body, contains('v' * 40));
+    expect(report.body, contains('p' * 40));
+    expect(report.clipboardText, contains(report.body));
+  });
+
+  test('step 9 trims the bank version after the platform is gone', () {
+    final id = 'i' * 616;
+    final report = _sized(
+      id: id,
+      prompt: 'P',
+      answer: '',
+      selected: '',
+      reference: '',
+      version: 'v' * 40,
+      platform: 'p' * 40,
+      bank: 'b' * 20,
+      source: 's' * 40,
+    );
+    final mailto = report.mailto.toString();
+    final decoded = _mailtoBody(report);
+    final app = _mailtoField(decoded, 'App: ');
+    final version = app
+        .replaceFirst('App: Scripture Trivia ', '')
+        .split(' · ')
+        .first;
+    final platform = app.split(' · ').last;
+
+    expect(mailto.length, lessThanOrEqualTo(maxMailtoLength));
+    expect(mailto, contains('&body='));
+    expect(version, isEmpty);
+    expect(platform, isEmpty);
+    expect(_mailtoField(decoded, 'Question bank: '), 'Question bank: b');
+    expect(
+      _mailtoField(decoded, 'Source: '),
+      'Source: ${'s' * maxReportSourceLength}',
+    );
+    expect(_mailtoField(decoded, 'Question: '), 'Question: P');
+    expect(decoded, contains('Question ID: $id'));
+    expect(decoded, contains('--- end of report ---'));
+    expect(report.body, contains('b' * 20));
+    expect(report.body, contains('s' * 40));
+    expect(report.clipboardText, contains(report.body));
+  });
+
+  test('step 9 trims the source after the bank version is gone', () {
+    final id = 'i' * 624;
+    final report = _sized(
+      id: id,
+      prompt: 'P',
+      answer: '',
+      selected: '',
+      reference: '',
+      version: 'v' * 40,
+      platform: 'p' * 40,
+      bank: 'b' * 20,
+      source: 's' * 40,
+    );
+    final mailto = report.mailto.toString();
+    final decoded = _mailtoBody(report);
+    final app = _mailtoField(decoded, 'App: ');
+    final version = app
+        .replaceFirst('App: Scripture Trivia ', '')
+        .split(' · ')
+        .first;
+    final platform = app.split(' · ').last;
+
+    expect(mailto.length, lessThanOrEqualTo(maxMailtoLength));
+    expect(mailto, contains('&body='));
+    expect(version, isEmpty);
+    expect(platform, isEmpty);
+    expect(_mailtoField(decoded, 'Question bank: '), 'Question bank: ');
+    expect(_mailtoField(decoded, 'Source: '), 'Source: ${'s' * 17}');
+    expect(_mailtoField(decoded, 'Question: '), 'Question: P');
+    expect(decoded, contains('Question ID: $id'));
+    expect(decoded, contains('--- end of report ---'));
+    expect(report.body, contains('s' * 40));
     expect(report.clipboardText, contains(report.body));
   });
 
@@ -788,6 +907,8 @@ void main() {
       final mailto = report.mailto.toString();
       if (subjectLink.length > maxMailtoLength) {
         subjectTooLong++;
+        expect(mailto, subjectLink);
+        expect(mailto, isNot(contains('&body=')));
         continue;
       }
       fitted++;
