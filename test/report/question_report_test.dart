@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:saints_trivia_flutter/report/question_report.dart';
 import 'package:saints_trivia_flutter/report/report_config.dart';
+import 'package:saints_trivia_flutter/report/reported_questions_provider.dart';
 
 QuestionReport _report({
   String prompt = 'D&C 1:38 teaches that it is the same.',
@@ -64,7 +67,7 @@ void main() {
     expect(mailto, isNot(contains('+')));
     expect(mailto, contains('%20'));
     expect(mailto, contains('%26'));
-    expect(mailto, isNot(contains('lang=')));
+    expect(report.mailto.queryParameters.keys.toList(), ['subject', 'body']);
     final query = report.mailto.query;
     final subject = Uri.decodeComponent(
       query.split('&').first.replaceFirst('subject=', ''),
@@ -203,4 +206,134 @@ void main() {
     }
     expect(count, 591);
   });
+
+  test('a long prompt is cut to 120 characters plus an ellipsis', () {
+    final prompt = 'Q' * 2000;
+    final report = _report(prompt: prompt, note: 'Keep this note');
+
+    expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
+    final body = _mailtoBody(report);
+    expect(body, contains('${'Q' * 120}…'));
+    expect(body, isNot(contains('Q' * 121)));
+    expect(body, contains('Note: Keep this note'));
+    expect(report.clipboardText, contains(prompt));
+  });
+
+  test('the last shrink loop shortens the prompt with an empty note', () {
+    final prompt = 'Q' * 300;
+    final report = QuestionReport(
+      questionId: 'q' * 320,
+      prompt: prompt,
+      correctAnswer: 'The same',
+      selectedAnswer: 'picked',
+      reference: 'D&C 1:38',
+      reason: ReportReason.other,
+      note: 'n' * 280,
+      appVersion: 'v1.0.0',
+      platform: 'p' * 360,
+      bankVersion: 'v1',
+      source: 's' * 180,
+      createdAtUtc: DateTime.utc(2026, 11, 18, 15, 46),
+    );
+
+    expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
+    final body = _mailtoBody(report);
+    final shown = body
+        .split('\r\n')
+        .firstWhere((line) => line.startsWith('Question: '))
+        .replaceFirst('Question: ', '');
+    expect(shown.length, lessThan(120));
+    expect(prompt.startsWith(shown), isTrue);
+    expect(body, contains('Note: —'));
+    expect(report.clipboardText, contains(prompt));
+    expect(report.clipboardText, contains('n' * 280));
+  });
+
+  test('formatReportUtc zero-pads a UTC time and converts a local one', () {
+    expect(
+      formatReportUtc(DateTime.utc(2026, 1, 2, 3, 4, 5)),
+      '2026-01-02T03:04:05Z',
+    );
+    final local = DateTime(2026, 1, 2, 3, 4, 5);
+    expect(local.isUtc, isFalse);
+    final utc = local.toUtc();
+    String two(int value) => value.toString().padLeft(2, '0');
+    expect(
+      formatReportUtc(local),
+      '${utc.year.toString().padLeft(4, '0')}-'
+      '${two(utc.month)}-${two(utc.day)}'
+      'T${two(utc.hour)}:${two(utc.minute)}:${two(utc.second)}Z',
+    );
+  });
+
+  test('reportPlatformLabel follows the debug platform override', () {
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    const names = {
+      TargetPlatform.android: 'Android',
+      TargetPlatform.iOS: 'iOS',
+      TargetPlatform.macOS: 'macOS',
+      TargetPlatform.windows: 'Windows',
+      TargetPlatform.linux: 'Linux',
+      TargetPlatform.fuchsia: 'Fuchsia',
+    };
+    for (final entry in names.entries) {
+      debugDefaultTargetPlatformOverride = entry.key;
+      expect(platformLabel(entry.key), entry.value);
+      expect(reportPlatformLabel(), entry.value);
+    }
+  });
+
+  test('each reason has its note hint', () {
+    expect(reportNoteHintNone, 'What should it say?');
+    expect(ReportReason.wrongAnswer.noteHint, 'What should the answer be?');
+    expect(ReportReason.wrongReference.noteHint, 'Which verse should it be?');
+    expect(ReportReason.typoOrWording.noteHint, 'What should it say?');
+    expect(ReportReason.other.noteHint, 'Tell us what\u2019s wrong');
+  });
+
+  test('copyWith can clear the reason and replace the note', () {
+    const draft = ReportDraft(reason: ReportReason.other, note: 'keep');
+
+    final cleared = draft.copyWith(clearReason: true);
+    expect(cleared.reason, isNull);
+    expect(cleared.note, 'keep');
+
+    final noted = draft.copyWith(note: 'next');
+    expect(noted.reason, ReportReason.other);
+    expect(noted.note, 'next');
+
+    final both = draft.copyWith(
+      reason: ReportReason.wrongAnswer,
+      clearReason: true,
+      note: 'gone',
+    );
+    expect(both.reason, isNull);
+    expect(both.note, 'gone');
+  });
+
+  test('markReported is a no-op the second time', () {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    final reports = container.read(reportedQuestionIdsProvider.notifier);
+
+    reports.markReported('ot-0001');
+    final first = container.read(reportedQuestionIdsProvider);
+    reports.markReported('ot-0001');
+    final second = container.read(reportedQuestionIdsProvider);
+
+    expect(identical(first, second), isTrue);
+    expect(second.reportedIds, {'ot-0001'});
+
+    reports.markReported('ot-0002');
+    expect(container.read(reportedQuestionIdsProvider).reportedIds, {
+      'ot-0001',
+      'ot-0002',
+    });
+  });
+}
+
+String _mailtoBody(QuestionReport report) {
+  return Uri.decodeComponent(
+    report.mailto.query.split('&').skip(1).join('&').replaceFirst('body=', ''),
+  );
 }
