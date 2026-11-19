@@ -70,6 +70,10 @@ final class QuestionReport {
       'To: $kReportEmail\r\nSubject: $subject\r\n\r\n$body';
 
   /// Encoded mailto, kept at or under 1,800 characters.
+  ///
+  /// The question and the note shrink first. If that is still too long, the
+  /// correct answer, the reference, and the player's answer shrink, and then
+  /// the question id in this link only. [body] and [clipboardText] stay full.
   Uri get mailto {
     var question = prompt;
     final fullNote = note;
@@ -100,19 +104,85 @@ final class QuestionReport {
       question = question.characters.skipLast(1).string;
       uri = _mailto(question, '');
     }
-    return uri;
+    if (uri.toString().length <= maxMailtoLength) return uri;
+    final answer = _trimTail(
+      correctAnswer,
+      (value) => _mailto(question, '', answer: value),
+    );
+    uri = _mailto(question, '', answer: answer);
+    if (uri.toString().length <= maxMailtoLength) return uri;
+    final scripture = _trimTail(
+      reference,
+      (value) => _mailto(question, '', answer: answer, scripture: value),
+    );
+    uri = _mailto(question, '', answer: answer, scripture: scripture);
+    if (uri.toString().length <= maxMailtoLength) return uri;
+    final selected = _trimTail(
+      selectedAnswer,
+      (value) => _mailto(
+        question,
+        '',
+        answer: answer,
+        scripture: scripture,
+        selected: value,
+      ),
+    );
+    uri = _mailto(
+      question,
+      '',
+      answer: answer,
+      scripture: scripture,
+      selected: selected,
+    );
+    if (uri.toString().length <= maxMailtoLength) return uri;
+    final id = _trimTail(
+      questionId,
+      (value) => _mailto(
+        question,
+        '',
+        answer: answer,
+        scripture: scripture,
+        selected: selected,
+        id: value,
+      ),
+    );
+    return _mailto(
+      question,
+      '',
+      answer: answer,
+      scripture: scripture,
+      selected: selected,
+      id: id,
+    );
   }
 
-  String _body(String question, String noteText) {
+  /// Drops characters from the end of [value] until [build] fits.
+  String _trimTail(String value, Uri Function(String candidate) build) {
+    var current = value;
+    while (current.characters.isNotEmpty &&
+        build(current).toString().length > maxMailtoLength) {
+      current = current.characters.skipLast(1).string;
+    }
+    return current;
+  }
+
+  String _body(
+    String question,
+    String noteText, {
+    String? answer,
+    String? selected,
+    String? scripture,
+    String? id,
+  }) {
     final lines = <String>[
       'Add anything else here (optional).',
       '',
       '--- Scripture Trivia report ---',
-      'Question ID: $questionId',
+      'Question ID: ${id ?? questionId}',
       'Question: $question',
-      'Correct answer (app): $correctAnswer',
-      "Player's answer: $selectedAnswer",
-      'Reference: $reference',
+      'Correct answer (app): ${answer ?? correctAnswer}',
+      "Player's answer: ${selected ?? selectedAnswer}",
+      'Reference: ${scripture ?? reference}',
       'Reason: ${reason.label}',
       'Note: ${noteText.isEmpty ? '—' : noteText}',
       'App: Scripture Trivia $appVersion · $platform',
@@ -124,9 +194,27 @@ final class QuestionReport {
     return lines.join('\r\n');
   }
 
-  Uri _mailto(String question, String noteText) {
-    final encodedBody = Uri.encodeComponent(_body(question, noteText));
-    final encodedSubject = Uri.encodeComponent(subject);
+  Uri _mailto(
+    String question,
+    String noteText, {
+    String? answer,
+    String? selected,
+    String? scripture,
+    String? id,
+  }) {
+    final encodedBody = Uri.encodeComponent(
+      _body(
+        question,
+        noteText,
+        answer: answer,
+        selected: selected,
+        scripture: scripture,
+        id: id,
+      ),
+    );
+    final encodedSubject = Uri.encodeComponent(
+      id == null ? subject : '[Trivia report] $id – ${reason.slug}',
+    );
     return Uri.parse(
       'mailto:$kReportEmail?subject=$encodedSubject&body=$encodedBody',
     );
