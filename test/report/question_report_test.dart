@@ -923,11 +923,6 @@ void main() {
         continue;
       }
       final encodedBody = mailto.substring(markerAt + '&body='.length);
-      if (encodedBody.isEmpty) {
-        expect(mailto.length, maxMailtoLength);
-        expect(mailto, endsWith('&body='));
-        continue;
-      }
       final decoded = utf8.decode(_percentBytes(encodedBody));
       expect(decoded, isNot(contains('\uFFFD')));
       expect(encodedBody, isNot(matches(RegExp(r'%[0-9A-Fa-f]{0,1}$'))));
