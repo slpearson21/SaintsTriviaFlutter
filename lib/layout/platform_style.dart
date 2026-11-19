@@ -29,9 +29,6 @@ bool isCupertinoPlatform(TargetPlatform platform) {
 /// follows the platform at the call, including a test override. Page
 /// transitions stay on the theme built for that same platform. The game
 /// screen's edge swipe follows those transitions.
-///
-/// [context] is ignored. An existing test still passes one, so the
-/// argument stays optional.
-bool usesMaterialChrome([Object? context]) {
+bool usesMaterialChrome() {
   return !isCupertinoPlatform(defaultTargetPlatform);
 }
