@@ -2,10 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
-import '../layout/screen_body.dart';
-import '../layout/st_icon.dart';
 import '../layout/platform_style.dart';
-import '../layout/text_scale.dart' hide usesMaterialChrome;
+import '../layout/screen_body.dart';
+import '../layout/section_label.dart';
+import '../layout/st_icon.dart';
+import '../layout/text_scale.dart';
 import '../progress/home_providers.dart';
 import '../progress/home_snapshot.dart';
 import '../progress/play_again.dart';
@@ -26,7 +27,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final snapshot = ref.watch(homeSnapshotProvider);
     final now = ref.watch(homeClockProvider)();
-    final material = usesMaterialChrome(context);
+    final material = usesMaterialChrome();
     final settings = snapshot.lastSettings;
     final lastGame = snapshot.lastGame;
 
@@ -45,7 +46,7 @@ class HomeScreen extends ConsumerWidget {
             _HomeHero(firstRun: snapshot.isFirstRun),
             const SizedBox(height: StSpace.xl),
             if (snapshot.isFirstRun) ...[
-              const _SectionLabel('How it works'),
+              const SectionLabel('How it works'),
               const SizedBox(height: StSpace.sm),
               const _HowItWorksCard(),
               const SizedBox(height: StSpace.lg),
@@ -182,7 +183,7 @@ class _HomeIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final color = usesMaterialChrome(context)
+    final color = usesMaterialChrome()
         ? scheme.onSurfaceVariant
         : scheme.primary;
     final target = minTapTarget(context);
@@ -280,32 +281,6 @@ class _HomeHero extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.title);
-
-  /// Title case. iOS draws it as small caps; Android keeps this casing.
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final material = usesMaterialChrome(context);
-    final style = material
-        ? theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary)
-        : theme.textTheme.labelMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          );
-    return Semantics(
-      header: true,
-      child: Text(
-        material ? title : title.toUpperCase(),
-        semanticsLabel: title,
-        style: style,
       ),
     );
   }
@@ -554,7 +529,7 @@ class _ProgressHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Expanded(child: _SectionLabel('Your progress')),
+        const Expanded(child: SectionLabel('Your progress')),
         TextButton(
           style: TextButton.styleFrom(
             foregroundColor: Theme.of(context).colorScheme.primary,

@@ -65,7 +65,6 @@ class _ScriptureReferenceChipState
         ?.copyWith(color: widget.foreground);
     final face = Row(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (widget.leading != null) ...[
           widget.leading!,

@@ -4,10 +4,10 @@ import 'package:material_ui/material_ui.dart';
 
 import '../data/questions/scripture_volume.dart';
 import '../layout/home_back_button.dart';
+import '../layout/platform_style.dart';
 import '../layout/section_label.dart';
 import '../layout/st_icon.dart';
-import '../layout/platform_style.dart';
-import '../layout/text_scale.dart' hide usesMaterialChrome;
+import '../layout/text_scale.dart';
 import '../persistence/finished_game_record.dart';
 import '../progress/home_providers.dart';
 import '../progress/stats_summary.dart';
@@ -22,7 +22,7 @@ class StatsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final summary = ref.watch(statsSummaryProvider);
     final now = ref.watch(homeClockProvider)();
-    final material = usesMaterialChrome(context);
+    final material = usesMaterialChrome();
     return Scaffold(
       appBar: AppBar(
         centerTitle: !material,

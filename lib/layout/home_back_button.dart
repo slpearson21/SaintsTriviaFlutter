@@ -5,7 +5,7 @@ import '../routing/routes.dart';
 import '../theme/st_theme.dart';
 import 'platform_style.dart';
 import 'st_icon.dart';
-import 'text_scale.dart' hide usesMaterialChrome;
+import 'text_scale.dart';
 
 /// Back control for screens opened from Home.
 ///
@@ -15,13 +15,13 @@ class HomeBackButton extends StatelessWidget {
   const HomeBackButton({super.key});
 
   static double? leadingWidth(BuildContext context) {
-    if (usesMaterialChrome(context) || isLargeText(context)) return null;
+    if (usesMaterialChrome() || isLargeText(context)) return null;
     return 112;
   }
 
   @override
   Widget build(BuildContext context) {
-    final material = usesMaterialChrome(context);
+    final material = usesMaterialChrome();
     final scheme = Theme.of(context).colorScheme;
     final target = minTapTarget(context);
     if (material || isLargeText(context)) {

@@ -5,7 +5,7 @@ import '../routing/routes.dart';
 import '../theme/st_theme.dart';
 import 'platform_style.dart';
 import 'st_icon.dart';
-import 'text_scale.dart' hide usesMaterialChrome;
+import 'text_scale.dart';
 
 /// The setup bar, shared by E2 and by E1 when it replaces setup or preparing.
 ///
@@ -13,7 +13,7 @@ import 'text_scale.dart' hide usesMaterialChrome;
 /// shows a back arrow. Both leave for Home, since these routes were opened
 /// with [GoRouter.go].
 AppBar newGameAppBar(BuildContext context) {
-  final material = usesMaterialChrome(context);
+  final material = usesMaterialChrome();
   final large = isLargeText(context);
   return AppBar(
     automaticallyImplyLeading: false,
@@ -39,7 +39,7 @@ class _HomeButton extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final target = minTapTarget(context);
     if (!showHomeLabel) {
-      final material = usesMaterialChrome(context);
+      final material = usesMaterialChrome();
       return IconButton(
         tooltip: material ? 'Back' : 'Home',
         onPressed: () => _leave(context),

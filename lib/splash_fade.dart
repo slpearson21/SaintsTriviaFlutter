@@ -406,7 +406,6 @@ class _SplashFadeState extends State<SplashFade>
                           width: mark.extent,
                           height: mark.extent,
                           fit: BoxFit.fill,
-                          filterQuality: FilterQuality.medium,
                           excludeFromSemantics: true,
                         ),
                       ),

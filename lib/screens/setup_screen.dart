@@ -7,10 +7,11 @@ import '../data/questions/question_bank_provider.dart';
 import '../data/questions/scripture_volume.dart';
 import '../game/game_engine.dart';
 import '../game/game_providers.dart';
-import '../layout/screen_body.dart';
-import '../layout/st_icon.dart';
 import '../layout/platform_style.dart';
-import '../layout/text_scale.dart' hide usesMaterialChrome;
+import '../layout/screen_body.dart';
+import '../layout/section_label.dart';
+import '../layout/st_icon.dart';
+import '../layout/text_scale.dart';
 import '../progress/home_snapshot.dart';
 import '../routing/routes.dart';
 import '../theme/st_theme.dart';
@@ -173,7 +174,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
             available: _max(bank),
           )
         : null;
-    final material = usesMaterialChrome(context);
+    final material = usesMaterialChrome();
     final large = isLargeText(context);
 
     return Scaffold(
@@ -193,7 +194,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const _SectionLabel('Choose scriptures'),
+            const SectionLabel('Choose scriptures'),
             const SizedBox(height: StSpace.sm),
             _VolumeCard(
               bank: bank,
@@ -202,7 +203,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
               onToggleAll: _toggleAll,
             ),
             const SizedBox(height: StSpace.lg),
-            const _SectionLabel('Number of questions'),
+            const SectionLabel('Number of questions'),
             const SizedBox(height: StSpace.sm),
             if (banner != null) ...[
               _ClampBanner(message: banner),
@@ -293,7 +294,7 @@ class _SetupBackButton extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final target = minTapTarget(context);
     if (!showHomeLabel) {
-      final material = usesMaterialChrome(context);
+      final material = usesMaterialChrome();
       return IconButton(
         tooltip: material ? 'Back' : 'Home',
         onPressed: () => _leave(context),
@@ -338,31 +339,6 @@ void _leave(BuildContext context) {
     return;
   }
   context.go(AppRoutes.home);
-}
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.title);
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final material = usesMaterialChrome(context);
-    final style = material
-        ? theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary)
-        : theme.textTheme.labelMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          );
-    return Semantics(
-      header: true,
-      child: Text(
-        material ? title : title.toUpperCase(),
-        semanticsLabel: title,
-        style: style,
-      ),
-    );
-  }
 }
 
 class _VolumeCard extends StatelessWidget {
@@ -557,7 +533,7 @@ class _CheckMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (usesMaterialChrome(context)) {
+    if (usesMaterialChrome()) {
       return IgnorePointer(
         child: Checkbox(
           value: value,

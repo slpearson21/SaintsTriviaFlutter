@@ -5,10 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../game/game_providers.dart';
+import '../layout/platform_style.dart';
 import '../layout/section_label.dart';
 import '../layout/st_icon.dart';
-import '../layout/platform_style.dart';
-import '../layout/text_scale.dart' hide usesMaterialChrome;
+import '../layout/text_scale.dart';
 import '../progress/play_again.dart';
 import '../report/report_sheet.dart';
 import '../results/results_summary.dart';
@@ -60,7 +60,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       ReviewFilter.missed => missed,
       ReviewFilter.correct => correct,
     };
-    final material = usesMaterialChrome(context);
+    final material = usesMaterialChrome();
     final large = isLargeText(context);
 
     return Scaffold(
