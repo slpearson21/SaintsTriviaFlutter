@@ -22,11 +22,7 @@ void main() {
         ),
       );
       final context = tester.element(find.byType(SizedBox));
-      expect(
-        usesMaterialChrome(context),
-        isNot(cupertino),
-        reason: platform.name,
-      );
+      expect(usesMaterialChrome(), isNot(cupertino), reason: platform.name);
       expect(
         minTapTarget(context),
         cupertino ? 44 : StSpace.minTap,
@@ -48,7 +44,7 @@ void main() {
     );
 
     final context = tester.element(find.byType(SizedBox));
-    expect(usesMaterialChrome(context), isTrue);
+    expect(usesMaterialChrome(), isTrue);
     expect(minTapTarget(context), 44);
   });
 }

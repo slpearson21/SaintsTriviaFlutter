@@ -430,7 +430,8 @@ String _countText(WidgetTester tester) {
   return tester.widget<Text>(find.byKey(const Key('setup-count'))).data!;
 }
 
-/// The host theme. [SaintsTriviaApp] builds it for the current platform.
+/// Pumps the game on the host theme; [SaintsTriviaApp] builds it for the
+/// current platform.
 Future<ProviderContainer> _pumpGame(
   WidgetTester tester, {
   CanOpenLink? canOpen,
