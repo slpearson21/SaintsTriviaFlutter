@@ -77,7 +77,7 @@ final class QuestionReport {
   /// further if the link is still too long. The subject always keeps the
   /// question id whole. The body's "Question ID:" line can be shortened
   /// by the final body cut, which never splits a character. A subject
-  /// already over 1,800 is returned on its own, without `&body=`.
+  /// that leaves no room for `&body=` is returned on its own.
   /// [body] and [clipboardText] stay full.
   Uri get mailto {
     var version = _bounded(appVersion, maxReportAppVersionLength);
@@ -413,14 +413,14 @@ final class QuestionReport {
   /// Cuts the body value without splitting a character or the subject.
   ///
   /// The subject keeps the question id whole. The body's question id can
-  /// be shortened. When the subject alone is already over
-  /// [maxMailtoLength], the link stops at the subject and drops `&body=`.
+  /// be shortened. When the subject plus `&body=` does not fit, the link
+  /// stops at the subject.
   Uri _clipMailto(String text) {
     const marker = '&body=';
     final markerAt = text.indexOf(marker);
     if (markerAt < 0) return Uri.parse(text);
     final prefixLength = markerAt + marker.length;
-    if (markerAt > maxMailtoLength) {
+    if (prefixLength > maxMailtoLength) {
       return Uri.parse(text.substring(0, markerAt));
     }
     var end = text.length;
@@ -498,8 +498,8 @@ final class QuestionReport {
   }
 }
 
-/// Target length of an encoded mailto. A subject already over this
-/// length is returned on its own, without the body.
+/// Target length of an encoded mailto. A subject that leaves no room
+/// for `&body=` is returned on its own, without the body.
 const maxMailtoLength = 1800;
 
 /// The note field stops at this many characters.

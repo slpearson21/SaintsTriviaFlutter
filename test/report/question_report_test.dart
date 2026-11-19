@@ -332,6 +332,35 @@ void main() {
     expect(Uri.decodeComponent(mailto.split('subject=').last), report.subject);
   });
 
+  test('a subject with no room for the body marker drops it', () {
+    final ids = ['x' * 1716, 'é' * 286, '😀' * 143, '—' * 191];
+    for (final id in ids) {
+      final report = QuestionReport(
+        questionId: id,
+        prompt: 'Prompt',
+        correctAnswer: 'The same',
+        selectedAnswer: 'picked',
+        reference: 'D&C 1:38',
+        reason: ReportReason.other,
+        note: '',
+        appVersion: 'v1.0.0',
+        platform: 'Android',
+        bankVersion: 'v1',
+        source: 'game',
+        createdAtUtc: DateTime.utc(2026, 11, 18, 15, 46),
+      );
+
+      final mailto = report.mailto.toString();
+      expect(mailto.length, lessThanOrEqualTo(maxMailtoLength), reason: id);
+      expect(mailto, isNot(contains('&body=')), reason: id);
+      expect(
+        Uri.decodeComponent(mailto.split('subject=').last),
+        report.subject,
+        reason: id,
+      );
+    }
+  });
+
   test('formatReportUtc zero-pads a UTC time and converts a local one', () {
     expect(
       formatReportUtc(DateTime.utc(2026, 1, 2, 3, 4, 5)),
