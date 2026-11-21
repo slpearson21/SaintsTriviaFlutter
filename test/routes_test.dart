@@ -29,7 +29,7 @@ Future<void> _openResults(WidgetTester tester) async {
 void main() {
   testWidgets('every route renders and is reachable', (tester) async {
     await pumpApp(tester, overrides: _routeController());
-    expect(find.text('Scripture Trivia'), findsOneWidget);
+    expect(find.text('LDS Scripture Trivia'), findsOneWidget);
     expect(find.text('Start a game'), findsOneWidget);
 
     await tester.tap(find.text('Start a game'));
@@ -55,7 +55,7 @@ void main() {
     await tester.ensureVisible(find.text('Done'));
     await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
-    expect(find.text('Scripture Trivia'), findsOneWidget);
+    expect(find.text('LDS Scripture Trivia'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Stats'));
     await tester.pumpAndSettle();
@@ -63,7 +63,7 @@ void main() {
 
     await tester.pageBack();
     await tester.pumpAndSettle();
-    expect(find.text('Scripture Trivia'), findsOneWidget);
+    expect(find.text('LDS Scripture Trivia'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Settings'));
     await tester.pumpAndSettle();
@@ -82,7 +82,7 @@ void main() {
     await tester.pageBack();
     await tester.pumpAndSettle();
 
-    expect(find.text('Scripture Trivia'), findsOneWidget);
+    expect(find.text('LDS Scripture Trivia'), findsOneWidget);
     expect(find.text('Question'), findsNothing);
     expect(find.byType(AlertDialog), findsNothing);
   });
@@ -102,7 +102,7 @@ void main() {
     await tester.pageBack();
     await tester.pumpAndSettle();
 
-    expect(find.text('Scripture Trivia'), findsOneWidget);
+    expect(find.text('LDS Scripture Trivia'), findsOneWidget);
     expect(find.text('Select all'), findsNothing);
     expect(find.text('Question'), findsNothing);
   });

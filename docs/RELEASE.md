@@ -10,7 +10,7 @@ The name (`1.0.0`) is semver. The number after `+` is the build number. Incremen
 
 Android reads that line as `flutter.versionName` and `flutter.versionCode` in `android/app/build.gradle.kts`. iOS reads it through `CFBundleShortVersionString` = `$(FLUTTER_BUILD_NAME)` and `CFBundleVersion` = `$(FLUTTER_BUILD_NUMBER)` in `ios/Runner/Info.plist`.
 
-The application id and bundle id are `com.dusk.scripturetrivia` on Android and iOS. The iOS test target is `com.dusk.scripturetrivia.RunnerTests`. The Apple signing team is unset until a team is chosen. The launcher label on both platforms is Trivia. The store listing name is Scripture Trivia.
+The application id and bundle id are `com.dusk.scripturetrivia` on Android and iOS. The iOS test target is `com.dusk.scripturetrivia.RunnerTests`. The Apple signing team is unset until a team is chosen. The launcher label on Android and iOS is LDS Scripture Trivia. The store listing name is LDS Scripture Trivia. macOS shows that name through `CFBundleDisplayName`. `PRODUCT_NAME` stays `saints_trivia_flutter`, so the `.app` bundle name does not change.
 
 A device that already has a test build under `com.dusk.saintstrivia.saints_trivia_flutter` will not replace it. The new id installs beside that app, with fresh stats. Uninstall the old Trivia app before installing this one.
 

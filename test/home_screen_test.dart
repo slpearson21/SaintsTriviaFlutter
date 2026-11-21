@@ -408,9 +408,9 @@ void main() {
       await pumpApp(tester);
 
       expect(
-        tester.getSemantics(find.text('Scripture Trivia')),
+        tester.getSemantics(find.text('LDS Scripture Trivia')),
         matchesSemantics(
-          label: 'Scripture Trivia',
+          label: 'LDS Scripture Trivia',
           isHeader: true,
           textDirection: TextDirection.ltr,
         ),
@@ -547,8 +547,8 @@ void main() {
 
     expect(find.text('HOW IT WORKS'), findsOneWidget);
     expect(find.text('How it works'), findsNothing);
-    expect(find.text('Scripture Trivia'), findsOneWidget);
-    final title = tester.widget<Text>(find.text('Scripture Trivia'));
+    expect(find.text('LDS Scripture Trivia'), findsOneWidget);
+    final title = tester.widget<Text>(find.text('LDS Scripture Trivia'));
     expect(title.style?.fontFamily, 'SourceSerif4');
     expect(title.style?.fontSize, 28);
 
@@ -655,7 +655,7 @@ void _expectTitleFits(
   String reason, {
   required bool wraps,
 }) {
-  const title = 'Scripture Trivia';
+  const title = 'LDS Scripture Trivia';
   final paragraph = tester.renderObject<RenderParagraph>(find.text(title));
   expect(paragraph.didExceedMaxLines, isFalse, reason: reason);
   final space = title.indexOf(' ');

@@ -122,7 +122,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Scripture Trivia'), findsOneWidget);
+    expect(find.text('LDS Scripture Trivia'), findsOneWidget);
     expect(container.read(questionBankProvider.exists), isFalse);
   });
 
@@ -193,7 +193,7 @@ void main() {
     await tester.tap(find.text('Try again'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Scripture Trivia'), findsOneWidget);
+    expect(find.text('LDS Scripture Trivia'), findsOneWidget);
     expect(find.text('Try again'), findsNothing);
     expect(calls, 2);
   });

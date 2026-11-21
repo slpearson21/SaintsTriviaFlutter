@@ -313,7 +313,7 @@ void main() {
     expect(find.text('Sound & haptics'), findsOneWidget);
     expect(opened, isEmpty);
     expect(feedbackRecipient, kReportEmail);
-    expect(feedbackUri.query, 'subject=Scripture%20Trivia%20feedback');
+    expect(feedbackUri.query, 'subject=LDS%20Scripture%20Trivia%20feedback');
 
     await tester.scrollUntilVisible(
       find.text(reportPrivacyLine),
@@ -330,7 +330,7 @@ void main() {
     expect(
       find.descendant(
         of: dialog,
-        matching: find.text('About Scripture Trivia'),
+        matching: find.text('About LDS Scripture Trivia'),
       ),
       findsOneWidget,
     );

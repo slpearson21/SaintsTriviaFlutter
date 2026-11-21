@@ -60,8 +60,9 @@ final class QuestionReport {
   final String source;
   final DateTime createdAtUtc;
 
-  /// `[Trivia report] <id> – <reason slug>`.
-  String get subject => '[Trivia report] $questionId – ${reason.slug}';
+  /// `[LDS Scripture Trivia report] <id> – <reason slug>`.
+  String get subject =>
+      '[LDS Scripture Trivia report] $questionId – ${reason.slug}';
 
   /// Full body. Never shortened. The clipboard uses this.
   String get body => _body(prompt, note);
@@ -363,7 +364,7 @@ final class QuestionReport {
     final lines = <String>[
       'Add anything else here (optional).',
       '',
-      '--- Scripture Trivia report ---',
+      '--- LDS Scripture Trivia report ---',
       'Question ID: $questionId',
       'Question: $question',
       'Correct answer (app): ${answer ?? correctAnswer}',
@@ -371,7 +372,7 @@ final class QuestionReport {
       'Reference: ${scripture ?? reference}',
       'Reason: ${reason.label}',
       'Note: ${noteText.isEmpty ? '—' : noteText}',
-      'App: Scripture Trivia $versionText · $platformText',
+      'App: LDS Scripture Trivia $versionText · $platformText',
       'Question bank: ${bank ?? bankVersion}',
       'Source: ${reportSource ?? source}',
       'Reported at: ${formatReportUtc(createdAtUtc)}',

@@ -274,7 +274,7 @@ void main() {
     expect(find.text(reportNoMailTitle), findsOneWidget);
     expect(find.text(kReportEmail), findsOneWidget);
     expect(clipboard, contains('To: $kReportEmail'));
-    expect(clipboard, contains('Subject: [Trivia report]'));
+    expect(clipboard, contains('Subject: [LDS Scripture Trivia report]'));
     expect(clipboard, contains('typo-or-wording'));
     expect(clipboard, contains('Needs a look'));
     expect(clipboard, isNot(contains('option index')));
