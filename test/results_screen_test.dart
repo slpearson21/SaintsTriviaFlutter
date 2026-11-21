@@ -796,52 +796,55 @@ void main() {
       _expectTonalDone(tester);
     }
 
-    tester.platformDispatcher.textScaleFactorTestValue = 2;
     await tester.binding.setSurfaceSize(const Size(393, 852));
-    await _openResults(tester, session: _mixed());
-    _expectTonalDone(tester);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    for (final brightness in Brightness.values) {
+      tester.platformDispatcher.platformBrightnessTestValue = brightness;
+      await _openResults(tester, session: _mixed());
+      _expectTonalDone(tester);
 
-    final body = tester.widget<ScreenBody>(find.byType(ScreenBody));
-    final pinned = body.primary! as FilledButton;
-    expect(pinned.key, const Key('results-play-again'));
-    final scroll = find.byType(SingleChildScrollView);
-    expect(
-      find.descendant(
-        of: scroll,
-        matching: find.byKey(const Key('results-play-again')),
-      ),
-      findsNothing,
-    );
-    expect(
-      find.descendant(
-        of: scroll,
-        matching: find.byKey(const Key('results-done')),
-      ),
-      findsOneWidget,
-    );
-    expect(
-      find.descendant(
-        of: scroll,
-        matching: find.byKey(const Key('results-new-game')),
-      ),
-      findsOneWidget,
-    );
-    expect(
-      find.descendant(
-        of: scroll,
-        matching: find.byKey(const Key('results-review')),
-      ),
-      findsOneWidget,
-    );
-    expect(
-      find.descendant(of: scroll, matching: find.byType(FilledButton)),
-      findsOneWidget,
-    );
+      final body = tester.widget<ScreenBody>(find.byType(ScreenBody));
+      final pinned = body.primary! as FilledButton;
+      expect(pinned.key, const Key('results-play-again'));
+      final scroll = find.byType(SingleChildScrollView);
+      expect(
+        find.descendant(
+          of: scroll,
+          matching: find.byKey(const Key('results-play-again')),
+        ),
+        findsNothing,
+      );
+      expect(
+        find.descendant(
+          of: scroll,
+          matching: find.byKey(const Key('results-done')),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: scroll,
+          matching: find.byKey(const Key('results-new-game')),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: scroll,
+          matching: find.byKey(const Key('results-review')),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: scroll, matching: find.byType(FilledButton)),
+        findsOneWidget,
+      );
+    }
 
     await tester.ensureVisible(find.byKey(const Key('results-done')));
     await tester.tap(find.byKey(const Key('results-done')));
     await tester.pumpAndSettle();
-    expect(find.text('Scripture Trivia'), findsOneWidget);
+    expect(find.text('LDS Scripture Trivia'), findsOneWidget);
     expect(find.text('Great effort!'), findsNothing);
   });
 
@@ -1304,6 +1307,9 @@ void _expectTonalDone(WidgetTester tester) {
   );
 
   final doneRect = tester.getRect(doneFinder);
+  final minimum = done.themeStyleOf(doneContext)?.minimumSize?.resolve(enabled);
+  expect(minimum?.height, 52);
+  expect(doneRect.height, greaterThanOrEqualTo(52));
   expect(doneRect.width, tester.getRect(playFinder).width);
   // Flush with the row above: the column does not insert a gap.
   expect(
