@@ -48,7 +48,7 @@ void main() {
   testWidgets('a game link with no settings opens setup', (tester) async {
     await pumpApp(tester);
 
-    GoRouter.of(tester.element(find.text('Scripture Trivia')))
+    GoRouter.of(tester.element(find.text('LDS Scripture Trivia')))
         .go(AppRoutes.game);
     await tester.pumpAndSettle();
 
@@ -62,7 +62,7 @@ void main() {
   ) async {
     await pumpApp(tester, overrides: [fixedHomeSnapshot(_returning)]);
 
-    GoRouter.of(tester.element(find.text('Scripture Trivia')))
+    GoRouter.of(tester.element(find.text('LDS Scripture Trivia')))
         .go(AppRoutes.game, extra: 'deep link');
     await tester.pumpAndSettle();
 
@@ -76,7 +76,7 @@ void main() {
   testWidgets('route extra wins over the saved game', (tester) async {
     await pumpApp(tester, overrides: [fixedHomeSnapshot(_returning)]);
 
-    GoRouter.of(tester.element(find.text('Scripture Trivia')))
+    GoRouter.of(tester.element(find.text('LDS Scripture Trivia')))
         .go(AppRoutes.game, extra: _routeSettings);
     await tester.pumpAndSettle();
 
@@ -89,7 +89,7 @@ void main() {
   testWidgets('a null extra uses the saved game', (tester) async {
     await pumpApp(tester, overrides: [fixedHomeSnapshot(_returning)]);
 
-    GoRouter.of(tester.element(find.text('Scripture Trivia')))
+    GoRouter.of(tester.element(find.text('LDS Scripture Trivia')))
         .go(AppRoutes.game);
     await tester.pumpAndSettle();
 

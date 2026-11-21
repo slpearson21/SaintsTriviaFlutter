@@ -1,4 +1,4 @@
-// Scripture Trivia — design tokens (v1). Material 3, Flutter 3.22+.
+// LDS Scripture Trivia — design tokens (v1). Material 3, Flutter 3.22+.
 // Fonts: Source Serif 4 (SIL OFL) bundled for display/headline/title + question prompts.
 // UI text uses the platform default (SF Pro on iOS, Roboto on Android).
 import 'package:cupertino_ui/cupertino_ui.dart'

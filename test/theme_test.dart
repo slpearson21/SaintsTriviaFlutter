@@ -13,7 +13,7 @@ void main() {
 
     await pumpApp(tester);
 
-    final theme = Theme.of(tester.element(find.text('Scripture Trivia')));
+    final theme = Theme.of(tester.element(find.text('LDS Scripture Trivia')));
     final colors = theme.extension<StColors>();
     expect(theme.brightness, Brightness.light);
     expect(colors, isNotNull);
@@ -41,7 +41,7 @@ void main() {
 
     await pumpApp(tester);
 
-    final theme = Theme.of(tester.element(find.text('Scripture Trivia')));
+    final theme = Theme.of(tester.element(find.text('LDS Scripture Trivia')));
     final colors = theme.extension<StColors>();
     expect(theme.brightness, Brightness.dark);
     expect(colors, isNotNull);

@@ -107,7 +107,7 @@ class _AndroidHomeBar extends StatelessWidget implements PreferredSizeWidget {
                   child: Semantics(
                     header: true,
                     child: Text(
-                      'Scripture Trivia',
+                      'LDS Scripture Trivia',
                       style: theme.textTheme.headlineSmall,
                       softWrap: true,
                       overflow: TextOverflow.clip,
@@ -160,7 +160,7 @@ class _IosHomeHeader extends StatelessWidget {
         Semantics(
           header: true,
           child: Text(
-            'Scripture Trivia',
+            'LDS Scripture Trivia',
             style: Theme.of(context).textTheme.headlineMedium,
           ),
         ),

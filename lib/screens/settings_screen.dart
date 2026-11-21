@@ -18,7 +18,7 @@ import '../services/open_link.dart';
 import '../theme/st_theme.dart';
 
 const scriptureTriviaDisclaimer =
-    'Scripture Trivia is a free, unofficial app. It is not an official '
+    'LDS Scripture Trivia is a free, unofficial app. It is not an official '
     'product of, or endorsed by, The Church of Jesus Christ of Latter-day Saints.';
 
 /// v1 hides Send feedback. The row stays in source behind this flag, so
@@ -31,7 +31,7 @@ const bool kShowSendFeedback = false;
 const feedbackRecipient = kReportEmail;
 
 final feedbackUri = Uri.parse(
-  'mailto:$feedbackRecipient?subject=${Uri.encodeComponent('Scripture Trivia feedback')}',
+  'mailto:$feedbackRecipient?subject=${Uri.encodeComponent('LDS Scripture Trivia feedback')}',
 );
 
 /// S12 / S13. Appearance, feedback, gameplay, and on-device data.
@@ -124,7 +124,7 @@ class SettingsScreen extends ConsumerWidget {
                 _LinkRow(
                   key: const Key('settings-about'),
                   icon: Icons.info_outline,
-                  title: 'About Scripture Trivia',
+                  title: 'About LDS Scripture Trivia',
                   trailing: scriptureTriviaVersionLabel,
                   onPressed: () => unawaited(_showAbout(context)),
                 ),
@@ -170,7 +170,7 @@ Future<void> _sendFeedback(BuildContext context, WidgetRef ref) {
 }
 
 Future<void> _showAbout(BuildContext context) {
-  const title = Text('About Scripture Trivia');
+  const title = Text('About LDS Scripture Trivia');
   final message = Text(
     '$scriptureTriviaVersionLabel\n\n$scriptureTriviaDisclaimer\n\n$reportPrivacyLine',
   );

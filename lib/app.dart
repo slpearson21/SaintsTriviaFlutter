@@ -31,7 +31,7 @@ class SaintsTriviaApp extends ConsumerWidget {
       settingsProvider.select((settings) => settings.themeMode),
     );
     return MaterialApp.router(
-      title: 'Scripture Trivia',
+      title: 'LDS Scripture Trivia',
       theme: buildLightTheme(),
       darkTheme: buildDarkTheme(),
       themeMode: themeMode,

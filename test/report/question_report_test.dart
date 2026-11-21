@@ -35,7 +35,10 @@ QuestionReport _report({
 void main() {
   test('subject uses the reason slug and the body uses the label', () {
     final report = _report();
-    expect(report.subject, '[Trivia report] dc-0001 – typo-or-wording');
+    expect(
+      report.subject,
+      '[LDS Scripture Trivia report] dc-0001 – typo-or-wording',
+    );
     expect(report.body, contains('Reason: Typo or wording'));
     expect(report.body, contains("Player's answer: Temporary"));
     expect(report.body, contains('Correct answer (app): The same'));
@@ -43,7 +46,10 @@ void main() {
     expect(report.body, contains('Reference: D&C 1:38'));
     expect(report.body, contains('Source: game'));
     expect(report.body, contains('Question bank: v1'));
-    expect(report.body, contains('App: Scripture Trivia v1.0.0 · iOS 18.1'));
+    expect(
+      report.body,
+      contains('App: LDS Scripture Trivia v1.0.0 · iOS 18.1'),
+    );
     expect(report.body, contains('Reported at: 2026-11-18T15:46:00Z'));
     expect(report.body, contains('\r\n'));
     expect(report.body, isNot(contains('\n\n')));
@@ -334,7 +340,7 @@ void main() {
   });
 
   test('a subject that ends on the cap keeps an empty body', () {
-    final id = 'x' * 1715;
+    final id = 'x' * 1697;
     final report = QuestionReport(
       questionId: id,
       prompt: 'Prompt',
@@ -361,7 +367,10 @@ void main() {
   });
 
   test('a subject with no room for the body marker drops it', () {
-    final ids = ['x' * 1716, 'é' * 286, '😀' * 143, '—' * 191];
+    // Counts land the subject in the 6-character band where it fits and
+    // `&body=` does not. An emoji encodes as 12 characters, so it steps
+    // over that band; see the following test.
+    final ids = ['x' * 1698, 'é' * 283, '—' * 189];
     for (final id in ids) {
       final report = QuestionReport(
         questionId: id,
@@ -387,6 +396,38 @@ void main() {
         reason: id,
       );
     }
+  });
+
+  test('an emoji id steps over the six-character cap window', () {
+    QuestionReport report(int count) {
+      return QuestionReport(
+        questionId: '😀' * count,
+        prompt: 'Prompt',
+        correctAnswer: 'The same',
+        selectedAnswer: 'picked',
+        reference: 'D&C 1:38',
+        reason: ReportReason.other,
+        note: '',
+        appVersion: 'v1.0.0',
+        platform: 'Android',
+        bankVersion: 'v1',
+        source: 'game',
+        createdAtUtc: DateTime.utc(2026, 11, 18, 15, 46),
+      );
+    }
+
+    final under = report(141).mailto.toString();
+    expect(under.length, lessThanOrEqualTo(maxMailtoLength));
+    expect(under, contains('&body='));
+
+    final overReport = report(142);
+    final over = overReport.mailto.toString();
+    expect(over, isNot(contains('&body=')));
+    expect(over.length, greaterThan(maxMailtoLength));
+    expect(
+      Uri.decodeComponent(over.split('subject=').last),
+      overReport.subject,
+    );
   });
 
   test('formatReportUtc zero-pads a UTC time and converts a local one', () {
@@ -459,7 +500,7 @@ void main() {
     final decoded = _mailtoBody(report);
     final app = _mailtoField(decoded, 'App: ');
     final version = app
-        .replaceFirst('App: Scripture Trivia ', '')
+        .replaceFirst('App: LDS Scripture Trivia ', '')
         .split(' · ')
         .first;
     final platform = app.split(' · ').last;
@@ -541,7 +582,7 @@ void main() {
     final shown = _mailtoField(decoded, 'Note: ').replaceFirst('Note: ', '');
 
     expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
-    expect(shown, 'n' * 262);
+    expect(shown, 'n' * 232);
     expect(note.startsWith(shown), isTrue);
     expect(_mailtoField(decoded, 'Question: '), 'Question: ${'P' * 80}');
     expect(
@@ -575,7 +616,7 @@ void main() {
     ).replaceFirst('Question: ', '');
 
     expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
-    expect(shown, 'P' * 58);
+    expect(shown, 'P' * 28);
     expect(prompt.startsWith(shown), isTrue);
     expect(shown.characters.length, greaterThan(1));
     expect(_mailtoField(decoded, 'Note: '), 'Note: —');
@@ -609,7 +650,7 @@ void main() {
     ).replaceFirst('Correct answer (app): ', '');
 
     expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
-    expect(shown, 'A' * 1232);
+    expect(shown, 'A' * 1202);
     expect(answer.startsWith(shown), isTrue);
     expect(_mailtoField(decoded, 'Question: '), 'Question: P');
     expect(_mailtoField(decoded, 'Note: '), 'Note: —');
@@ -651,7 +692,7 @@ void main() {
       _mailtoField(decoded, "Player's answer: "),
       "Player's answer: Selected stays",
     );
-    expect(_mailtoField(decoded, 'App: '), 'App: Scripture Trivia v · p');
+    expect(_mailtoField(decoded, 'App: '), 'App: LDS Scripture Trivia v · p');
     expect(decoded, contains('--- end of report ---'));
     expect(report.body, contains(reference));
     expect(report.clipboardText, contains(report.body));
@@ -686,7 +727,7 @@ void main() {
     );
     expect(
       _mailtoField(decoded, 'App: '),
-      'App: Scripture Trivia ${'v' * 32} · ${'p' * 32}',
+      'App: LDS Scripture Trivia ${'v' * 32} · ${'p' * 32}',
     );
     expect(
       _mailtoField(decoded, 'Question bank: '),
@@ -699,7 +740,7 @@ void main() {
   });
 
   test('step 9 trims app version and leaves the later metadata capped', () {
-    final id = 'i' * 580;
+    final id = 'i' * 565;
     final report = _sized(
       id: id,
       prompt: 'P',
@@ -715,7 +756,7 @@ void main() {
     final decoded = _mailtoBody(report);
     final app = _mailtoField(decoded, 'App: ');
     final version = app
-        .replaceFirst('App: Scripture Trivia ', '')
+        .replaceFirst('App: LDS Scripture Trivia ', '')
         .split(' · ')
         .first;
     final platform = app.split(' · ').last;
@@ -741,7 +782,7 @@ void main() {
   });
 
   test('step 9 trims platform after the app version is gone', () {
-    final id = 'i' * 600;
+    final id = 'i' * 585;
     final report = _sized(
       id: id,
       prompt: 'P',
@@ -757,7 +798,7 @@ void main() {
     final decoded = _mailtoBody(report);
     final app = _mailtoField(decoded, 'App: ');
     final version = app
-        .replaceFirst('App: Scripture Trivia ', '')
+        .replaceFirst('App: LDS Scripture Trivia ', '')
         .split(' · ')
         .first;
     final platform = app.split(' · ').last;
@@ -783,7 +824,7 @@ void main() {
   });
 
   test('step 9 trims the bank version after the platform is gone', () {
-    final id = 'i' * 616;
+    final id = 'i' * 601;
     final report = _sized(
       id: id,
       prompt: 'P',
@@ -799,7 +840,7 @@ void main() {
     final decoded = _mailtoBody(report);
     final app = _mailtoField(decoded, 'App: ');
     final version = app
-        .replaceFirst('App: Scripture Trivia ', '')
+        .replaceFirst('App: LDS Scripture Trivia ', '')
         .split(' · ')
         .first;
     final platform = app.split(' · ').last;
@@ -822,7 +863,7 @@ void main() {
   });
 
   test('step 9 trims the source after the bank version is gone', () {
-    final id = 'i' * 624;
+    final id = 'i' * 609;
     final report = _sized(
       id: id,
       prompt: 'P',
@@ -838,7 +879,7 @@ void main() {
     final decoded = _mailtoBody(report);
     final app = _mailtoField(decoded, 'App: ');
     final version = app
-        .replaceFirst('App: Scripture Trivia ', '')
+        .replaceFirst('App: LDS Scripture Trivia ', '')
         .split(' · ')
         .first;
     final platform = app.split(' · ').last;
@@ -857,7 +898,7 @@ void main() {
   });
 
   test('step 10 clips the body on a character boundary', () {
-    final id = 'é' * 130;
+    final id = 'é' * 128;
     final prompt = '😀' * 8;
     final report = _sized(
       id: id,

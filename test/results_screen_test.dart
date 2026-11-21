@@ -705,13 +705,13 @@ void main() {
     await tester.pageBack();
     await tester.pumpAndSettle();
     // New game replaced the stack with setup, so back is home.
-    expect(find.text('Scripture Trivia'), findsOneWidget);
+    expect(find.text('LDS Scripture Trivia'), findsOneWidget);
 
     await _openResults(tester, session: session);
     await tester.ensureVisible(find.byKey(const Key('results-done')));
     await tester.tap(find.byKey(const Key('results-done')));
     await tester.pumpAndSettle();
-    expect(find.text('Scripture Trivia'), findsOneWidget);
+    expect(find.text('LDS Scripture Trivia'), findsOneWidget);
     expect(find.text('Great effort!'), findsNothing);
   });
 
@@ -721,13 +721,13 @@ void main() {
     await _pump(tester);
     final router = _router(tester)..go(AppRoutes.results);
     await tester.pumpAndSettle();
-    expect(find.text('Scripture Trivia'), findsOneWidget);
+    expect(find.text('LDS Scripture Trivia'), findsOneWidget);
     expect(find.text('Results'), findsNothing);
     expect(tester.takeException(), isNull);
 
     router.go(AppRoutes.review);
     await tester.pumpAndSettle();
-    expect(find.text('Scripture Trivia'), findsOneWidget);
+    expect(find.text('LDS Scripture Trivia'), findsOneWidget);
     expect(find.text('Review answers'), findsNothing);
 
     final held = await _pump(
@@ -749,14 +749,14 @@ void main() {
     );
     held.read(appRouterProvider).go(AppRoutes.results);
     await tester.pumpAndSettle();
-    expect(find.text('Scripture Trivia'), findsOneWidget);
+    expect(find.text('LDS Scripture Trivia'), findsOneWidget);
     expect(tester.takeException(), isNull);
 
     final empty = await _pump(tester, overrides: [_held(_played(const []))]);
     empty.read(appRouterProvider).go(AppRoutes.review);
     await tester.pumpAndSettle();
     expect(find.text('Review answers'), findsNothing);
-    expect(find.text('Scripture Trivia'), findsOneWidget);
+    expect(find.text('LDS Scripture Trivia'), findsOneWidget);
   });
 
   testWidgets('a finished game is recorded once across rebuilds', (

@@ -571,7 +571,7 @@ void main() {
     await tester.tap(find.text('Quit'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Scripture Trivia'), findsOneWidget);
+    expect(find.text('LDS Scripture Trivia'), findsOneWidget);
     expect(find.text('Question'), findsNothing);
     expect(container.read(gameControllerProvider), isNull);
   });
