@@ -340,7 +340,7 @@ void main() {
   });
 
   test('a subject that ends on the cap keeps an empty body', () {
-    final id = 'x' * 1697;
+    final id = 'x' * 1692;
     final report = QuestionReport(
       questionId: id,
       prompt: 'Prompt',
@@ -367,10 +367,9 @@ void main() {
   });
 
   test('a subject with no room for the body marker drops it', () {
-    // Counts land the subject in the 6-character band where it fits and
-    // `&body=` does not. An emoji encodes as 12 characters, so it steps
-    // over that band; see the following test.
-    final ids = ['x' * 1698, 'é' * 283, '—' * 189];
+    // These counts land in the 6-character band where the subject fits and
+    // `&body=` does not. Emoji and em dash step over that band.
+    final ids = ['x' * 1693, 'é' * 283];
     for (final id in ids) {
       final report = QuestionReport(
         questionId: id,
@@ -417,16 +416,46 @@ void main() {
     }
 
     final under = report(141).mailto.toString();
-    expect(under.length, lessThanOrEqualTo(maxMailtoLength));
-    expect(under, contains('&body='));
+    final over = report(142).mailto.toString();
 
-    final overReport = report(142);
-    final over = overReport.mailto.toString();
+    expect(under, endsWith('&body='));
+    expect(under.length, maxMailtoLength);
     expect(over, isNot(contains('&body=')));
     expect(over.length, greaterThan(maxMailtoLength));
     expect(
       Uri.decodeComponent(over.split('subject=').last),
-      overReport.subject,
+      report(142).subject,
+    );
+  });
+
+  test('an em dash id steps over the six-character cap window', () {
+    QuestionReport report(int count) {
+      return QuestionReport(
+        questionId: '—' * count,
+        prompt: 'Prompt',
+        correctAnswer: 'The same',
+        selectedAnswer: 'picked',
+        reference: 'D&C 1:38',
+        reason: ReportReason.other,
+        note: '',
+        appVersion: 'v1.0.0',
+        platform: 'Android',
+        bankVersion: 'v1',
+        source: 'game',
+        createdAtUtc: DateTime.utc(2026, 11, 18, 15, 46),
+      );
+    }
+
+    final under = report(188).mailto.toString();
+    final over = report(189).mailto.toString();
+
+    expect(under, endsWith('&body='));
+    expect(under.length, maxMailtoLength);
+    expect(over, isNot(contains('&body=')));
+    expect(over.length, greaterThan(maxMailtoLength));
+    expect(
+      Uri.decodeComponent(over.split('subject=').last),
+      report(189).subject,
     );
   });
 
@@ -582,7 +611,7 @@ void main() {
     final shown = _mailtoField(decoded, 'Note: ').replaceFirst('Note: ', '');
 
     expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
-    expect(shown, 'n' * 232);
+    expect(shown, 'n' * 227);
     expect(note.startsWith(shown), isTrue);
     expect(_mailtoField(decoded, 'Question: '), 'Question: ${'P' * 80}');
     expect(
@@ -616,7 +645,7 @@ void main() {
     ).replaceFirst('Question: ', '');
 
     expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
-    expect(shown, 'P' * 28);
+    expect(shown, 'P' * 23);
     expect(prompt.startsWith(shown), isTrue);
     expect(shown.characters.length, greaterThan(1));
     expect(_mailtoField(decoded, 'Note: '), 'Note: —');
@@ -650,7 +679,7 @@ void main() {
     ).replaceFirst('Correct answer (app): ', '');
 
     expect(report.mailto.toString().length, lessThanOrEqualTo(maxMailtoLength));
-    expect(shown, 'A' * 1202);
+    expect(shown, 'A' * 1197);
     expect(answer.startsWith(shown), isTrue);
     expect(_mailtoField(decoded, 'Question: '), 'Question: P');
     expect(_mailtoField(decoded, 'Note: '), 'Note: —');
@@ -740,7 +769,7 @@ void main() {
   });
 
   test('step 9 trims app version and leaves the later metadata capped', () {
-    final id = 'i' * 565;
+    final id = 'i' * 567;
     final report = _sized(
       id: id,
       prompt: 'P',
@@ -763,7 +792,7 @@ void main() {
 
     expect(mailto.length, lessThanOrEqualTo(maxMailtoLength));
     expect(mailto, contains('&body='));
-    expect(version, 'v' * 25);
+    expect(version, 'v' * 16);
     expect(platform, 'p' * maxReportPlatformLength);
     expect(
       _mailtoField(decoded, 'Question bank: '),
@@ -782,7 +811,7 @@ void main() {
   });
 
   test('step 9 trims platform after the app version is gone', () {
-    final id = 'i' * 585;
+    final id = 'i' * 583;
     final report = _sized(
       id: id,
       prompt: 'P',
@@ -806,7 +835,7 @@ void main() {
     expect(mailto.length, lessThanOrEqualTo(maxMailtoLength));
     expect(mailto, contains('&body='));
     expect(version, isEmpty);
-    expect(platform, 'p' * 17);
+    expect(platform, 'p' * 16);
     expect(
       _mailtoField(decoded, 'Question bank: '),
       'Question bank: ${'b' * maxReportBankVersionLength}',
@@ -824,7 +853,7 @@ void main() {
   });
 
   test('step 9 trims the bank version after the platform is gone', () {
-    final id = 'i' * 601;
+    final id = 'i' * 598;
     final report = _sized(
       id: id,
       prompt: 'P',
@@ -849,7 +878,10 @@ void main() {
     expect(mailto, contains('&body='));
     expect(version, isEmpty);
     expect(platform, isEmpty);
-    expect(_mailtoField(decoded, 'Question bank: '), 'Question bank: b');
+    expect(
+      _mailtoField(decoded, 'Question bank: '),
+      'Question bank: ${'b' * 2}',
+    );
     expect(
       _mailtoField(decoded, 'Source: '),
       'Source: ${'s' * maxReportSourceLength}',
@@ -863,7 +895,7 @@ void main() {
   });
 
   test('step 9 trims the source after the bank version is gone', () {
-    final id = 'i' * 609;
+    final id = 'i' * 606;
     final report = _sized(
       id: id,
       prompt: 'P',
@@ -889,7 +921,7 @@ void main() {
     expect(version, isEmpty);
     expect(platform, isEmpty);
     expect(_mailtoField(decoded, 'Question bank: '), 'Question bank: ');
-    expect(_mailtoField(decoded, 'Source: '), 'Source: ${'s' * 17}');
+    expect(_mailtoField(decoded, 'Source: '), 'Source: ${'s' * 18}');
     expect(_mailtoField(decoded, 'Question: '), 'Question: P');
     expect(decoded, contains('Question ID: $id'));
     expect(decoded, contains('--- end of report ---'));
@@ -920,14 +952,13 @@ void main() {
     final decoded = utf8.decode(_percentBytes(encodedBody));
 
     expect(markerAt + '&body='.length, lessThanOrEqualTo(maxMailtoLength));
-    expect(mailto.length, 1798);
-    expect(mailto.length, lessThan(maxMailtoLength));
-    expect(encodedBody, endsWith('%F0%9F%98%80%0D'));
+    expect(mailto.length, maxMailtoLength);
+    expect(encodedBody, endsWith('%F0%9F%98%80'));
     expect(encodedBody, isNot(matches(RegExp(r'%[0-9A-Fa-f]{0,1}$'))));
     expect(subject, report.subject);
     expect(subject, contains(id));
     expect(decoded, contains('Question ID: $id'));
-    expect(decoded, endsWith('😀\r'));
+    expect(decoded, endsWith('😀'));
     expect(decoded, isNot(contains('\uFFFD')));
     expect(decoded, isNot(contains('--- end of report ---')));
     expect(report.body, contains(prompt));
@@ -1023,6 +1054,11 @@ void main() {
       'ot-0001',
       'ot-0002',
     });
+  });
+
+  test('the report address is not the example.com placeholder', () {
+    expect(kReportEmail, 'deepwaterstdio@gmail.com');
+    expect(kReportEmail.contains('example.com'), isFalse);
   });
 }
 
