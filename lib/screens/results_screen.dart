@@ -152,8 +152,11 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
           ),
         ],
       ),
-      TextButton(
+      FilledButton.tonal(
         key: const Key('results-done'),
+        style: FilledButton.styleFrom(
+          side: BorderSide(color: Theme.of(context).colorScheme.outline),
+        ),
         onPressed: () => context.go(AppRoutes.home),
         child: const Text('Done'),
       ),
