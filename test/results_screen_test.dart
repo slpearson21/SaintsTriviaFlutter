@@ -13,6 +13,7 @@ import 'package:saints_trivia_flutter/data/questions/question_bank_provider.dart
 import 'package:saints_trivia_flutter/data/questions/questions.dart';
 import 'package:saints_trivia_flutter/game/game_engine.dart';
 import 'package:saints_trivia_flutter/game/game_providers.dart';
+import 'package:saints_trivia_flutter/layout/screen_body.dart';
 import 'package:saints_trivia_flutter/persistence/finished_game_record.dart';
 import 'package:saints_trivia_flutter/persistence/memory_progress_repository.dart';
 import 'package:saints_trivia_flutter/persistence/persistence_providers.dart';
@@ -782,6 +783,71 @@ void main() {
     expect(recorded, [same(session)]);
   });
 
+  testWidgets('done is a full-width tonal button and play again stays pinned', (
+    tester,
+  ) async {
+    addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    for (final brightness in Brightness.values) {
+      tester.platformDispatcher.platformBrightnessTestValue = brightness;
+      await _openResults(tester, session: _mixed());
+      _expectTonalDone(tester);
+    }
+
+    await tester.binding.setSurfaceSize(const Size(393, 852));
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    for (final brightness in Brightness.values) {
+      tester.platformDispatcher.platformBrightnessTestValue = brightness;
+      await _openResults(tester, session: _mixed());
+      _expectTonalDone(tester);
+
+      final body = tester.widget<ScreenBody>(find.byType(ScreenBody));
+      final pinned = body.primary! as FilledButton;
+      expect(pinned.key, const Key('results-play-again'));
+      final scroll = find.byType(SingleChildScrollView);
+      expect(
+        find.descendant(
+          of: scroll,
+          matching: find.byKey(const Key('results-play-again')),
+        ),
+        findsNothing,
+      );
+      expect(
+        find.descendant(
+          of: scroll,
+          matching: find.byKey(const Key('results-done')),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: scroll,
+          matching: find.byKey(const Key('results-new-game')),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: scroll,
+          matching: find.byKey(const Key('results-review')),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: scroll, matching: find.byType(FilledButton)),
+        findsOneWidget,
+      );
+    }
+
+    await tester.ensureVisible(find.byKey(const Key('results-done')));
+    await tester.tap(find.byKey(const Key('results-done')));
+    await tester.pumpAndSettle();
+    expect(find.text('LDS Scripture Trivia'), findsOneWidget);
+    expect(find.text('Great effort!'), findsNothing);
+  });
+
   testWidgets('large text stacks the actions and fits the numeral', (
     tester,
   ) async {
@@ -1217,4 +1283,65 @@ Future<ProviderContainer> _openResults(
   container.read(appRouterProvider).go(AppRoutes.results);
   await tester.pumpAndSettle();
   return container;
+}
+
+void _expectTonalDone(WidgetTester tester) {
+  const enabled = <WidgetState>{};
+  final doneFinder = find.byKey(const Key('results-done'));
+  final playFinder = find.byKey(const Key('results-play-again'));
+  final done = tester.widget<FilledButton>(doneFinder);
+  final play = tester.widget<FilledButton>(playFinder);
+  final doneContext = tester.element(doneFinder);
+  final scheme = Theme.of(doneContext).colorScheme;
+
+  expect(
+    _buttonBackground(done, doneContext, enabled),
+    scheme.secondaryContainer,
+  );
+  final side = _buttonSide(done, doneContext, enabled);
+  expect(side?.color, scheme.outline);
+  expect(side?.width, 1);
+  expect(
+    _buttonBackground(play, tester.element(playFinder), enabled),
+    scheme.primary,
+  );
+
+  final doneRect = tester.getRect(doneFinder);
+  final minimum = done.themeStyleOf(doneContext)?.minimumSize?.resolve(enabled);
+  expect(minimum?.height, 52);
+  expect(doneRect.height, greaterThanOrEqualTo(52));
+  expect(doneRect.width, tester.getRect(playFinder).width);
+  // Flush with the row above: the column does not insert a gap.
+  expect(
+    doneRect.top,
+    greaterThanOrEqualTo(
+      tester.getRect(find.byKey(const Key('results-new-game'))).bottom,
+    ),
+  );
+  expect(
+    doneRect.top,
+    greaterThanOrEqualTo(
+      tester.getRect(find.byKey(const Key('results-review'))).bottom,
+    ),
+  );
+}
+
+Color? _buttonBackground(
+  FilledButton button,
+  BuildContext context,
+  Set<WidgetState> states,
+) {
+  return button.style?.backgroundColor?.resolve(states) ??
+      button.themeStyleOf(context)?.backgroundColor?.resolve(states) ??
+      button.defaultStyleOf(context).backgroundColor?.resolve(states);
+}
+
+BorderSide? _buttonSide(
+  FilledButton button,
+  BuildContext context,
+  Set<WidgetState> states,
+) {
+  return button.style?.side?.resolve(states) ??
+      button.themeStyleOf(context)?.side?.resolve(states) ??
+      button.defaultStyleOf(context).side?.resolve(states);
 }
